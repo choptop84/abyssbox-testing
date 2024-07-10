@@ -1,0 +1,807 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel='shortcut icon' type='image/x-icon' href='./favicon.ico' />
+    <!-- CDN for jQuery and select2 -->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"
+            integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+            crossorigin="anonymous"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/alwan/dist/js/alwan.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/alwan/dist/css/alwan.min.css" />
+    <script src="https://cdn.jsdelivr.net/gh/mmig/opus-encdec@e33ca40/dist/libopus-encoder.js"></script>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AbyssBox</title>
+    <meta name="application-name" roperty="AbyssBox" />
+    <meta name="apple-mobile-web-app-title" content="AbyssBox">
+    <meta name="description" content="Abyssbox is an online tool for sketching and sharing instrumental music." />
+    <meta name="keywords" content="chiptune, instrumental, music, song, melody, composition, tool, free, online, square wave, NES, NSF, abyssbox, ultrabox, beepbox, jummbox, pandorasbox, modbox, sandbox, goldbox, wackybox, todbox" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="theme-color" content="#444" />
+    <meta name="msapplication-TileColor" content="#dba600" />
+    <meta name="msapplication-config" content="/browserconfig.xml" />
+    <meta name="format-detection" content="telephone=no" />
+    <link rel="apple-touch-icon" sizes="180x180" href="icon_32.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="icon_32.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link href="https://fonts.googleapis.com/css?family=B612" rel="stylesheet" media="none" onload="if (this.media != 'all') this.media='all';" /> <!-- this is a trick to load CSS asynchronously. -->
+    <style type="text/css">
+
+        html {
+            background: var(--page-margin, black);;
+            overflow-x: hidden;
+            font-size: large;
+            font-family: 'B612', sans-serif;
+            line-height: 1.3;
+            color: var(--primary-text, white);
+        }
+        
+        #modTitle::before {
+            content: "AbyssBox";
+            color: var(--mod-title, var(--link-accent, #9c64f7));
+        }
+
+        div.instrument-settings-area.load {
+            scrollbar-width: none;
+        }
+
+        body {
+            margin: auto;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            align-content: center;
+        }
+
+        #beepboxEditorContainer {
+            min-height: 645px;
+            overflow: auto;
+            background: var(--editor-background, black);
+            width: 100%;
+			max-width: 710px;
+            padding-left: 30px;
+            padding-right: 30px;
+        }
+
+        .thingy {
+        animation: shake 0.5s;
+        animation-iteration-count: infinite;
+        }
+
+        @keyframes shake {
+        0% { transform: translate(1px, 1px) rotate(0deg); }
+        10% { transform: translate(-1px, -2px) rotate(-1deg); }
+        20% { transform: translate(-3px, 0px) rotate(1deg); }
+        30% { transform: translate(3px, 2px) rotate(0deg); }
+        40% { transform: translate(1px, -1px) rotate(1deg); }
+        50% { transform: translate(-1px, 2px) rotate(-1deg); }
+        60% { transform: translate(-3px, 1px) rotate(0deg); }
+        70% { transform: translate(3px, 1px) rotate(-1deg); }
+        80% { transform: translate(-1px, -1px) rotate(1deg); }
+        90% { transform: translate(1px, 2px) rotate(0deg); }
+        100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+
+        #text-content {
+            overflow: auto;
+            background: var(--editor-background, black);
+            width: 100%;
+			max-width: 710px;
+            padding-left: 30px;
+            padding-right: 30px;
+        }
+
+        h1 {
+            font-size: 1.7rem;
+            text-align: center;
+            margin-top: 0.5em;
+            margin-bottom: 0.5em;
+            -webkit-text-stroke-width: 0;
+            color: var(--mod-title, var(--link-accent, #9c64f7));
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            text-align: center;
+            margin-top: 0.5em;
+            margin-bottom: 0.5em;
+            -webkit-text-stroke-width: 0;
+        }
+
+        .overlay {
+            height: 100%;
+            width: 100%;
+            position: fixed;
+            z-index: 9999;
+            top: 0;
+            left: 0;
+            background-color: rgba(0,0,0, 0);
+            overflow-x: hidden;
+            pointer-events: none;
+        }
+
+        .centerDiv {
+			margin: 0px auto;
+		}
+
+        a {
+            color: var(--link-accent, #98f);
+        }
+
+        .donation form {
+            display: inline;
+        }
+
+        .promptContainerBG::before {
+            content: "";
+            position: absolute;
+            background: inherit;
+            z-index: -1;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            box-shadow: inset 0 0 2000px rgba(0, 0, 0, .5);
+            filter: blur(10px);
+            margin: -20px;
+        }
+
+
+        .donation input[type="submit"] {
+            appearance: none;
+            -webkit-appearance: none;
+            background: none;
+            border: none;
+            font-family: inherit;
+            font-size: inherit;
+            color: var(--link-accent, #98f);
+            text-decoration: underline;
+            cursor: pointer;
+            padding: 0;
+            margin: 0;
+        }
+
+        /* wide screen */
+		@media (min-width: 711px) {
+            html {
+                width: 100%;
+            }
+
+            body {
+                width: 100%;
+            }
+
+            .column-container {
+				width: 710px;
+                display: flex;
+				gap: 25px;
+            }
+
+            .instructions-column {
+				min-width: 0;
+            }
+
+        }
+        /* narrow screen */
+		@media (max-width: 710px) {
+            body {
+                width: 100%;
+            }
+
+            p, .donation {
+                margin: 1em 0.5em;
+            }
+
+            .column-container {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+	 <!--WIP, DO NOT USE-->
+	 <!--<center>THIS URL IS MEANT FOR TESTING THE CHANGES MADE IN ULTRABOX 2.0. THIS URL WILL BE DELETED WHEN ULTRABOX 2.0 RELEASES, AND ANY SONGS YOU MAKE HERE MAY BE UNRECOVERABLE. YOU'VE BEEN WARNED.</center>-->
+
+<body id="secondImage">
+
+    <div id="overlay" class="overlay">
+    </div>
+
+    <script>
+        const image = localStorage.getItem('customTheme2');
+        const el  = document.getElementById('secondImage');
+        
+        // console.log(image, el);
+        if (image != null && image !== "null" && image !== "undefined") {
+            el.style.backgroundImage="url(" + image + ")";
+            el.style.backgroundRepeat= "repeat";
+        } 
+
+    </script>
+    <div id="beepboxEditorContainer">
+        <noscript>
+            Sorry, AbyssBox and UltraBox require a JavaScript-enabled browser.
+        </noscript>
+    </div>
+    <div id="text-content">
+        <section>
+
+            <h1>
+                <div id="modTitle"><span id="plant" style="display: inline; color:var(--plant, #62a13b)"></span></div>
+            </h1>
+            
+            <p id="introduction">
+                AbyssBox is a Modification of Ultrabox by choptop84, Ultrabox is made by Neptendo and Main, with assistence from community members!<br>
+                Ultrabox takes elements from most of the beepbox mods available (see <a href="./credits.html">credits</a>) and puts them in one convenient package.
+                <br>
+                <br>
+                AbyssBox adds many improvements to the UI for both PC and Mobile. Over 20 themes, and 5 layouts! Plus many more other miscellaneous changes that improve the user experience. 
+                Though that isn't all AbyssBox adds. There are many more changes and improvements all over the app.
+                <br>
+                <br>
+            </p>
+            <p>
+                 <!--(Everything below is, more or less, the usual beepbox description)-->
+            </p>
+            <p>
+                All song data is contained in the URL at the top of your browser.
+                When you make changes to the song, the URL is updated to reflect your changes.
+                When you are satisfied with your song, just copy and paste the URL to save and share your song!
+                <br>
+                <br>
+				Though you should instead click 'File' and then 'Shorten Song Url', it makes the link more
+                managable!
+            </p>
+            <!--
+    <div class="donation">
+        BeepBox is a passion project, and will always be free to use. If you find it valuable and have the means, any gratuity via
+        <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
+            <input type="hidden" name="cmd" value="_donations" />
+            <input type="hidden" name="business" value="QZJTX9GRYEV9N" />
+            <input type="hidden" name="currency_code" value="USD" />
+            <input type="submit" name="submit" value="Paypal"/>
+        </form>
+        would be appreciated!
+    </div>
+    -->
+        </section>
+
+        <div class="column-container" >
+            <main class="instructions-column">
+                <section>
+                    <h2>
+                        Instructions
+                    </h2>
+                    <p>
+                        You can add or remove notes by clicking on the gray rows at the top.
+                        AbyssBox automatically plays the notes out loud for you. Try it!
+			    <img id="Hotdog" src="hotdog.png" width="500" height="333" onclick="changeHotdogSize()"/>
+				<script>
+				function changeHotdogSize(){
+
+					var image = document.getElementById('Hotdog');
+					image.width = Math.random() * (750 - 20) + 20;
+					image.height = Math.random() * (499 - 20) + 20;
+
+                    var explosion = new Audio('explosion.mp3');
+
+                    function getRandomInt(max) {
+                    return Math.floor(Math.random() * max);
+                    }
+
+                    var shouldExplode = getRandomInt(5);
+                    var hotdogSkin = getRandomInt(15);
+
+                    if (shouldExplode != 1) {
+                        if (hotdogSkin >= 3) {
+                        image.src = ("hotdog.png"); } 
+                        else if (hotdogSkin == 2) {
+                        image.src = ("banana.png"); }
+                        else if (hotdogSkin == 1) {
+                        image.src = ("pizza.png"); }
+                        else if (hotdogSkin == 0) {
+                        image.src = ("donut.png"); }
+                    }
+
+                    if (shouldExplode == 1) {
+                        console.log("Hello! I exploded!");
+                        explosion.play();
+                        image.src = ("explosion.gif");
+                        
+                    }
+                }
+				</script>
+
+                    </p>
+                    <p>
+                        Notes go into patterns, and you can edit one pattern at a time.
+                        Those numbered boxes at the bottom of the editor are the different patterns you can edit.
+                        <span id="bar-editing">
+                            Click the boxes to move to a different part of the song, or click the arrows on the currently selected box to swap which pattern is played during that part of the song.
+                        </span>
+                    </p>
+                    <p>
+                        AbyssBox can play several rows of patterns simultaneously, and each row has its own set of patterns.
+                        Most rows can play melodies or harmonies, but the bottom row is for drums.
+                    </p>
+                    <p>
+                        All song data is contained in the URL at the top of your browser.
+                        When you make changes to the song, the URL is updated to reflect your changes.
+                        When you are satisfied with your song, just copy and paste the URL to save and share your song!
+                    </p>
+
+                    <div id="keyboard-instructions">
+                        <p>
+                            When AbyssBox has focus (click on its interface above), you can use these keyboard shortcuts: <br />
+                        </p>
+                        <ul>
+                            <li>Spacebar: play or pause the song</li>
+                            <li><b>Shift Spacebar</b>: play from mouse location</li>
+							<li><b>Z</b>: undo, <b>Y or Shift Z</b>: redo</li>
+                            <li>C: copy pattern from selection</li>
+                            <li>V: paste pattern into selection</li>
+                            <li><b>0-9</b>: assign pattern number to selection</li>
+							<li><b>Arrows</b>: move selection</li>
+							<li><b>Ctrl + Arrows</b>: rearrange channels</li>
+							<li><b>[ ]</b>: move playhead backward or forward</li>
+							<li><b>F/H</b>: move to First or Highlighted pattern </li>
+							<li><b>Shift & Drag</b>: select part of a pattern (long press on touch screen)</li>
+							<li>These are just a few shortcuts, check AbyssBox's edit menu for more!</li>
+                            <!-- need to edit this eventually -->
+                        </ul>
+                    </div>
+                    <p>
+                        In the note pattern editor, you can click and drag horizontally on a note to adjust its duration.
+                        You can also click above or below an existing note to add more notes to be played simultaneously, which is called a chord.
+                    </p>
+                    <p>
+                        ADVANCED: Drag vertically from an existing note to bend its pitch, or drag vertically from above or below the note to adjust its volume. You can perform fine volume adjustment if you hold Control while doing this!
+                    </p>
+                    <p>
+                        ADVANCED: Click and drag on the pattern grid to make a selection. You can then press C/V to mass copy/paste parts of your song.
+
+                    </p>
+                    <p>
+                        AbyssBox has many more features.
+                        Try playing with the buttons and menus on the right side to find out what it can do!
+                        You can also click on the label next to each option for a description of what it does.
+                    </p>
+                    <p>
+                        <!-- <a href="https://twitter.com/beepboxco" target="_blank">Check out some of these songs that other people have posted on Twitter!</a> -->
+                        <!-- If you find something you like, you should let the creator know! -->
+                        <!-- And if you see any beginners asking for advice, maybe you can help them! -->
+						Want to see what people have made with BeepBox? Songs that were shared on Twitter prior to 2023-05-22 can now be browsed in <a href="https://twitter-archive.beepbox.co/" target="_blank">this interactive archive</a>!
+                    </p>
+                </section>
+                <section>
+                    <h2>
+                        About
+                    </h2>
+                    <p>
+                       AbyssBox is a mod of BeepBox developed by choptop84 and UltraBox is a mod of BeepBox developed by Main and Neptendo. The easiest way to contact the developers is via the <a href="https://discord.com/invite/beepbox" target="_blank">Beepbox Discord</a>.<br><br>
+                    </p>
+                    <p>
+                       AbyssBox nor UltraBox does not claim ownership over songs created with it, so original songs belong to their authors.
+                    </p>
+                    <p>
+                      None of AbyssBox, it's creator, Ultrabox nor its creators assume responsibility for any copyrighted material played on AbyssBox. No songs are ever received, recorded, or distributed by AbyssBox's servers. All song data is contained in the URL after the hash (#) mark, and Abyssbox running inside your browser converts that data into sound waves.
+                    </p>
+                    <p>
+                        AbyssBox does not collect, track, or share any user data.
+                    </p>
+                    <p id="offline-instructions">
+                        <!--
+                        You can download <a download="ultrabox-offline.html" href="ultrabox-offline.html">an offline version of UltraBox</a> to use when you don't have access to the internet. The features are otherwise the same.
+                        -->
+                    </p>
+                    <p>
+                        You can download and use <a href="https://github.com/choptop84/abyssbox-source" target="_blank">the source code</a> under the MIT license.
+                        The original BeepBox source code by John Nesky can be found <a href="https://github.com/johnnesky/beepbox" target="_blank">here</a>.
+                    </p>
+                    <p>
+                        The patch notes of AbyssBox are available <a href="./patch-notes">here</a>.
+                    </p>     
+                </section>
+            </main>
+            <!-- <aside class="twitter-column"> -->
+                <!-- <h2> -->
+                    <!-- Twitter Archive: -->
+                <!-- </h2> -->
+                <!-- <div style="background: black;"> -->
+                    <!-- <a class="twitter-timeline" data-width="300" data-height="2000" data-link-color="#9988ff" data-chrome="noheader nofooter transparent" data-dnt="true" data-theme="dark" href="https://twitter-archive.beepbox.co/" target="_blank">Songs retweeted by @beepboxco</a> -->
+                    <!-- <script async src="https://twitter-archive.beepbox.co/" charset="utf-8"></script> -->
+                <!-- </div> -->
+            <!-- </aside> -->
+        </div>
+    </div>
+
+    <div>
+        <img id="egg" src="./egg/egg.png" style="display: none; cursor:pointer; width: 10px; height: 13px; left:0; bottom: 0; position: fixed;" onclick="toEgg()"/>
+        <script>
+
+            function getRandomInt(max) {
+                return Math.floor(Math.random() * max);
+                }
+
+            var egg = document.getElementById('egg');
+            var doesEggDisplay = getRandomInt(100);
+
+            if (doesEggDisplay == 1) {
+                egg.style.display = "";
+            }
+
+            function toEgg() {
+                location.href = './egg';
+            }
+        </script>
+    </div>
+    <!--
+    Instead of loading js beepbox editor interface directly, test for browser support.
+    <script type="text/javascript" src="beepbox_editor.min.js"></script>
+    -->
+    <script type="text/javascript">
+
+        var time = new Date(); 
+
+        var timeOffset = 0;
+
+        var AMPM = "AM"
+
+        var timeHours = time.getHours();
+        var timeMinutes = time.getMinutes();
+        var timeMinutesExt = "0";
+        if (timeHours > 12) {
+            timeOffset = 12;
+            AMPM = "PM";
+        } else {
+            timeOffset = 0;
+            AMPM = "AM";
+        }
+
+        if (timeMinutes < 10) {
+            timeMinutesExt = "0";
+        } else {
+            timeMinutesExt = "";
+        }
+
+        var timeNum = (timeHours-timeOffset)+":"+timeMinutesExt+timeMinutes+" "+AMPM;
+        
+
+        // plants originate from JummBox, but then in GoldBox was renamed from jummboxPlants to goldboxPlants, so here I just renamed them to plants to simplify things
+        const theme = localStorage.getItem("colorTheme");
+        var plants = [
+        "  Free!",
+        "  Once was Ultrabox",
+        "  How do you feel?",
+        "  You're making a masterpiece",
+        "  Anime",
+        "  wahhh?!?!",
+        "  🌈🍂🍁🍀🌷🍄🐲🌈🍃🌺🍄",
+        "  Amen break 145bpm be like",
+        "  ≽(◕ ᴗ ◕)≼",
+        "  ≽(ᴗ _ ᴗ)≼",
+        "  ≽(⌐ _ ⌐)≼",
+        "  ≽(ᵕ ‿ ᵕ)≼",
+        "  ☀️⭐🕒👁️",
+        "  🪱 wormy :)",
+        "  :wackybox:",
+        "  AAAAAAAAAAAAAAA oh you scared me!",
+        "  :p",
+        "  nyeh heh heh heh!",
+        "  IS THAT SAN-",
+        "  Megalo incoming!!!",
+        "  PizzaBox",
+        "  Try Minecraft!",
+        "  burgor",
+        "  wah wah",
+        "  plus",
+        "+",
+        "  😳🔥",
+        "  xoBssybA",
+        "  Also try Monday Night BeepBoxing!",
+        "  https://tinyurl.com/3hudd29u",
+        "  Click here for a secret!",
+        "  Do NOT click here!!!",
+        "  The Game...",
+        "  Shakey Shakey!!!",
+        "  By The Way, Clicking these sometimes does funny stuff",
+        "  But to the left!!!",
+        "But Stacked!",
+        "  Mwah",
+        "  Bwaah",
+        "  Bwaaaaaaah",
+        "  Meow",
+        "  Adventure",
+        "  Adventure 2",
+        '  <("𓆏")',
+        `  "Do people even read these?" No probably not but I don't care!!!`,
+        `ing your mom!!!`,
+        `  Your theme is/was `+theme+" when you got here!", 
+        "  plants, but cool!",
+        "  ThemeBox is real",
+        "  Now using arrays!",
+        '  No association with "Abyss Box"',
+        "  shitbox4 is the worst!",
+        ", also has developed BoxBeep!",
+        "  named after My Abyss!",
+        "  check out My Abyss!",
+        "  Over 60 themes more than what UltraBox has!",
+        "  Is not full of water!",
+        "  Also try NepBox!",
+        "  Also try MidBox!",
+        "  AbyssBox-chan is canon!",
+        "  Samples better not be broken again!",
+        "  Excessive!",
+        "  Azur lane is a good theme!",
+        "  Also Try Azumanga Daioh!",
+        "  o my gah!",
+        "  Thank you John Nesky!",
+        "  I love you!",
+        "  Would you marry me?!",
+        "  The last two plants are unrelated",
+        "  there are a lot of plants in AbyssBox",
+        "  fun fact:",
+        "  is an online tool for for sketching and sharing instrumental music.",
+        "  Please send me this song!",
+        "  Easier than ever!",
+        "  It is 4:19 AM as of me writing this!",
+        "  BedBox",
+        "  ( σ ‸σ)",
+        "  You will never see this plant in the mod! Isn't that crazy?!",
+        "  Make me a melody!",
+        "  Random!",
+        "  One of the mods of all time!",
+        "  Fortnite?!",
+        "  What time is it? It is "+timeNum+" right now",
+        "  Too many plants!",
+        "  Glyde is in WubWub with Dubstep!",
+        "  ツンデレ",
+        "  Too many themes? No way!",
+        "2",
+        "  match 3 centered music sim",
+        "4",
+        "  TheGubbys",
+        "  Nokia Cat is cool!",
+        "  Bulbasaur",
+        "  ✨ Plant Life ✨",
+        "  Monstera",
+        "  Niko OneShot",
+        "  Liliac",
+        "  🍂",
+        "  🌿",
+        "  🌺",
+        "  🍃",
+        "  🍄",
+        "  🍀🌷",
+        "  1️⃣3️⃣1️⃣2️⃣",
+        "  🐟",
+        "  ⚡",
+        "  🔵",
+        "  💫",
+        "  👽",
+        "  🍕",
+        "  🌭",
+        "  🍔",
+        "  🍟",
+        "  hoyse 💥❗",
+        "  🧿",
+        "  not :wackybox:",
+        "  100% beef",
+        "  100% vegan",
+        ];
+
+        const curPlant = Math.floor(Math.random() * plants.length);
+        document.getElementById("plant").innerHTML = plants[curPlant];
+
+        if (document.getElementById("plant").innerHTML == "But Stacked!") {
+            document.getElementById("modTitle").style.display = "flex";
+            document.getElementById("modTitle").style.flexFlow = "column";
+            }
+
+        if (document.getElementById("plant").innerHTML == "  You will never see this plant in the mod! Isn't that crazy?!") {
+            document.getElementById("plant").innerHTML = "  Love!";
+        }
+
+        if (document.getElementById("plant").innerHTML == "  there are a lot of plants in AbyssBox") {
+            document.getElementById("plant").innerHTML = "  there are "+plants.length+" plants in AbyssBox!";
+
+            }    
+
+        if (document.getElementById("plant").innerHTML == "  But to the left!!!") {
+            document.getElementById("plant").style.paddingLeft = "  5px";
+            document.getElementById("modTitle").style.display = "flex";
+            }
+
+        if (document.getElementById("plant").innerHTML == "  Shakey Shakey!!!") {
+            document.getElementById("modTitle").className = "thingy";
+            }    
+
+        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|android|ipad|playbook|silk/i.test(navigator.userAgent)) {
+            document.getElementById("introduction").innerHTML = "UltraBox is an online tool for sketching and sharing chiptune melodies. Make sure that your volume is turned up, then press the play button!";
+            document.getElementById("keyboard-instructions").style.display = "none";
+            document.getElementById("bar-editing").innerHTML = "Tap the boxes to move to a different part of the song, or tap on the currently selected box to swap which pattern is played during that part of the song.";
+			//document.getElementById("offline-instructions").innerHTML = 'You can use BeepBox when your device is offline if you put a shortcut to BeepBox on your home screen. <ul><li>Chrome: find the "Add to Home Screen" option in the ⋮ menu.</li><li>Firefox: find the "Add Page Shortcut" option in the ⋮ menu.</li><li>Safari: find the "Add to Home Screen" option in the bookmark menu.</li></ul>';
+        }
+
+        function browserHasRequiredFeatures() {
+            "use strict";
+            if (window.AudioContext == undefined && window.webkitAudioContext == undefined) {
+                return false;
+            }
+
+            try {
+                eval("class T {}");
+                eval("const a = () => 0");
+                eval("for (const a of []);");
+            } catch (error) {
+                return false;
+            }
+
+            return true;
+        }
+
+        if (browserHasRequiredFeatures()) {
+            // Go ahead and load js beepbox editor interface:
+            var fileref = document.createElement("script");
+            fileref.setAttribute("type", "text/javascript");
+            fileref.setAttribute("src", "beepbox_editor.min.js");
+            document.head.appendChild(fileref);
+        } else {
+            document.getElementById("beepboxEditorContainer").innerHTML = "Sorry, UltraBox doesn't support your browser. Try a recent version of Chrome, Firefox, Edge, Safari, or Opera.";
+        }
+
+		// If the page was loaded with an old song version that old versions of BeepBox support,
+		// update the links to the old versions so that they'll open the song.
+	    //HEY, ULTRABOX DOESN'T HAVE THESE, WHAT DO WE DO????
+		if (/^#[1-6]/.test(location.hash)) {
+			document.getElementById("linkTo2_3").href += location.hash;
+		}
+		if (/^#[1-8]/.test(location.hash)) {
+			document.getElementById("linkTo3_0").href += location.hash;
+		}
+    </script>
+    <script> 
+        document.getElementById("plant").addEventListener("click", this._clickies);
+        function _clickies() {
+            if (document.getElementById("plant").innerHTML == "  Click here for a secret!") {
+                location.href = './secret';
+            } else if (document.getElementById("plant").innerHTML == "  :wackybox:") {
+                var wackybox = new Audio('wackybox.mp3');
+                wackybox.play();
+            } else if (document.getElementById("plant").innerHTML == "  xoBssybA") {
+				let xScale = 100;
+				let rising = 0; 
+                let ending = 0;
+				const skewInterval = setInterval(() => {
+					if (xScale > 100) {
+						rising = 0;
+                        ending++;
+					}
+					if (xScale < -100) {
+						rising = 1;
+                        ending++;
+					}
+
+					if (xScale > 0) {
+						document.body.style.filter = `brightness(100%)`;
+					} else if (xScale <= 0) {
+						document.body.style.filter = `brightness(80%)`;
+					}
+
+                    if (ending < 2) {
+                        if (rising == 0) {
+                            xScale -= 0.2;
+                        } else if (rising == 1) {
+                            xScale += 0.2;
+                        }
+                    } else {
+                        xScale = 100;
+                        document.getElementById("plant").innerHTML = "  oh wow! I'm dizzy now!"
+                    }
+
+					document.body.style.transform = `scale(${xScale}%, 100%)`;
+				}, 1);
+            } else if (document.getElementById("plant").innerHTML == "  plus") {
+                document.getElementById("plant").innerHTML = "+"
+            } else if (document.getElementById("plant").innerHTML == "+") {
+                document.getElementById("plant").innerHTML = "  plus"
+            } else if (document.getElementById("plant").innerHTML == "  ≽(◕ ᴗ ◕)≼") {
+                switch (Math.floor(Math.random() * 3)) {
+                    case 0:
+                        document.getElementById("plant").innerHTML = "  ≽(ᴗ _ ᴗ)≼"
+                    break;
+                    case 1:
+                        document.getElementById("plant").innerHTML = "  ≽(⌐ _ ⌐)≼";
+                    break;
+			        case 2:
+                        document.getElementById("plant").innerHTML = "  ≽(ᵕ ‿ ᵕ)≼";
+                    }
+            } else if (document.getElementById("plant").innerHTML == "  ≽(ᴗ _ ᴗ)≼") {
+                switch (Math.floor(Math.random() * 3)) {
+                    case 0:
+                        document.getElementById("plant").innerHTML = "  ≽(◕ ᴗ ◕)≼"
+                    break;
+                    case 1:
+                        document.getElementById("plant").innerHTML = "  ≽(⌐ _ ⌐)≼";
+                    break;
+			        case 2:
+                        document.getElementById("plant").innerHTML = "  ≽(ᵕ ‿ ᵕ)≼";
+                    }
+            } else if (document.getElementById("plant").innerHTML == "  ≽(⌐ _ ⌐)≼") {
+                switch (Math.floor(Math.random() * 3)) {
+                    case 0:
+                        document.getElementById("plant").innerHTML = "  ≽(ᴗ _ ᴗ)≼"
+                    break;
+                    case 1:
+                        document.getElementById("plant").innerHTML = "  ≽(◕ ᴗ ◕)≼";
+                    break;
+			        case 2:
+                        document.getElementById("plant").innerHTML = "  ≽(ᵕ ‿ ᵕ)≼";
+                    }
+            } else if (document.getElementById("plant").innerHTML == "  ≽(ᵕ ‿ ᵕ)≼") {
+                switch (Math.floor(Math.random() * 3)) {
+                    case 0:
+                        document.getElementById("plant").innerHTML = "  ≽(ᴗ _ ᴗ)≼"
+                    break;
+                    case 1:
+                        document.getElementById("plant").innerHTML = "  ≽(⌐ _ ⌐)≼";
+                    break;
+			        case 2:
+                        document.getElementById("plant").innerHTML = "  ≽(◕ ᴗ ◕)≼";
+                    }
+            } else if (document.getElementById("plant").innerHTML == "  Amen break 145bpm be like") {
+                var amen = new Audio('amen-break-145.mp3');
+                amen.play();
+            } else if (document.getElementById("plant").innerHTML == "  Try Minecraft!") {
+                window.open("https://classic.minecraft.net", "_blank");
+            } else if (document.getElementById("plant").innerHTML == "  How do you feel?") {
+                document.getElementById("plant").innerHTML = "  I hope you're doing well."
+            } else if (document.getElementById("plant").innerHTML == "  I hope you're doing well.") {
+                document.getElementById("plant").innerHTML = "  I just want you to remember."
+            } else if (document.getElementById("plant").innerHTML == "  I just want you to remember.") {
+                document.getElementById("plant").innerHTML = "  If you're feeling down, you'll have me to lean on."
+            } else if (document.getElementById("plant").innerHTML == "  If you're feeling down, you'll have me to lean on.") {
+                document.getElementById("plant").innerHTML = "  I'll be here for as long as I can be."
+            } else if (document.getElementById("plant").innerHTML == "  I'll be here for as long as I can be.") {
+                document.getElementById("plant").innerHTML = "  Now, back to memes :)"
+            } else if (document.getElementById("plant").innerHTML == "  Now, back to memes :)") {
+                document.getElementById("plant").innerHTML = "  :wackybox:"
+            } else if (document.getElementById("plant").innerHTML == "  Do NOT click here!!!") {
+                window.open("https://www.youtube.com/watch?v=fC7oUOUEEi4", "_blank");
+                document.getElementById("plant").innerHTML = "  What did I tell you!?"
+            } else if (document.getElementById("plant").innerHTML == "  What did I tell you!?") {
+                window.open("https://www.youtube.com/watch?v=2qgxAHW1w78", "_blank");
+                document.getElementById("plant").innerHTML = "  You fell for it again!?"
+            } else if (document.getElementById("plant").innerHTML == "  You fell for it again!?") {
+                window.open("https://www.youtube.com/watch?v=Kob0G2hE8IY", "_blank");
+                document.getElementById("plant").innerHTML = "  YOU'RE JOKING RIGHT!?"
+            } else if (document.getElementById("plant").innerHTML == "  YOU'RE JOKING RIGHT!?") {
+                window.open("https://shattereddisk.github.io/rickroll/rickroll.mp4", "_blank");
+                document.getElementById("plant").innerHTML = "  No way..."
+            } else if (document.getElementById("plant").innerHTML == "  Free!") {
+                document.getElementById("plant").innerHTML = "  Actually I lied..."
+            } else if (document.getElementById("plant").innerHTML == "  Actually I lied...") {
+                document.getElementById("plant").innerHTML = "  You're Using a pirated version of AbyssBox..."
+            } else if (document.getElementById("plant").innerHTML == "  You're Using a pirated version of AbyssBox...") {
+                document.getElementById("plant").innerHTML = "  Get Caught Theif!"
+                window.open("./piracy", "_blank");
+            } else if (document.getElementById("plant").innerHTML == "  Once was Ultrabox") {
+                document.getElementById("plant").innerHTML = "  But Not Anymore!"
+            } else if (document.getElementById("plant").innerHTML == "  nyeh heh heh heh!") {
+                window.open("./wet", "_blank");
+            } else if (document.getElementById("plant").innerHTML == "  IS THAT SAN-") {
+                window.open("./wet/SAAAAAAAAA.mp4", "_blank");
+            } else if (document.getElementById("plant").innerHTML == "  Megalo incoming!!!") {
+                window.open("https://pastelink.net/iatgfekp", "_blank");
+            }
+        }
+    </script>
+</body>
+</html>
