@@ -60223,6 +60223,9 @@ You should be redirected to the song at:<br /><br />
                     else {
                         this._instrumentSettingsTextRow.textContent = this._doc.song.channels[this._doc.channel].name;
                     }
+                    if (this._doc.prefs.instrumentSettingsSimplifier == true) {
+                        this._instOptionsDiv.style.display = "none";
+                    }
                     this._chipNoiseSelectRow.style.display = "none";
                     this._chipWaveSelectRow.style.display = "none";
                     this._useChipWaveAdvancedLoopControlsRow.style.display = "none";
