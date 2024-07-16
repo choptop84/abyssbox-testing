@@ -55374,8 +55374,8 @@ You should be redirected to the song at:<br /><br />
             this._pattern2 = _pattern2;
             this._pattern3 = _pattern3;
             this._currentThemeProperty = "--page-margin";
-            this._fileInput = input$4({ type: "file", accept: ".png,.jpg,.jpeg", text: "choose editor background image" });
-            this._fileInput2 = input$4({ type: "file", accept: ".png,.jpg,.jpeg", text: "choose website background image" });
+            this._fileInput = input$4({ type: "file", accept: ".png,.jpg,.jpeg,.gif", text: "choose editor background image" });
+            this._fileInput2 = input$4({ type: "file", accept: ".png,.jpg,.jpeg,.gif", text: "choose website background image" });
             this._advancedSettings = select$5({ style: "width: 100%; margin-top: 1.5em; margin-bottom: 1.5em;" }, option$5({ value: "basic" }, "Templates"), option$5({ value: "editor" }, "Editor"), option$5({ value: "css" }, "Import/Export"));
             this._basicCatagoryButton = button$9({ style: "height: auto; min-height: var(--button-size); margin: 0.5em; width: 34%; border-bottom: solid; border-bottom-color: var(--link-accent)" }, "Templates");
             this._editorCatagoryButton = button$9({ style: "height: auto; min-height: var(--button-size); margin: 0.5em; width:34%; color: var(--secondary-text);" }, "Editor");
