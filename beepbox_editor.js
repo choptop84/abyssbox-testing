@@ -58765,7 +58765,7 @@ You should be redirected to the song at:<br /><br />
             this._volumeBarBox = div({ class: "playback-volume-bar", style: "height: 12px; align-self: center;" }, this._volumeBarContainer);
             this._fileMenu = select({ style: "width: 100%;" }, option({ selected: true, disabled: true, hidden: false }, "File"), option({ value: "new" }, "+ New Blank Song"), option({ value: "import" }, "↑ > Import/Export Song (" + EditorConfig.ctrlSymbol + "S)"), option({ value: "copyUrl" }, "⎘ Copy Song URL"), option({ value: "shareUrl" }, "⤳ Share Song URL"), option({ value: "shortenUrl" }, "… Shorten Song URL"), option({ value: "configureShortener" }, "🛠 > Customize Url Shortener"), option({ value: "viewPlayer" }, "▶ View in Song Player"), option({ value: "copyEmbed" }, "⎘ Copy HTML Embed Code"), option({ value: "songRecovery" }, "⚠ > Recover Recent Song"));
             this._editMenu = select({ style: "width: 100%;" }, option({ selected: true, disabled: true, hidden: false }, "Edit"), option({ value: "undo" }, "Undo (Z)"), option({ value: "redo" }, "Redo (Y)"), option({ value: "copy" }, "Copy Pattern (C)"), option({ value: "pasteNotes" }, "Paste Pattern Notes (V)"), option({ value: "pasteNumbers" }, "Paste Pattern Numbers (" + EditorConfig.ctrlSymbol + "⇧V)"), option({ value: "insertBars" }, "Insert Bar (⏎)"), option({ value: "deleteBars" }, "Delete Selected Bars (⌫)"), option({ value: "insertChannel" }, "Insert Channel (" + EditorConfig.ctrlSymbol + "⏎)"), option({ value: "deleteChannel" }, "Delete Selected Channels (" + EditorConfig.ctrlSymbol + "⌫)"), option({ value: "selectChannel" }, "Select Channel (⇧A)"), option({ value: "selectAll" }, "Select All (A)"), option({ value: "duplicatePatterns" }, "Duplicate Reused Patterns (D)"), option({ value: "transposeUp" }, "Move Notes Up (+ or ⇧+)"), option({ value: "transposeDown" }, "Move Notes Down (- or ⇧-)"), option({ value: "moveNotesSideways" }, "> Move All Notes Sideways (W)"), option({ value: "generateEuclideanRhythm" }, "> Generate Euclidean Rhythm (E)"), option({ value: "beatsPerBar" }, "> Change Beats Per Bar (B)"), option({ value: "barCount" }, "> Change Song Length (L)"), option({ value: "channelSettings" }, "> Channel Settings (Q)"), option({ value: "limiterSettings" }, "> Limiter Settings (⇧L)"), option({ value: "addExternal" }, "> Add Custom Samples (⇧Q)"), option({ value: "songTheme" }, "> Set Theme For Song"), option({ value: "presetsPrompt" }, "> Select Presets"));
-            this._optionsMenu = select({ style: "width: 100%;" }, option({ selected: true, disabled: true, hidden: false }, "Preferences"), optgroup({ label: "Technical" }, option({ value: "autoPlay" }, "Auto Play on Load"), option({ value: "autoFollow" }, "Auto Follow Playhead"), option({ value: "enableNotePreview" }, "Hear Added Notes"), option({ value: "notesOutsideScale" }, "Place Notes Out of Scale"), option({ value: "setDefaultScale" }, "Set Current Scale as Default"), option({ value: "alwaysFineNoteVol" }, "Always Fine Note Volume"), option({ value: "enableChannelMuting" }, "Enable Channel Muting"), option({ value: "instrumentCopyPaste" }, "Enable Copy/Paste Buttons"), option({ value: "instrumentImportExport" }, "Enable Import/Export Buttons"), option({ value: "displayBrowserUrl" }, "Enable Song Data in URL"), option({ value: "closePromptByClickoff" }, "Close prompts on click off"), option({ value: "oldMobileLayout" }, "Use the Old mobile layout (Reload)"), option({ value: "instrumentSettingsSimplifier" }, "Use Mobile Instrument Settings"), option({ value: "recordingSetup" }, "Note Recording...")), optgroup({ label: "Appearance" }, option({ value: "showThird" }, 'Highlight "Third" Note (SandBox)'), option({ value: "showFifth" }, 'Highlight "Fifth" Note'), option({ value: "advancedColorScheme" }, "Advanced Color Scheme (ModBox)"), option({ value: "notesFlashWhenPlayed" }, "Notes Flash When Played (DB2)"), option({ value: "showChannels" }, "Show All Channels"), option({ value: "showScrollBar" }, "Show Octave Scroll Bar"), option({ value: "showLetters" }, "Show Piano Keys"), option({ value: "displayVolumeBar" }, "Show Playback Volume"), option({ value: "showOscilloscope" }, "Show Oscilloscope"), option({ value: "showSampleLoadingStatus" }, "Show Sample Loading Status"), option({ value: "showDescription" }, "Show Description"), option({ value: "frostedGlassBackground" }, "Use Frosted Glass Prompt Backdrops"), option({ value: "displayShortcutButtons" }, "Display Mobile Shortcut Buttons"), option({ value: "oldModNotes" }, 'Use Old Mod Notes'), option({ value: "layout" }, "> Set Layout"), option({ value: "colorTheme" }, "> Set Theme"), option({ value: "customTheme" }, "> Custom Theme")));
+            this._optionsMenu = select({ style: "width: 100%;" }, option({ selected: true, disabled: true, hidden: false }, "Preferences"), optgroup({ label: "Technical" }, option({ value: "autoPlay" }, "Auto Play on Load"), option({ value: "autoFollow" }, "Auto Follow Playhead"), option({ value: "enableNotePreview" }, "Hear Added Notes"), option({ value: "notesOutsideScale" }, "Place Notes Out of Scale"), option({ value: "setDefaultScale" }, "Set Current Scale as Default"), option({ value: "alwaysFineNoteVol" }, "Always Fine Note Volume"), option({ value: "enableChannelMuting" }, "Enable Channel Muting"), option({ value: "instrumentCopyPaste" }, "Enable Copy/Paste Buttons"), option({ value: "instrumentImportExport" }, "Enable Import/Export Buttons"), option({ value: "displayBrowserUrl" }, "Enable Song Data in URL"), option({ value: "closePromptByClickoff" }, "Close prompts on click off"), option({ value: "oldMobileLayout" }, "Use the Old mobile layout (Reload)"), option({ value: "instrumentSettingsSimplifier" }, "Use Mobile Instrument Settings"), option({ value: "recordingSetup" }, "Note Recording...")), optgroup({ label: "Appearance" }, option({ value: "showThird" }, 'Highlight "Third" Note (SandBox)'), option({ value: "showFifth" }, 'Highlight "Fifth" Note'), option({ value: "advancedColorScheme" }, "Advanced Color Scheme (ModBox)"), option({ value: "notesFlashWhenPlayed" }, "Notes Flash When Played (DB2)"), option({ value: "showChannels" }, "Show All Channels"), option({ value: "showScrollBar" }, "Show Octave Scroll Bar"), option({ value: "showLetters" }, "Show Piano Keys"), option({ value: "displayVolumeBar" }, "Show Playback Volume"), option({ value: "showOscilloscope" }, "Show Oscilloscope"), option({ value: "showSampleLoadingStatus" }, "Show Sample Loading Status"), option({ value: "showDescription" }, "Show Description"), option({ value: "frostedGlassBackground" }, "Use Frosted Glass Prompt Backdrops"), option({ value: "displayShortcutButtons" }, "Display Mobile Shortcut Buttons"), option({ value: "oldModNotes" }, 'Use Old Mod Notes'), option({ value: "selectionCounter" }, 'Selection Counter'), option({ value: "layout" }, "> Set Layout"), option({ value: "colorTheme" }, "> Set Theme"), option({ value: "customTheme" }, "> Custom Theme")));
             this._scaleSelect = buildOptions(select(), Config.scales.map(scale => scale.name));
             this._keySelect = buildOptions(select(), Config.keys.map(key => key.name).reverse());
             this._octaveStepper = input({ style: "width: 59.5%;", type: "number", min: Config.octaveMin, max: Config.octaveMax, value: "0" });
@@ -58969,6 +58969,8 @@ You should be redirected to the song at:<br /><br />
             this._instrumentExportGroup = div({ class: "editor-controls" }, div({ class: "selectRow" }, this._instrumentExportButton, this._instrumentImportButton));
             this._instrumentSettingsTextRow = div({ id: "instrumentSettingsText", style: `padding: 3px 0; max-width: 15em; text-align: center; color: ${ColorConfig.secondaryText};` }, "Instrument Settings");
             this._instrumentTypeSelectRow = div({ class: "selectRow", id: "typeSelectRow" }, span({ class: "tip", onclick: () => this._openPrompt("instrumentType") }, "Type:"), div(div({ class: "pitchSelect" }, this._pitchedPresetSelect), div({ class: "drumSelect" }, this._drumPresetSelect)));
+            this.selectedPatternCounter = div({ style: "margin:5px;" }, this._doc.selection.boxSelectionWidth * this._doc.selection.boxSelectionHeight);
+            this.selectedPatternDiv = div({ style: "background: var(--ui-widget-background); border-radius: 5px; height: 32px; position: absolute; font-size: 20px; text-align: center; align-content: center;pointer-events: none;" }, this.selectedPatternCounter);
             this._mobileInstSettingsButton = button({ class: "mobileInstButton", type: "button", style: "width:33%;", onclick: () => this._setSettingToInstrument() }, "Settings");
             this._mobileEffectsButton = button({ class: "mobileEffectsButton", type: "button", style: "width:30%; background: #fff0; color: var(--text-color-dim);", onclick: () => this._setSettingToEffect() }, "Effects");
             this._mobileEnvelopesButton = button({ class: "mobileEnvelopesButton", type: "button", style: "width:37%; background: #fff0; color: var(--text-color-dim);", onclick: () => this._setSettingToEnvelope() }, "Envelope");
@@ -59069,7 +59071,7 @@ You should be redirected to the song at:<br /><br />
             this._loopBarButton = button({ class: "loopBarButton", type: "button", title: "Loop only on the Currently Selected Bar" });
             this._fullscreenButton = button({ class: "fullscreenButton", type: "button", title: "Make the screen fit fully in your browser (Mobile Only)" });
             this._patternEditorRow = div({ style: "flex: 1; height: 100%; display: flex; overflow: hidden; justify-content: center;" }, this._patternEditorPrev.container, this._patternEditor.container, this._patternEditorNext.container);
-            this._patternArea = div({ class: "pattern-area", id: "pattern-area" }, this._piano.container, this._patternEditorRow, this._octaveScrollBar.container, this._zoomInButton, this._zoomOutButton, this._undoButton, this._redoButton, this._copyPatternButton, this._pastePatternButton, this._insertChannelButton, this._deleteChannelButton, this._selectAllButton, this._duplicateButton, this._notesUpButton, this._notesDownButton, this._loopBarButton, this._fullscreenButton);
+            this._patternArea = div({ class: "pattern-area", id: "pattern-area" }, this._piano.container, this._patternEditorRow, this._octaveScrollBar.container, this._zoomInButton, this._zoomOutButton, this._undoButton, this._redoButton, this._copyPatternButton, this._pastePatternButton, this._insertChannelButton, this._deleteChannelButton, this._selectAllButton, this._duplicateButton, this._notesUpButton, this._notesDownButton, this._loopBarButton, this._fullscreenButton, this.selectedPatternDiv);
             this._trackContainer = div({ class: "trackContainer" }, this._trackEditor.container, this._loopEditor.container);
             this._trackVisibleArea = div({ style: "position: absolute; width: 100%; height: 100%; pointer-events: none;" });
             this._trackAndMuteContainer = div({ class: "trackAndMuteContainer" }, this._muteEditor.container, this._trackContainer, this._trackVisibleArea);
@@ -59135,6 +59137,8 @@ You should be redirected to the song at:<br /><br />
                     this._doc.synth.loopBarStart = -1;
                     this._doc.synth.loopBarEnd = -1;
                     this._loopEditor.setLoopAt(this._doc.synth.loopBarStart, this._doc.synth.loopBarEnd);
+                    this._loopBarButton.style.display = "none";
+                    this._trackAndMuteContainer.style.marginBottom = "0.3em";
                 }
                 else if (_loopType == 2) {
                     this._doc.synth.loopRepeatCount = -1;
@@ -59143,11 +59147,15 @@ You should be redirected to the song at:<br /><br />
                     this._doc.synth.loopBarStart = -1;
                     this._doc.synth.loopBarEnd = -1;
                     this._loopEditor.setLoopAt(this._doc.synth.loopBarStart, this._doc.synth.loopBarEnd);
+                    this._loopBarButton.style.display = "none";
+                    this._trackAndMuteContainer.style.marginBottom = "0.3em";
                 }
                 else if (_loopType == 1) {
                     this._doc.synth.loopRepeatCount = -1;
                     this._loopEditor.container.style.display = "";
                     SongEditor._styleElement.textContent = SongEditor._setLoopIcon[1];
+                    this._loopBarButton.style.display = this._doc.prefs.displayShortcutButtons ? "" : "none";
+                    this._trackAndMuteContainer.style.marginBottom = "";
                 }
             };
             this.refocusStage = () => {
@@ -59209,6 +59217,16 @@ You should be redirected to the song at:<br /><br />
                         const maxBeatWidth = this._patternEditorRow.clientWidth / (this._doc.song.beatsPerBar + 2);
                         const beatWidth = Math.max(minBeatWidth, Math.min(maxBeatWidth, targetBeatWidth));
                         const patternEditorWidth = beatWidth * this._doc.song.beatsPerBar;
+                        if (this._doc.selection.boxSelectionWidth * this._doc.selection.boxSelectionHeight > 1) {
+                            this.selectedPatternCounter.innerHTML = String(this._doc.selection.boxSelectionWidth * this._doc.selection.boxSelectionHeight);
+                            this.selectedPatternDiv.style.display = this._doc.prefs.selectionCounter ? "" : "none";
+                            this.selectedPatternDiv.style.left = prefs.showLetters ? "40px" : "10px";
+                            this.selectedPatternDiv.style.top = prefs.displayShortcutButtons ? "200px" : "10px";
+                            this.selectedPatternDiv.style.right = "";
+                        }
+                        else {
+                            this.selectedPatternDiv.style.display = "none";
+                        }
                         if (this._doc.prefs.showDescription == false) {
                             beepboxEditorContainer$1.style.paddingBottom = "0";
                             beepboxEditorContainer$1.style.borderStyle = "none";
@@ -59231,48 +59249,33 @@ You should be redirected to the song at:<br /><br />
                         this._zoomOutButton.style.display = (this._doc.channel < this._doc.song.pitchChannelCount) ? "" : "none";
                         this._zoomInButton.style.right = prefs.showScrollBar ? "24px" : "4px";
                         this._zoomOutButton.style.right = prefs.showScrollBar ? "24px" : "4px";
-                        if (this._doc.prefs.displayShortcutButtons == false) {
-                            this._undoButton.style.display = "none";
-                            this._redoButton.style.display = "none";
-                            this._copyPatternButton.style.display = "none";
-                            this._pastePatternButton.style.display = "none";
-                            this._insertChannelButton.style.display = "none";
-                            this._deleteChannelButton.style.display = "none";
-                            this._selectAllButton.style.display = "none";
-                            this._duplicateButton.style.display = "none";
-                            this._loopBarButton.style.display = "none";
-                            this._notesDownButton.style.display = "none";
-                            this._notesUpButton.style.display = "none";
+                        this._undoButton.style.display = prefs.displayShortcutButtons ? "" : "none";
+                        this._redoButton.style.display = prefs.displayShortcutButtons ? "" : "none";
+                        this._copyPatternButton.style.display = prefs.displayShortcutButtons ? "" : "none";
+                        this._pastePatternButton.style.display = prefs.displayShortcutButtons ? "" : "none";
+                        this._insertChannelButton.style.display = prefs.displayShortcutButtons ? "" : "none";
+                        this._deleteChannelButton.style.display = prefs.displayShortcutButtons ? "" : "none";
+                        this._selectAllButton.style.display = prefs.displayShortcutButtons ? "" : "none";
+                        this._duplicateButton.style.display = prefs.displayShortcutButtons ? "" : "none";
+                        if (_loopType != 1) {
+                            this._loopBarButton.style.display = prefs.displayShortcutButtons ? "none" : "none";
                         }
-                        else {
-                            this._undoButton.style.display = "";
-                            this._redoButton.style.display = "";
-                            this._copyPatternButton.style.display = "";
-                            this._pastePatternButton.style.display = "";
-                            this._insertChannelButton.style.display = "";
-                            this._deleteChannelButton.style.display = "";
-                            this._selectAllButton.style.display = "";
-                            this._duplicateButton.style.display = "";
-                            if (_loopType != 1) {
-                                this._loopBarButton.style.display = "none";
-                            }
-                            else if (_loopType == 1) {
-                                this._loopBarButton.style.display = "";
-                            }
-                            this._notesDownButton.style.display = "";
-                            this._notesUpButton.style.display = "";
+                        else if (_loopType == 1) {
+                            this._loopBarButton.style.display = prefs.displayShortcutButtons ? "" : "none";
                         }
-                        this._undoButton.style.left = prefs.showScrollBar ? "40px" : "40px";
-                        this._redoButton.style.left = prefs.showScrollBar ? "70px" : "70px";
-                        this._copyPatternButton.style.left = prefs.showScrollBar ? "40px" : "40px";
-                        this._pastePatternButton.style.left = prefs.showScrollBar ? "70px" : "70px";
-                        this._insertChannelButton.style.left = prefs.showScrollBar ? "40px" : "40px";
-                        this._deleteChannelButton.style.left = prefs.showScrollBar ? "70px" : "70px";
-                        this._selectAllButton.style.left = prefs.showScrollBar ? "40px" : "40px";
-                        this._duplicateButton.style.left = prefs.showScrollBar ? "70px" : "70px";
-                        this._notesUpButton.style.left = prefs.showScrollBar ? "40px" : "40px";
-                        this._notesDownButton.style.left = prefs.showScrollBar ? "70px" : "70px";
-                        this._loopBarButton.style.left = prefs.showScrollBar ? "40px" : "40px";
+                        this._notesDownButton.style.display = prefs.displayShortcutButtons ? "" : "none";
+                        this._notesUpButton.style.display = prefs.displayShortcutButtons ? "" : "none";
+                        this._undoButton.style.left = prefs.showLetters ? "40px" : "10px";
+                        this._redoButton.style.left = prefs.showLetters ? "70px" : "40px";
+                        this._copyPatternButton.style.left = prefs.showLetters ? "40px" : "10px";
+                        this._pastePatternButton.style.left = prefs.showLetters ? "70px" : "40px";
+                        this._insertChannelButton.style.left = prefs.showLetters ? "40px" : "10px";
+                        this._deleteChannelButton.style.left = prefs.showLetters ? "70px" : "40px";
+                        this._selectAllButton.style.left = prefs.showLetters ? "40px" : "10px";
+                        this._duplicateButton.style.left = prefs.showLetters ? "70px" : "40px";
+                        this._notesUpButton.style.left = prefs.showLetters ? "40px" : "10px";
+                        this._notesDownButton.style.left = prefs.showLetters ? "70px" : "40px";
+                        this._loopBarButton.style.left = prefs.showLetters ? "40px" : "10px";
                         this._fullscreenButton.style.display = "none";
                         const secondImage = document.getElementById("secondImage");
                         if (secondImage != null) {
@@ -59286,48 +59289,43 @@ You should be redirected to the song at:<br /><br />
                         this._patternEditorNext.container.style.display = "none";
                         this._zoomInButton.style.display = "none";
                         this._zoomOutButton.style.display = "none";
-                        if (this._doc.prefs.displayShortcutButtons == false) {
-                            this._undoButton.style.display = "none";
-                            this._redoButton.style.display = "none";
-                            this._copyPatternButton.style.display = "none";
-                            this._pastePatternButton.style.display = "none";
-                            this._insertChannelButton.style.display = "none";
-                            this._deleteChannelButton.style.display = "none";
-                            this._selectAllButton.style.display = "none";
-                            this._duplicateButton.style.display = "none";
-                            this._loopBarButton.style.display = "none";
-                            this._notesDownButton.style.display = "none";
-                            this._notesUpButton.style.display = "none";
+                        if (this._doc.selection.boxSelectionWidth * this._doc.selection.boxSelectionHeight > 1) {
+                            this.selectedPatternCounter.innerHTML = String(this._doc.selection.boxSelectionWidth * this._doc.selection.boxSelectionHeight);
+                            this.selectedPatternDiv.style.display = this._doc.prefs.selectionCounter ? "" : "none";
+                            this.selectedPatternDiv.style.right = "104.5%";
+                            this.selectedPatternDiv.style.left = "";
+                            this.selectedPatternDiv.style.top = prefs.displayShortcutButtons ? "200px" : "10px";
                         }
                         else {
-                            this._undoButton.style.display = "";
-                            this._redoButton.style.display = "";
-                            this._copyPatternButton.style.display = "";
-                            this._pastePatternButton.style.display = "";
-                            this._insertChannelButton.style.display = "";
-                            this._deleteChannelButton.style.display = "";
-                            this._selectAllButton.style.display = "";
-                            this._duplicateButton.style.display = "";
-                            if (_loopType != 1) {
-                                this._loopBarButton.style.display = "none";
-                            }
-                            else if (_loopType == 1) {
-                                this._loopBarButton.style.display = "";
-                            }
-                            this._notesDownButton.style.display = "";
-                            this._notesUpButton.style.display = "";
+                            this.selectedPatternDiv.style.display = "none";
                         }
-                        this._undoButton.style.left = prefs.showScrollBar ? "-80px" : "-80px";
-                        this._redoButton.style.left = prefs.showScrollBar ? "-50px" : "-50px";
-                        this._copyPatternButton.style.left = prefs.showScrollBar ? "-80px" : "-80px";
-                        this._pastePatternButton.style.left = prefs.showScrollBar ? "-50px" : "-50px";
-                        this._insertChannelButton.style.left = prefs.showScrollBar ? "-80px" : "-80px";
-                        this._deleteChannelButton.style.left = prefs.showScrollBar ? "-50px" : "-50px";
-                        this._selectAllButton.style.left = prefs.showScrollBar ? "-80px" : "-80px";
-                        this._duplicateButton.style.left = prefs.showScrollBar ? "-50px" : "-50px";
-                        this._notesUpButton.style.left = prefs.showScrollBar ? "-80px" : "-80px";
-                        this._notesDownButton.style.left = prefs.showScrollBar ? "-50px" : "-50px";
-                        this._loopBarButton.style.left = prefs.showScrollBar ? "-50px" : "-50px";
+                        this._undoButton.style.display = prefs.displayShortcutButtons ? "" : "none";
+                        this._redoButton.style.display = prefs.displayShortcutButtons ? "" : "none";
+                        this._copyPatternButton.style.display = prefs.displayShortcutButtons ? "" : "none";
+                        this._pastePatternButton.style.display = prefs.displayShortcutButtons ? "" : "none";
+                        this._insertChannelButton.style.display = prefs.displayShortcutButtons ? "" : "none";
+                        this._deleteChannelButton.style.display = prefs.displayShortcutButtons ? "" : "none";
+                        this._selectAllButton.style.display = prefs.displayShortcutButtons ? "" : "none";
+                        this._duplicateButton.style.display = prefs.displayShortcutButtons ? "" : "none";
+                        if (_loopType != 1) {
+                            this._loopBarButton.style.display = prefs.displayShortcutButtons ? "none" : "none";
+                        }
+                        else if (_loopType == 1) {
+                            this._loopBarButton.style.display = prefs.displayShortcutButtons ? "" : "none";
+                        }
+                        this._notesDownButton.style.display = prefs.displayShortcutButtons ? "" : "none";
+                        this._notesUpButton.style.display = prefs.displayShortcutButtons ? "" : "none";
+                        this._undoButton.style.left = "-80px";
+                        this._redoButton.style.left = "-50px";
+                        this._copyPatternButton.style.left = "-80px";
+                        this._pastePatternButton.style.left = "-50px";
+                        this._insertChannelButton.style.left = "-80px";
+                        this._deleteChannelButton.style.left = "-50px";
+                        this._selectAllButton.style.left = "-80px";
+                        this._duplicateButton.style.left = "-50px";
+                        this._notesUpButton.style.left = "-80px";
+                        this._notesDownButton.style.left = "-50px";
+                        this._loopBarButton.style.left = "-50px";
                         this._fullscreenButton.style.display = "none";
                         beepboxEditorContainer$1.style.paddingBottom = "";
                         beepboxEditorContainer$1.style.borderStyle = "";
@@ -59338,6 +59336,7 @@ You should be redirected to the song at:<br /><br />
                     }
                 }
                 else {
+                    this.selectedPatternDiv.style.display = "none";
                     if (this._doc.prefs.oldMobileLayout != true) {
                         this._promptContainer.style.left = "50vw";
                         const effectStuffs = document.getElementById('effectsDiv');
@@ -59669,6 +59668,7 @@ You should be redirected to the song at:<br /><br />
                     (prefs.frostedGlassBackground ? textOnIcon : textOffIcon) + "Use Frosted Glass Prompt Backdrop",
                     (prefs.displayShortcutButtons ? textOnIcon : textOffIcon) + "Display Mobile Shortcut Buttons",
                     (prefs.oldModNotes ? textOnIcon : textOffIcon) + "Use Old Mod Notes",
+                    (prefs.selectionCounter ? textOnIcon : textOffIcon) + "Selection Counter",
                     "> Set Layout",
                     "> Set Theme",
                     "> Custom Theme",
@@ -62272,6 +62272,9 @@ You should be redirected to the song at:<br /><br />
                     case "oldModNotes":
                         this._doc.prefs.oldModNotes = !this._doc.prefs.oldModNotes;
                         break;
+                    case "selectionCounter":
+                        this._doc.prefs.selectionCounter = !this._doc.prefs.selectionCounter;
+                        break;
                     case "layout":
                         this._openPrompt("layout");
                         break;
@@ -64561,6 +64564,7 @@ You should be redirected to the song at:<br /><br />
             this.instrumentSettingsSimplifier = window.localStorage.getItem("instrumentSettingsSimplifier") == "true";
             this.oldMobileLayout = window.localStorage.getItem("oldMobileLayout") == "true";
             this.oldModNotes = window.localStorage.getItem("oldModNotes") == "true";
+            this.selectionCounter = window.localStorage.getItem("selectionCounter") != "false";
             this.keyboardLayout = window.localStorage.getItem("keyboardLayout") || "wickiHayden";
             this.bassOffset = (+window.localStorage.getItem("bassOffset")) || 0;
             this.layout = window.localStorage.getItem("layout") || "small";
@@ -64614,6 +64618,7 @@ You should be redirected to the song at:<br /><br />
             window.localStorage.setItem("showDescription", this.showDescription ? "true" : "false");
             window.localStorage.setItem("showInstrumentScrollbars", this.showInstrumentScrollbars ? "true" : "false");
             window.localStorage.setItem("notesFlashWhenPlayed", this.notesFlashWhenPlayed ? "true" : "false");
+            window.localStorage.setItem("selectionCounter", this.selectionCounter ? "true" : "false");
             window.localStorage.setItem("keyboardLayout", this.keyboardLayout);
             window.localStorage.setItem("bassOffset", String(this.bassOffset));
             window.localStorage.setItem("layout", this.layout);
