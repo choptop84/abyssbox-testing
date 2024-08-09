@@ -1714,7 +1714,7 @@ var beepbox = (function (exports) {
             return (_a = EditorConfig.presetCategories[0].presets.dictionary) === null || _a === void 0 ? void 0 : _a[TypePresets === null || TypePresets === void 0 ? void 0 : TypePresets[instrument]];
         }
     }
-    EditorConfig.version = "1.4.5";
+    EditorConfig.version = "1.5";
     EditorConfig.versionDisplayName = "AbyssBox " + EditorConfig.version;
     EditorConfig.releaseNotesURL = "./patch_notes.html";
     EditorConfig.isOnMac = /^Mac/i.test(navigator.platform) || /Mac OS X/i.test(navigator.userAgent) || /^(iPhone|iPad|iPod)/i.test(navigator.platform) || /(iPhone|iPad|iPod)/i.test(navigator.userAgent);
@@ -2092,6 +2092,8 @@ var beepbox = (function (exports) {
                 { name: "Shamisen 2", generalMidi: false, settings: { "type": "FM6op", "eqFilter": [], "eqFilterType": false, "eqSimpleCut": 10, "eqSimplePeak": 0, "envelopeSpeed": 12, "discreteEnvelope": false, "eqSubFilters0": [], "effects": ["chord type", "note filter", "reverb"], "chord": "strum", "fastTwoNoteArp": true, "arpeggioSpeed": 12, "noteFilterType": true, "noteSimpleCut": 8, "noteSimplePeak": 1, "noteFilter": [{ "type": "low-pass", "cutoffHz": 6000, "linearGain": 0.5 }], "noteSubFilters1": [{ "type": "low-pass", "cutoffHz": 6000, "linearGain": 0.5 }], "panDelay": 10, "reverb": 0, "fadeInSeconds": 0, "fadeOutTicks": 48, "algorithm": "Custom", "feedbackType": "Custom", "feedbackAmplitude": 4, "customAlgorithm": { "mods": [[6, 2, 3, 4, 5], [], [], [], [], []], "carrierCount": 2 }, "customFeedback": { "mods": [[1], [], [], [], [], []] }, "operators": [{ "frequency": "1×", "amplitude": 15, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "2×", "amplitude": 12, "waveform": "rounded", "pulseWidth": 5 }, { "frequency": "6×", "amplitude": 6, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "0.5×", "amplitude": 11, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "16×", "amplitude": 5, "waveform": "triangle", "pulseWidth": 5 }, { "frequency": "4×", "amplitude": 7, "waveform": "sine", "pulseWidth": 5 }], "envelopes": [{ "target": "noteFilterAllFreqs", "envelope": "twang 1" }] } },
                 { name: "Picked Dist Guitar", generalMidi: false, settings: { "type": "Picked String", "eqFilter": [], "eqFilterType": false, "eqSimpleCut": 10, "eqSimplePeak": 0, "envelopeSpeed": 12, "discreteEnvelope": false, "eqSubFilters0": [], "effects": ["vibrato", "note filter", "distortion", "bitcrusher"], "vibrato": "custom", "vibratoDepth": 0.32, "vibratoDelay": 19, "vibratoSpeed": 10, "vibratoType": 0, "noteFilterType": false, "noteSimpleCut": 10, "noteSimplePeak": 0, "noteFilter": [{ "type": "low-pass", "cutoffHz": 13454.34, "linearGain": 0.7071 }, { "type": "low-pass", "cutoffHz": 9513.66, "linearGain": 0.5 }], "noteSubFilters0": [{ "type": "low-pass", "cutoffHz": 13454.34, "linearGain": 0.7071 }, { "type": "low-pass", "cutoffHz": 9513.66, "linearGain": 0.5 }], "distortion": 43, "aliases": false, "bitcrusherOctave": 5.5, "bitcrusherQuantization": 14, "panDelay": 10, "fadeInSeconds": 0, "fadeOutTicks": 12, "harmonics": [86, 86, 86, 86, 71, 57, 71, 71, 14, 14, 14, 29, 57, 43, 43, 57, 43, 29, 29, 29, 29, 29, 29, 43, 43, 43, 0, 71], "unison": "none", "stringSustain": 71, "envelopes": [{ "target": "noteFilterAllFreqs", "envelope": "twang 3" }, { "target": "noteVolume", "envelope": "punch" }] } },
                 { name: "Heavy Knock", generalMidi: false, isNoise: true, settings: { "type": "noise", "eqFilter": [], "eqFilterType": false, "eqSimpleCut": 10, "eqSimplePeak": 0, "envelopeSpeed": 12, "discreteEnvelope": false, "eqSubFilters0": [], "effects": ["vibrato", "note filter", "reverb"], "vibrato": "delayed", "vibratoDepth": 0.3, "vibratoDelay": 18.5, "vibratoSpeed": 10, "vibratoType": 0, "noteFilterType": true, "noteSimpleCut": 7, "noteSimplePeak": 1, "noteFilter": [{ "type": "low-pass", "cutoffHz": 3828.43, "linearGain": 0.5 }], "noteSubFilters1": [{ "type": "low-pass", "cutoffHz": 3828.43, "linearGain": 0.5 }], "panDelay": 10, "reverb": 0, "fadeInSeconds": 0, "fadeOutTicks": 48, "wave": "white", "unison": "none", "envelopes": [{ "target": "noteFilterAllFreqs", "envelope": "twang 2" }] } },
+                { name: "Future Keys", generalMidi: false, settings: { "type": "harmonics", "eqFilter": [{ "type": "high-pass", "cutoffHz": 125, "linearGain": 0.25 }], "eqFilterType": false, "eqSimpleCut": 10, "eqSimplePeak": 0, "envelopeSpeed": 1, "discreteEnvelope": false, "eqSubFilters0": [{ "type": "high-pass", "cutoffHz": 125, "linearGain": 0.25 }], "effects": ["chorus", "echo", "reverb", "phaser"], "panDelay": 10, "chorus": 43, "echoSustain": 43, "echoDelayBeats": 0.75, "reverb": 19, "fadeInSeconds": 0, "fadeOutTicks": -1, "harmonics": [100, 100, 100, 86, 86, 86, 71, 71, 57, 29, 14, 14, 14, 0, 29, 57, 29, 0, 29, 43, 57, 57, 29, 14, 14, 29, 43, 29], "unison": "none", "envelopes": [{ "target": "phaserFreq", "envelope": "tremolo6" }, { "target": "noteVolume", "envelope": "twang -1" }] } },
+                { name: "Light Bell", generalMidi: false, settings: { "type": "Picked String", "eqFilter": [{ "type": "low-pass", "cutoffHz": 8000, "linearGain": 1 }, { "type": "high-pass", "cutoffHz": 88.39, "linearGain": 1 }], "eqFilterType": false, "eqSimpleCut": 10, "eqSimplePeak": 0, "envelopeSpeed": 12, "discreteEnvelope": false, "effects": ["reverb", "ring modulation"], "panDelay": 10, "reverb": 39, "fadeInSeconds": 0, "fadeOutTicks": 24, "harmonics": [43, 71, 0, 100, 0, 100, 0, 86, 0, 0, 86, 0, 14, 71, 14, 14, 57, 14, 14, 43, 14, 14, 43, 14, 14, 43, 14, 43], "unison": "shimmer", "stringSustain": 71, "envelopes": [{ "target": "noteVolume", "envelope": "twang 3" }] } },
             ]) },
     ]);
 
@@ -2839,6 +2841,21 @@ var beepbox = (function (exports) {
 		--export-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-export.png");
 		--export-instrument-symbol: var(--export-symbol);
 		--import-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-import.png");
+		--undo-symbol: url("https://choptop84.github.io/abyssbox-app/icon-undo.png");
+		--redo-symbol: url("https://choptop84.github.io/abyssbox-app/icon-redo.png");
+		--copy-symbol: url("https://choptop84.github.io/abyssbox-app/icon-copy.png");
+		--paste-symbol: url("https://choptop84.github.io/abyssbox-app/icon-paste.png");
+		--insert-channel-symbol: url("https://choptop84.github.io/abyssbox-app/icon-insertChannel.png");
+		--delete-channel-symbol: url("https://choptop84.github.io/abyssbox-app/icon-deleteChannel.png");
+		--select-all-symbol: url("https://choptop84.github.io/abyssbox-app/icon-SelectAll.png");
+		--duplicate-symbol: url("https://choptop84.github.io/abyssbox-app/icon-duplicate.png");
+		--notes-up-symbol: url("https://choptop84.github.io/abyssbox-app/moveNotesUp.png");
+		--notes-down-symbol: url("https://choptop84.github.io/abyssbox-app/moveNotesDown.png");
+		--loop-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-singleBarLoop.png");
+		--fullscreen-symbol: url("https://choptop84.github.io/abyssbox-app/icon-fullscreen.png");
+	--loop-within-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-bar.png");
+	--loop-full-song-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-song.png");
+	--dont-loop-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-once.png");
 		}
 		
 			@font-face {
@@ -3183,6 +3200,21 @@ var beepbox = (function (exports) {
 		--export-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-export.png");
 		--export-instrument-symbol: var(--export-symbol);
 		--import-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-import.png");
+		--undo-symbol: url("https://choptop84.github.io/abyssbox-app/icon-undo.png");
+		--redo-symbol: url("https://choptop84.github.io/abyssbox-app/icon-redo.png");
+		--copy-symbol: url("https://choptop84.github.io/abyssbox-app/icon-copy.png");
+		--paste-symbol: url("https://choptop84.github.io/abyssbox-app/icon-paste.png");
+		--insert-channel-symbol: url("https://choptop84.github.io/abyssbox-app/icon-insertChannel.png");
+		--delete-channel-symbol: url("https://choptop84.github.io/abyssbox-app/icon-deleteChannel.png");
+		--select-all-symbol: url("https://choptop84.github.io/abyssbox-app/icon-SelectAll.png");
+		--duplicate-symbol: url("https://choptop84.github.io/abyssbox-app/icon-duplicate.png");
+		--notes-up-symbol: url("https://choptop84.github.io/abyssbox-app/moveNotesUp.png");
+		--notes-down-symbol: url("https://choptop84.github.io/abyssbox-app/moveNotesDown.png");
+		--loop-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-singleBarLoop.png");
+		--fullscreen-symbol: url("https://choptop84.github.io/abyssbox-app/icon-fullscreen.png");
+		--loop-within-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-bar.png");
+	--loop-full-song-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-song.png");
+	--dont-loop-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-once.png");
 		}
 		
 			@font-face {
@@ -3591,6 +3623,21 @@ var beepbox = (function (exports) {
 		--export-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-export.png");
 		--export-instrument-symbol: var(--export-symbol);
 		--import-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-import.png");
+		--undo-symbol: url("https://choptop84.github.io/abyssbox-app/icon-undo.png");
+		--redo-symbol: url("https://choptop84.github.io/abyssbox-app/icon-redo.png");
+		--copy-symbol: url("https://choptop84.github.io/abyssbox-app/icon-copy.png");
+		--paste-symbol: url("https://choptop84.github.io/abyssbox-app/icon-paste.png");
+		--insert-channel-symbol: url("https://choptop84.github.io/abyssbox-app/icon-insertChannel.png");
+		--delete-channel-symbol: url("https://choptop84.github.io/abyssbox-app/icon-deleteChannel.png");
+		--select-all-symbol: url("https://choptop84.github.io/abyssbox-app/icon-SelectAll.png");
+		--duplicate-symbol: url("https://choptop84.github.io/abyssbox-app/icon-duplicate.png");
+		--notes-up-symbol: url("https://choptop84.github.io/abyssbox-app/moveNotesUp.png");
+		--notes-down-symbol: url("https://choptop84.github.io/abyssbox-app/moveNotesDown.png");
+		--loop-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-singleBarLoop.png");
+		--fullscreen-symbol: url("https://choptop84.github.io/abyssbox-app/icon-fullscreen.png");
+		--loop-within-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-bar.png");
+	--loop-full-song-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-song.png");
+	--dont-loop-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-once.png");
 		}
 		
 			@font-face {
@@ -3992,6 +4039,21 @@ var beepbox = (function (exports) {
 		--export-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-export.png");
 		--export-instrument-symbol: var(--export-symbol);
 		--import-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-import.png");
+		--undo-symbol: url("https://choptop84.github.io/abyssbox-app/icon-undo.png");
+		--redo-symbol: url("https://choptop84.github.io/abyssbox-app/icon-redo.png");
+		--copy-symbol: url("https://choptop84.github.io/abyssbox-app/icon-copy.png");
+		--paste-symbol: url("https://choptop84.github.io/abyssbox-app/icon-paste.png");
+		--insert-channel-symbol: url("https://choptop84.github.io/abyssbox-app/icon-insertChannel.png");
+		--delete-channel-symbol: url("https://choptop84.github.io/abyssbox-app/icon-deleteChannel.png");
+		--select-all-symbol: url("https://choptop84.github.io/abyssbox-app/icon-SelectAll.png");
+		--duplicate-symbol: url("https://choptop84.github.io/abyssbox-app/icon-duplicate.png");
+		--notes-up-symbol: url("https://choptop84.github.io/abyssbox-app/moveNotesUp.png");
+		--notes-down-symbol: url("https://choptop84.github.io/abyssbox-app/moveNotesDown.png");
+		--loop-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-singleBarLoop.png");
+		--fullscreen-symbol: url("https://choptop84.github.io/abyssbox-app/icon-fullscreen.png");
+		--loop-within-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-bar.png");
+	--loop-full-song-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-song.png");
+	--dont-loop-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-once.png");
 		}
 		
 			@font-face {
@@ -7313,6 +7375,21 @@ var beepbox = (function (exports) {
 		--export-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-export.png");
 		--export-instrument-symbol: var(--export-symbol);
 		--import-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-import.png");
+		--undo-symbol: url("https://choptop84.github.io/abyssbox-app/icon-undo.png");
+		--redo-symbol: url("https://choptop84.github.io/abyssbox-app/icon-redo.png");
+		--copy-symbol: url("https://choptop84.github.io/abyssbox-app/icon-copy.png");
+		--paste-symbol: url("https://choptop84.github.io/abyssbox-app/icon-paste.png");
+		--insert-channel-symbol: url("https://choptop84.github.io/abyssbox-app/icon-insertChannel.png");
+		--delete-channel-symbol: url("https://choptop84.github.io/abyssbox-app/icon-deleteChannel.png");
+		--select-all-symbol: url("https://choptop84.github.io/abyssbox-app/icon-SelectAll.png");
+		--duplicate-symbol: url("https://choptop84.github.io/abyssbox-app/icon-duplicate.png");
+		--notes-up-symbol: url("https://choptop84.github.io/abyssbox-app/moveNotesUp.png");
+		--notes-down-symbol: url("https://choptop84.github.io/abyssbox-app/moveNotesDown.png");
+		--loop-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-singleBarLoop.png");
+		--fullscreen-symbol: url("https://choptop84.github.io/abyssbox-app/icon-fullscreen.png");
+		--loop-within-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-bar.png");
+	--loop-full-song-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-song.png");
+	--dont-loop-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-once.png");
 		}
 		
 		.beepboxEditor input[type="range"]::-moz-range-track
@@ -8603,6 +8680,21 @@ var beepbox = (function (exports) {
 				--export-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-export.png");
 				--export-instrument-symbol: var(--export-symbol);
 				--import-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-import.png");
+				--undo-symbol: url("https://choptop84.github.io/abyssbox-app/icon-undo.png");
+				--redo-symbol: url("https://choptop84.github.io/abyssbox-app/icon-redo.png");
+				--copy-symbol: url("https://choptop84.github.io/abyssbox-app/icon-copy.png");
+				--paste-symbol: url("https://choptop84.github.io/abyssbox-app/icon-paste.png");
+				--insert-channel-symbol: url("https://choptop84.github.io/abyssbox-app/icon-insertChannel.png");
+				--delete-channel-symbol: url("https://choptop84.github.io/abyssbox-app/icon-deleteChannel.png");
+				--select-all-symbol: url("https://choptop84.github.io/abyssbox-app/icon-SelectAll.png");
+				--duplicate-symbol: url("https://choptop84.github.io/abyssbox-app/icon-duplicate.png");
+				--notes-up-symbol: url("https://choptop84.github.io/abyssbox-app/moveNotesUp.png");
+				--notes-down-symbol: url("https://choptop84.github.io/abyssbox-app/moveNotesDown.png");
+				--loop-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-singleBarLoop.png");
+				--fullscreen-symbol: url("https://choptop84.github.io/abyssbox-app/icon-fullscreen.png");
+				--loop-within-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-bar.png");
+	--loop-full-song-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-song.png");
+	--dont-loop-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-once.png");
 				} 
 					@font-face {
 				   font-family: "AbyssType";
@@ -9193,6 +9285,21 @@ var beepbox = (function (exports) {
 					--export-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-export.png");
 					--export-instrument-symbol: var(--export-symbol);
 					--import-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-import.png");
+					--undo-symbol: url("https://choptop84.github.io/abyssbox-app/icon-undo.png");
+					--redo-symbol: url("https://choptop84.github.io/abyssbox-app/icon-redo.png");
+					--copy-symbol: url("https://choptop84.github.io/abyssbox-app/icon-copy.png");
+					--paste-symbol: url("https://choptop84.github.io/abyssbox-app/icon-paste.png");
+					--insert-channel-symbol: url("https://choptop84.github.io/abyssbox-app/icon-insertChannel.png");
+					--delete-channel-symbol: url("https://choptop84.github.io/abyssbox-app/icon-deleteChannel.png");
+					--select-all-symbol: url("https://choptop84.github.io/abyssbox-app/icon-SelectAll.png");
+					--duplicate-symbol: url("https://choptop84.github.io/abyssbox-app/icon-duplicate.png");
+					--notes-up-symbol: url("https://choptop84.github.io/abyssbox-app/moveNotesUp.png");
+					--notes-down-symbol: url("https://choptop84.github.io/abyssbox-app/moveNotesDown.png");
+					--loop-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-singleBarLoop.png");
+					--fullscreen-symbol: url("https://choptop84.github.io/abyssbox-app/icon-fullscreen.png");
+					--loop-within-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-bar.png");
+	--loop-full-song-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-song.png");
+	--dont-loop-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-once.png");
 					}
 					
 						@font-face {
@@ -10283,6 +10390,21 @@ var beepbox = (function (exports) {
 						--export-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-export.png");
 						--export-instrument-symbol: var(--export-symbol);
 						--import-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-import.png");
+						--undo-symbol: url("https://choptop84.github.io/abyssbox-app/icon-undo.png");
+						--redo-symbol: url("https://choptop84.github.io/abyssbox-app/icon-redo.png");
+						--copy-symbol: url("https://choptop84.github.io/abyssbox-app/icon-copy.png");
+						--paste-symbol: url("https://choptop84.github.io/abyssbox-app/icon-paste.png");
+						--insert-channel-symbol: url("https://choptop84.github.io/abyssbox-app/icon-insertChannel.png");
+						--delete-channel-symbol: url("https://choptop84.github.io/abyssbox-app/icon-deleteChannel.png");
+						--select-all-symbol: url("https://choptop84.github.io/abyssbox-app/icon-SelectAll.png");
+						--duplicate-symbol: url("https://choptop84.github.io/abyssbox-app/icon-duplicate.png");
+						--notes-up-symbol: url("https://choptop84.github.io/abyssbox-app/moveNotesUp.png");
+						--notes-down-symbol: url("https://choptop84.github.io/abyssbox-app/moveNotesDown.png");
+						--loop-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-singleBarLoop.png");
+						--fullscreen-symbol: url("https://choptop84.github.io/abyssbox-app/icon-fullscreen.png");
+						--loop-within-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-bar.png");
+	--loop-full-song-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-song.png");
+	--dont-loop-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-once.png");
 						} 
 							@font-face {
 						   font-family: "AbyssType";
@@ -10567,6 +10689,21 @@ var beepbox = (function (exports) {
 				--export-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-export.png");
 				--export-instrument-symbol: var(--export-symbol);
 				--import-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-import.png");
+				--undo-symbol: url("https://choptop84.github.io/abyssbox-app/icon-undo.png");
+				--redo-symbol: url("https://choptop84.github.io/abyssbox-app/icon-redo.png");
+				--copy-symbol: url("https://choptop84.github.io/abyssbox-app/icon-copy.png");
+				--paste-symbol: url("https://choptop84.github.io/abyssbox-app/icon-paste.png");
+				--insert-channel-symbol: url("https://choptop84.github.io/abyssbox-app/icon-insertChannel.png");
+				--delete-channel-symbol: url("https://choptop84.github.io/abyssbox-app/icon-deleteChannel.png");
+				--select-all-symbol: url("https://choptop84.github.io/abyssbox-app/icon-SelectAll.png");
+				--duplicate-symbol: url("https://choptop84.github.io/abyssbox-app/icon-duplicate.png");
+				--notes-up-symbol: url("https://choptop84.github.io/abyssbox-app/moveNotesUp.png");
+				--notes-down-symbol: url("https://choptop84.github.io/abyssbox-app/moveNotesDown.png");
+				--loop-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-singleBarLoop.png");
+				--fullscreen-symbol: url("https://choptop84.github.io/abyssbox-app/icon-fullscreen.png");
+				--loop-within-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-bar.png");
+	--loop-full-song-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-song.png");
+	--dont-loop-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-once.png");
 				} 
 			
 			@font-face {
@@ -12792,6 +12929,21 @@ var beepbox = (function (exports) {
 				--export-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-export.png");
 				--export-instrument-symbol: var(--export-symbol);
 				--import-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-import.png");
+				--undo-symbol: url("https://choptop84.github.io/abyssbox-app/icon-undo.png");
+				--redo-symbol: url("https://choptop84.github.io/abyssbox-app/icon-redo.png");
+				--copy-symbol: url("https://choptop84.github.io/abyssbox-app/icon-copy.png");
+				--paste-symbol: url("https://choptop84.github.io/abyssbox-app/icon-paste.png");
+				--insert-channel-symbol: url("https://choptop84.github.io/abyssbox-app/icon-insertChannel.png");
+				--delete-channel-symbol: url("https://choptop84.github.io/abyssbox-app/icon-deleteChannel.png");
+				--select-all-symbol: url("https://choptop84.github.io/abyssbox-app/icon-SelectAll.png");
+				--duplicate-symbol: url("https://choptop84.github.io/abyssbox-app/icon-duplicate.png");
+				--notes-up-symbol: url("https://choptop84.github.io/abyssbox-app/moveNotesUp.png");
+				--notes-down-symbol: url("https://choptop84.github.io/abyssbox-app/moveNotesDown.png");
+				--loop-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-singleBarLoop.png");
+				--fullscreen-symbol: url("https://choptop84.github.io/abyssbox-app/icon-fullscreen.png");
+				--loop-within-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-bar.png");
+	--loop-full-song-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-song.png");
+	--dont-loop-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-once.png");
 				} 
 					@font-face {
 				   font-family: "AbyssType";
@@ -13809,6 +13961,21 @@ var beepbox = (function (exports) {
 		--export-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-export.png");
 		--export-instrument-symbol: var(--export-symbol);
 		--import-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-import.png");
+		--undo-symbol: url("https://choptop84.github.io/abyssbox-app/icon-undo.png");
+		--redo-symbol: url("https://choptop84.github.io/abyssbox-app/icon-redo.png");
+		--copy-symbol: url("https://choptop84.github.io/abyssbox-app/icon-copy.png");
+		--paste-symbol: url("https://choptop84.github.io/abyssbox-app/icon-paste.png");
+		--insert-channel-symbol: url("https://choptop84.github.io/abyssbox-app/icon-insertChannel.png");
+		--delete-channel-symbol: url("https://choptop84.github.io/abyssbox-app/icon-deleteChannel.png");
+		--select-all-symbol: url("https://choptop84.github.io/abyssbox-app/icon-SelectAll.png");
+		--duplicate-symbol: url("https://choptop84.github.io/abyssbox-app/icon-duplicate.png");
+		--notes-up-symbol: url("https://choptop84.github.io/abyssbox-app/moveNotesUp.png");
+		--notes-down-symbol: url("https://choptop84.github.io/abyssbox-app/moveNotesDown.png");
+		--loop-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-singleBarLoop.png");
+		--fullscreen-symbol: url("https://choptop84.github.io/abyssbox-app/icon-fullscreen.png");
+		--loop-within-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-bar.png");
+	--loop-full-song-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-song.png");
+	--dont-loop-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-once.png");
 		} 
 			@font-face {
 		   font-family: "AbyssType";
@@ -22529,22 +22696,24 @@ var beepbox = (function (exports) {
 	--add-symbol: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="-13 -13 26 26"><path fill="gray" d="M -8 -1 L -1 -1 L -1 -8  L 1 -8 L 1 -1 L 8 -1 L 8 1 L 1 1 L 1 8 L -1 8 L -1 1 L -8 1 z"/></svg>');
 	--zoom-in-symbol: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="-10 -10 20 20"><circle cx="-1" cy="-1" r="6" stroke-width="2" stroke="gray" fill="none"></circle><path stroke="gray" stroke-width="2" d="M 3 3 L 7 7 M -1 -4 L -1 2 M -4 -1 L 2 -1" fill="none"></path></svg>');
 	--zoom-out-symbol: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="-10 -10 20 20"><circle cx="-1" cy="-1" r="6" stroke-width="2" stroke="gray" fill="none"></circle><path stroke="gray" stroke-width="2" d="M 3 3 L 7 7 M -4 -1 L 2 -1" fill="none"></path></svg>');
-	--undo-symbol: url("https://choptop84.github.io/abyssbox-app/icon-undo.png");
-	--redo-symbol: url("https://choptop84.github.io/abyssbox-app/icon-redo.png");
-	--copy-symbol: url("https://choptop84.github.io/abyssbox-app/icon-copy.png");
-	--paste-symbol: url("https://choptop84.github.io/abyssbox-app/icon-paste.png");
-	--insert-channel-symbol: url("https://choptop84.github.io/abyssbox-app/icon-insertChannel.png");
-	--delete-channel-symbol: url("https://choptop84.github.io/abyssbox-app/icon-deleteChannel.png");
-	--select-all-symbol: url("https://choptop84.github.io/abyssbox-app/icon-SelectAll.png");
-	--duplicate-symbol: url("https://choptop84.github.io/abyssbox-app/icon-duplicate.png");
-	--notes-up-symbol: url("https://choptop84.github.io/abyssbox-app/moveNotesUp.png");
-	--notes-down-symbol: url("https://choptop84.github.io/abyssbox-app/moveNotesDown.png");
-	--loop-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-singleBarLoop.png");
+	--undo-symbol: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 36 36"><defs><clipPath id="a"><path d="M0 0h36v36H0z"/></clipPath></defs><path d="M15 16c.53 0 1.04.21 1.41.59.38.37.59.88.59 1.41s-.21 1.04-.59 1.41c-.37.38-4.62 4.63-5 5-.37.38-.88.59-1.41.59s-1.04-.21-1.41-.59c-.38-.37-4.63-4.62-5-5C3.21 19.04 3 18.53 3 18s.21-1.04.59-1.41c.37-.38.88-.59 1.41-.59h2C7 8.825 12.825 3 20 3s13 5.825 13 13v4c0 7.175-5.823 13-13 13a3.001 3.001 0 0 1 0-6c3.862 0 7-3.137 7-7v-4c0-3.863-3.137-7-7-7s-7 3.137-7 7z"/></svg>');
+	--redo-symbol: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 36 36"><defs><clipPath id="a"><path d="M0 0h36v36H0z"/></clipPath></defs><path d="M21 16c-.53 0-1.04.21-1.41.59-.38.37-.59.88-.59 1.41s.21 1.04.59 1.41c.37.38 4.62 4.63 5 5 .37.38.88.59 1.41.59s1.04-.21 1.41-.59c.38-.37 4.63-4.62 5-5 .38-.37.59-.88.59-1.41s-.21-1.04-.59-1.41c-.37-.38-.88-.59-1.41-.59h-2c0-7.175-5.825-13-13-13S3 8.825 3 16v4c0 7.175 5.823 13 13 13a3.001 3.001 0 0 0 0-6c-3.862 0-7-3.137-7-7v-4c0-3.863 3.137-7 7-7s7 3.137 7 7z"/></svg>');
+	--copy-symbol: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 36 36"><defs><clipPath id="a"><path d="M0 0h36v36H0z"/></clipPath></defs><path d="M14 15H7a1 1 0 0 0-1 1v13a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-5h-2c-1.656 0-3-1.344-3-3zm7-9h-3a1 1 0 0 0-1 1v13a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-6h-6c-1.656 0-3-1.344-3-3zm8 5-5-5v4.5a.5.5 0 0 0 .5.5zm-15 1H6.182A3.184 3.184 0 0 0 3 15.182v14.636A3.184 3.184 0 0 0 6.182 33h12.636A3.184 3.184 0 0 0 22 29.818V24h7.818A3.184 3.184 0 0 0 33 20.818V12c0-.79-.32-1.56-.88-2.12l-6-6C25.56 3.32 24.8 3 24 3h-6.818A3.184 3.184 0 0 0 14 6.182zm6 4h7a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1h-7a1 1 0 0 1-1-1v-1a1 1 0 0 1 1-1" fill-rule="evenodd"/></svg>');
+	--paste-symbol: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 36 36"><defs><clipPath id="a"><path d="M0 0h36v36H0z"/></clipPath></defs><path d="M15 31H7a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1h4v2h10V8h4a1 1 0 0 1 1 1v3l3 3V8c0-1.656-1.344-3-3-3h-5a3.19 3.19 0 0 0-3.182-3h-3.636A3.19 3.19 0 0 0 11 5H6C4.344 5 3 6.344 3 8v23c0 1.656 1.344 3 3 3h9zm2.606-26.5c.493 0 .894.401.894.894V7.5h-5V5.394c0-.493.401-.894.894-.894zM19 34c-1.656 0-3-1.344-3-3V16.182A3.184 3.184 0 0 1 19.182 13H24c.8 0 1.56.32 2.12.88l6 6c.56.56.88 1.33.88 2.12v8.818A3.184 3.184 0 0 1 29.818 34zm11-12-6-6v5.5a.5.5 0 0 0 .5.5zm-9-6h-1a1 1 0 0 0-1 1v13a1 1 0 0 0 1 1h9a1 1 0 0 0 1-1v-5h-6c-1.656 0-3-1.344-3-3zm6 11a1 1 0 0 1 0 2h-5a1 1 0 0 1 0-2z" /></svg>');
+	
+	--insert-channel-symbol: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 36 36"><defs><clipPath id="a"><path d="M0 0h36v36H0z"/></clipPath></defs><path d="M11 3a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM6.5 5a1 1 0 0 1 2 0v4h1a1 1 0 0 1 0 2h-4a1 1 0 0 1 0-2h1V7H6a1 1 0 0 1 0-2zM11 24a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1zm-4.5 2a1 1 0 0 1 2 0v4h1a1 1 0 0 1 0 2h-4a1 1 0 0 1 0-2h1v-2H6a1 1 0 0 1 0-2zm15-23a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1h-7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM17 5a1 1 0 0 1 2 0v4h1a1 1 0 0 1 0 2h-4a1 1 0 0 1 0-2h1V7h-.5a1 1 0 0 1 0-2zm4.5 19a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1h-7a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1zM17 26a1 1 0 0 1 2 0v4h1a1 1 0 0 1 0 2h-4a1 1 0 0 1 0-2h1v-2h-.5a1 1 0 0 1 0-2zM32 3a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1h-7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zm-4.5 2a1 1 0 0 1 2 0v4h1a1 1 0 0 1 0 2h-4a1 1 0 0 1 0-2h1V7H27a1 1 0 0 1 0-2zM32 24a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1h-7a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1zm-4.5 2a1 1 0 0 1 2 0v4h1a1 1 0 0 1 0 2h-4a1 1 0 0 1 0-2h1v-2H27a1 1 0 0 1 0-2zm-19-9v-2a1 1 0 0 0-2 0v2h-2a1 1 0 0 0 0 2h2v2a1 1 0 0 0 2 0v-2h2a1 1 0 0 0 0-2zM19 17v-2a1 1 0 0 0-2 0v2h-2a1 1 0 0 0 0 2h2v2a1 1 0 0 0 2 0v-2h2a1 1 0 0 0 0-2zm10.5 0v-2a1 1 0 0 0-2 0v2h-2a1 1 0 0 0 0 2h2v2a1 1 0 0 0 2 0v-2h2a1 1 0 0 0 0-2z" fill-rule="evenodd"/></svg>');
+	--delete-channel-symbol: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 36 36"><defs><clipPath id="a"><path d="M0 0h36v36H0z"/></clipPath></defs><path d="M11 3a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM6.5 5a1 1 0 0 1 2 0v4h1a1 1 0 0 1 0 2h-4a1 1 0 0 1 0-2h1V7H6a1 1 0 0 1 0-2zM11 24a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1zm-4.5 2a1 1 0 0 1 2 0v4h1a1 1 0 0 1 0 2h-4a1 1 0 0 1 0-2h1v-2H6a1 1 0 0 1 0-2zm15-23a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1h-7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM17 5a1 1 0 0 1 2 0v4h1a1 1 0 0 1 0 2h-4a1 1 0 0 1 0-2h1V7h-.5a1 1 0 0 1 0-2zm4.5 19a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1h-7a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1zM17 26a1 1 0 0 1 2 0v4h1a1 1 0 0 1 0 2h-4a1 1 0 0 1 0-2h1v-2h-.5a1 1 0 0 1 0-2zM32 3a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1h-7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zm-4.5 2a1 1 0 0 1 2 0v4h1a1 1 0 0 1 0 2h-4a1 1 0 0 1 0-2h1V7H27a1 1 0 0 1 0-2zM32 24a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1h-7a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1zm-4.5 2a1 1 0 0 1 2 0v4h1a1 1 0 0 1 0 2h-4a1 1 0 0 1 0-2h1v-2H27a1 1 0 0 1 0-2zm-20-9.414-2.793-2.793a.999.999 0 1 0-1.414 1.414L6.086 18l-2.793 2.793a.999.999 0 1 0 1.414 1.414L7.5 19.414l2.793 2.793a.999.999 0 1 0 1.414-1.414L8.914 18l2.793-2.793a.999.999 0 1 0-1.414-1.414zm10.5 0-2.793-2.793a.999.999 0 1 0-1.414 1.414L16.586 18l-2.793 2.793a.999.999 0 1 0 1.414 1.414L18 19.414l2.793 2.793a.999.999 0 1 0 1.414-1.414L19.414 18l2.793-2.793a.999.999 0 1 0-1.414-1.414zm10.5 0-2.793-2.793a.999.999 0 1 0-1.414 1.414L27.086 18l-2.793 2.793a.999.999 0 1 0 1.414 1.414l2.793-2.793 2.793 2.793a.999.999 0 1 0 1.414-1.414L29.914 18l2.793-2.793a.999.999 0 1 0-1.414-1.414z" fill-rule="evenodd"/></svg>');
+	--select-all-symbol: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 36 36"><defs><clipPath id="a"><path d="M0 0h36v36H0z"/></clipPath></defs><path d="M10 33H5.951A2.95 2.95 0 0 1 3 30.049V26h3v3.2a.8.8 0 0 0 .8.8H10zm1 0h4v-3h-4zm0-30h4v3h-4zm-1 0H5.951A2.95 2.95 0 0 0 3 5.951V10h3V6.8a.8.8 0 0 1 .8-.8H10zM3 25v-4h3v4zm30 0v-4h-3v4zm0 1v4.049A2.95 2.95 0 0 1 30.049 33H26v-3h3.2a.8.8 0 0 0 .8-.8V26zm-17 7h4v-3h-4zm0-30h4v3h-4zM3 20v-4h3v4zm30 0v-4h-3v4zM21 33h4v-3h-4zm0-30h4v3h-4zm12 12v-4h-3v4zM3 15v-4h3v4zM26 3h4.049A2.95 2.95 0 0 1 33 5.951V10h-3V6.8a.8.8 0 0 0-.8-.8H26zM9 8h7a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1m11 0h7a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1h-7a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1M9 19h7a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1m13.414 2H27a1 1 0 0 0 0-2h-7a1 1 0 0 0-1 1v7a1 1 0 0 0 2 0v-4.586l5.293 5.293a.999.999 0 1 0 1.414-1.414z" fill-rule="evenodd" /></svg>');
+	--duplicate-symbol: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 36 36"><defs><clipPath id="a"><path d="M0 0h36v36H0z"/></clipPath></defs><path d="M20 13h-3.25C14.68 13 13 14.68 13 16.75V20H6.778A.78.78 0 0 1 6 19.222V6.778C6 6.349 6.349 6 6.778 6h12.444c.429 0 .778.349.778.778zm-3.222 3h12.444c.429 0 .778.349.778.778v12.444a.78.78 0 0 1-.778.778H16.778a.78.78 0 0 1-.778-.778V16.778c0-.429.349-.778.778-.778M23 13h6.25c2.07 0 3.75 1.68 3.75 3.75v12.5c0 2.07-1.68 3.75-3.75 3.75h-12.5C14.68 33 13 31.32 13 29.25V23H6.75C4.68 23 3 21.32 3 19.25V6.75C3 4.68 4.68 3 6.75 3h12.5C21.32 3 23 4.68 23 6.75zm-1 9v-3a1 1 0 0 1 2 0v3h3a1 1 0 0 1 0 2h-3v3a1 1 0 0 1-2 0v-3h-3a1 1 0 0 1 0-2z" fill-rule="evenodd"/></svg>');
+	--notes-up-symbol: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 36 36"><defs><clipPath id="a"><path d="M0 0h36v36H0z"/></clipPath></defs><path d="M12 10.778V28.4c0 1.298-1.414 3.474-3.502 4.192-2.421.834-4.834.348-5.385-1.082s.968-3.269 3.389-4.102c1.728-.595 3.452-.518 4.498.095V7l18-4v21l-1 1V7.222zM26 28.18l3.604-3.576c.79-.791 2.058-.807 2.828-.036.771.77.755 2.038-.036 2.828l-5 5c-.79.791-2.058.807-2.828.036l-5-5c-.771-.77-.755-2.038.036-2.828.79-.791 2.058-.807 2.828-.036z"/></svg>');
+	--notes-down-symbol: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 36 36"><defs><clipPath id="a"><path d="M0 0h36v36H0z"/></clipPath></defs><path d="M12 10.778V28.4c0 1.298-1.414 3.474-3.502 4.192-2.421.834-4.834.348-5.385-1.082s.968-3.269 3.389-4.102c1.728-.595 3.452-.518 4.498.095V7l18-4v22l-1-1V7.222zM26 28.82l-3.604 3.576c-.79.791-2.058.807-2.828.036-.771-.77-.755-2.038.036-2.828l5-5c.79-.791 2.058-.807 2.828-.036l5 5c.771.77.755 2.038-.036 2.828-.79.791-2.058.807-2.828.036z" /></svg>');
+	--loop-bar-symbol: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 36 36"><defs><clipPath id="a"><path d="M0 0h36v36H0z"/></clipPath></defs><path d="M31.667 19c.736 0 1.333.597 1.333 1.333v9.334c0 .736-.597 1.333-1.333 1.333h-9.334A1.333 1.333 0 0 1 21 29.667v-9.334c0-.736.597-1.333 1.333-1.333zM26 27h-2a1 1 0 0 0 0 2h6a1 1 0 0 0 0-2h-2v-5a1 1 0 0 0-2 0v.5h-1a1 1 0 0 0 0 2h1zm5-9c0-4.967-4.033-9-9-9H12c-4.967 0-9 4.033-9 9s4.033 9 9 9h8v-5h-8c-2.208 0-4-1.792-4-4s1.792-4 4-4h10c2.208 0 4 1.792 4 4z"/></svg>');
+
 	--fullscreen-symbol: url("https://choptop84.github.io/abyssbox-app/icon-fullscreen.png");
 
-	--loop-within-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-bar.png");
-	--loop-full-song-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-song.png");
-	--dont-loop-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-once.png");
+	--loop-within-bar-symbol: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="2 -0.5 12 12"><path d="M 5 2 C 3 2 2 3 2 5 L 2 6 C 2 8 3 9 5 9 L 11 9 C 13 9 14 8 14 6 L 14 5 C 14 3 13 2 11 2 L 8 2 L 8 4 L 11 4 C 11 4 12 4 12 5 L 12 6 C 12 7 11 7 11 7 L 5 7 C 5 7 4 7 4 6 L 4 5 C 4 4 5 4 5 4 L 8 4 L 8 2"/></svg>');
+	--loop-full-song-symbol: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="2 -2 15 15"><path d="M 3 3 C 2 3 2 3 2 3 L 4 6 L 6 3 L 5 3 C 5 3 5 1 7 1 L 12 1 C 14 1 14 3 14 3 L 13 8 L 15 5 L 17 8 L 16 8 C 16 12 12 12 12 12 L 7 12 C 3 12 3 8 3 8 C 3 7 5 7 5 8 C 5 8 5 10 7 10 L 12 10 C 14 10 14 8 14 8 L 13 8 L 14 3 C 14 4 16 4 16 3 C 16 -1 12 -1 12 -1 L 7 -1 C 3 -1 3 3 3 3 Z Z"/></svg>');
+	--dont-loop-symbol: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="2 -2 15 15"><path d="M 3 3 C 2 3 2 3 2 3 L 4 6 L 6 3 L 5 3 C 5 3 5 1 7 1 L 12 1 C 14 1 14 3 14 3 L 13 8 L 15 5 L 17 8 L 16 8 C 16 12 12 12 12 12 L 7 12 C 3 12 3 8 3 8 C 3 7 5 7 5 8 C 5 8 5 10 7 10 L 12 10 C 14 10 14 8 14 8 L 8 8 L 8 7 L 9 7 L 9 4.5 L 8 4.5 L 8 3.5 L 9 3 L 10 3 L 10 7 L 11 7 L 11 8 L 13 8 L 14 3 C 14 4 16 4 16 3 C 16 -1 12 -1 12 -1 L 7 -1 C 3 -1 3 3 3 3 Z Z"/></svg>');
 
 	--checkmark-symbol: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="-13 -13 26 26"><path fill="gray" d="M -9 -2 L -8 -3 L -3 2 L 9 -8 L 10 -7 L -3 8 z"/></svg>');
 	--drum-symbol: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="40" viewBox="0 0 32 40"> \
