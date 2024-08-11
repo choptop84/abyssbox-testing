@@ -61947,6 +61947,24 @@ You should be redirected to the song at:<br /><br />
                         this._doc.record(group);
                         event.preventDefault();
                         break;
+                    case 80:
+                        if (canPlayNotes)
+                            break;
+                        if (event.ctrlKey || event.metaKey) {
+                            this._toggleRecord();
+                            this._doc.synth.loopBarStart = -1;
+                            this._doc.synth.loopBarEnd = -1;
+                            this._loopEditor.setLoopAt(this._doc.synth.loopBarStart, this._doc.synth.loopBarEnd);
+                            event.preventDefault();
+                            this.refocusStage();
+                        }
+                        else if (canPlayNotes)
+                            break;
+                        if (needControlForShortcuts == (event.ctrlKey || event.metaKey) && event.shiftKey) {
+                            location.href = "player/#song=" + this._doc.song.toBase64String();
+                            event.preventDefault();
+                        }
+                        break;
                     case 81:
                         if (canPlayNotes)
                             break;

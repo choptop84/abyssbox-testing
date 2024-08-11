@@ -2407,6 +2407,21 @@ var beepbox = (function (exports) {
 		--export-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-export.png");
 		--export-instrument-symbol: var(--export-symbol);
 		--import-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-import.png");
+		--undo-symbol: url("https://choptop84.github.io/abyssbox-app/icon-undo.png");
+		--redo-symbol: url("https://choptop84.github.io/abyssbox-app/icon-redo.png");
+		--copy-symbol: url("https://choptop84.github.io/abyssbox-app/icon-copy.png");
+		--paste-symbol: url("https://choptop84.github.io/abyssbox-app/icon-paste.png");
+		--insert-channel-symbol: url("https://choptop84.github.io/abyssbox-app/icon-insertChannel.png");
+		--delete-channel-symbol: url("https://choptop84.github.io/abyssbox-app/icon-deleteChannel.png");
+		--select-all-symbol: url("https://choptop84.github.io/abyssbox-app/icon-SelectAll.png");
+		--duplicate-symbol: url("https://choptop84.github.io/abyssbox-app/icon-duplicate.png");
+		--notes-up-symbol: url("https://choptop84.github.io/abyssbox-app/moveNotesUp.png");
+		--notes-down-symbol: url("https://choptop84.github.io/abyssbox-app/moveNotesDown.png");
+		--loop-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-singleBarLoop.png");
+		--fullscreen-symbol: url("https://choptop84.github.io/abyssbox-app/icon-fullscreen.png");
+	--loop-within-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-bar.png");
+	--loop-full-song-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-song.png");
+	--dont-loop-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-once.png");
 		}
 		
 			@font-face {
@@ -2751,6 +2766,21 @@ var beepbox = (function (exports) {
 		--export-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-export.png");
 		--export-instrument-symbol: var(--export-symbol);
 		--import-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-import.png");
+		--undo-symbol: url("https://choptop84.github.io/abyssbox-app/icon-undo.png");
+		--redo-symbol: url("https://choptop84.github.io/abyssbox-app/icon-redo.png");
+		--copy-symbol: url("https://choptop84.github.io/abyssbox-app/icon-copy.png");
+		--paste-symbol: url("https://choptop84.github.io/abyssbox-app/icon-paste.png");
+		--insert-channel-symbol: url("https://choptop84.github.io/abyssbox-app/icon-insertChannel.png");
+		--delete-channel-symbol: url("https://choptop84.github.io/abyssbox-app/icon-deleteChannel.png");
+		--select-all-symbol: url("https://choptop84.github.io/abyssbox-app/icon-SelectAll.png");
+		--duplicate-symbol: url("https://choptop84.github.io/abyssbox-app/icon-duplicate.png");
+		--notes-up-symbol: url("https://choptop84.github.io/abyssbox-app/moveNotesUp.png");
+		--notes-down-symbol: url("https://choptop84.github.io/abyssbox-app/moveNotesDown.png");
+		--loop-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-singleBarLoop.png");
+		--fullscreen-symbol: url("https://choptop84.github.io/abyssbox-app/icon-fullscreen.png");
+		--loop-within-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-bar.png");
+	--loop-full-song-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-song.png");
+	--dont-loop-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-once.png");
 		}
 		
 			@font-face {
@@ -3159,6 +3189,21 @@ var beepbox = (function (exports) {
 		--export-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-export.png");
 		--export-instrument-symbol: var(--export-symbol);
 		--import-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-import.png");
+		--undo-symbol: url("https://choptop84.github.io/abyssbox-app/icon-undo.png");
+		--redo-symbol: url("https://choptop84.github.io/abyssbox-app/icon-redo.png");
+		--copy-symbol: url("https://choptop84.github.io/abyssbox-app/icon-copy.png");
+		--paste-symbol: url("https://choptop84.github.io/abyssbox-app/icon-paste.png");
+		--insert-channel-symbol: url("https://choptop84.github.io/abyssbox-app/icon-insertChannel.png");
+		--delete-channel-symbol: url("https://choptop84.github.io/abyssbox-app/icon-deleteChannel.png");
+		--select-all-symbol: url("https://choptop84.github.io/abyssbox-app/icon-SelectAll.png");
+		--duplicate-symbol: url("https://choptop84.github.io/abyssbox-app/icon-duplicate.png");
+		--notes-up-symbol: url("https://choptop84.github.io/abyssbox-app/moveNotesUp.png");
+		--notes-down-symbol: url("https://choptop84.github.io/abyssbox-app/moveNotesDown.png");
+		--loop-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-singleBarLoop.png");
+		--fullscreen-symbol: url("https://choptop84.github.io/abyssbox-app/icon-fullscreen.png");
+		--loop-within-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-bar.png");
+	--loop-full-song-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-song.png");
+	--dont-loop-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-once.png");
 		}
 		
 			@font-face {
@@ -3560,6 +3605,21 @@ var beepbox = (function (exports) {
 		--export-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-export.png");
 		--export-instrument-symbol: var(--export-symbol);
 		--import-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-import.png");
+		--undo-symbol: url("https://choptop84.github.io/abyssbox-app/icon-undo.png");
+		--redo-symbol: url("https://choptop84.github.io/abyssbox-app/icon-redo.png");
+		--copy-symbol: url("https://choptop84.github.io/abyssbox-app/icon-copy.png");
+		--paste-symbol: url("https://choptop84.github.io/abyssbox-app/icon-paste.png");
+		--insert-channel-symbol: url("https://choptop84.github.io/abyssbox-app/icon-insertChannel.png");
+		--delete-channel-symbol: url("https://choptop84.github.io/abyssbox-app/icon-deleteChannel.png");
+		--select-all-symbol: url("https://choptop84.github.io/abyssbox-app/icon-SelectAll.png");
+		--duplicate-symbol: url("https://choptop84.github.io/abyssbox-app/icon-duplicate.png");
+		--notes-up-symbol: url("https://choptop84.github.io/abyssbox-app/moveNotesUp.png");
+		--notes-down-symbol: url("https://choptop84.github.io/abyssbox-app/moveNotesDown.png");
+		--loop-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-singleBarLoop.png");
+		--fullscreen-symbol: url("https://choptop84.github.io/abyssbox-app/icon-fullscreen.png");
+		--loop-within-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-bar.png");
+	--loop-full-song-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-song.png");
+	--dont-loop-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-once.png");
 		}
 		
 			@font-face {
@@ -6881,6 +6941,21 @@ var beepbox = (function (exports) {
 		--export-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-export.png");
 		--export-instrument-symbol: var(--export-symbol);
 		--import-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-import.png");
+		--undo-symbol: url("https://choptop84.github.io/abyssbox-app/icon-undo.png");
+		--redo-symbol: url("https://choptop84.github.io/abyssbox-app/icon-redo.png");
+		--copy-symbol: url("https://choptop84.github.io/abyssbox-app/icon-copy.png");
+		--paste-symbol: url("https://choptop84.github.io/abyssbox-app/icon-paste.png");
+		--insert-channel-symbol: url("https://choptop84.github.io/abyssbox-app/icon-insertChannel.png");
+		--delete-channel-symbol: url("https://choptop84.github.io/abyssbox-app/icon-deleteChannel.png");
+		--select-all-symbol: url("https://choptop84.github.io/abyssbox-app/icon-SelectAll.png");
+		--duplicate-symbol: url("https://choptop84.github.io/abyssbox-app/icon-duplicate.png");
+		--notes-up-symbol: url("https://choptop84.github.io/abyssbox-app/moveNotesUp.png");
+		--notes-down-symbol: url("https://choptop84.github.io/abyssbox-app/moveNotesDown.png");
+		--loop-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-singleBarLoop.png");
+		--fullscreen-symbol: url("https://choptop84.github.io/abyssbox-app/icon-fullscreen.png");
+		--loop-within-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-bar.png");
+	--loop-full-song-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-song.png");
+	--dont-loop-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-once.png");
 		}
 		
 		.beepboxEditor input[type="range"]::-moz-range-track
@@ -8171,6 +8246,21 @@ var beepbox = (function (exports) {
 				--export-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-export.png");
 				--export-instrument-symbol: var(--export-symbol);
 				--import-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-import.png");
+				--undo-symbol: url("https://choptop84.github.io/abyssbox-app/icon-undo.png");
+				--redo-symbol: url("https://choptop84.github.io/abyssbox-app/icon-redo.png");
+				--copy-symbol: url("https://choptop84.github.io/abyssbox-app/icon-copy.png");
+				--paste-symbol: url("https://choptop84.github.io/abyssbox-app/icon-paste.png");
+				--insert-channel-symbol: url("https://choptop84.github.io/abyssbox-app/icon-insertChannel.png");
+				--delete-channel-symbol: url("https://choptop84.github.io/abyssbox-app/icon-deleteChannel.png");
+				--select-all-symbol: url("https://choptop84.github.io/abyssbox-app/icon-SelectAll.png");
+				--duplicate-symbol: url("https://choptop84.github.io/abyssbox-app/icon-duplicate.png");
+				--notes-up-symbol: url("https://choptop84.github.io/abyssbox-app/moveNotesUp.png");
+				--notes-down-symbol: url("https://choptop84.github.io/abyssbox-app/moveNotesDown.png");
+				--loop-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-singleBarLoop.png");
+				--fullscreen-symbol: url("https://choptop84.github.io/abyssbox-app/icon-fullscreen.png");
+				--loop-within-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-bar.png");
+	--loop-full-song-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-song.png");
+	--dont-loop-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-once.png");
 				} 
 					@font-face {
 				   font-family: "AbyssType";
@@ -8761,6 +8851,21 @@ var beepbox = (function (exports) {
 					--export-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-export.png");
 					--export-instrument-symbol: var(--export-symbol);
 					--import-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-import.png");
+					--undo-symbol: url("https://choptop84.github.io/abyssbox-app/icon-undo.png");
+					--redo-symbol: url("https://choptop84.github.io/abyssbox-app/icon-redo.png");
+					--copy-symbol: url("https://choptop84.github.io/abyssbox-app/icon-copy.png");
+					--paste-symbol: url("https://choptop84.github.io/abyssbox-app/icon-paste.png");
+					--insert-channel-symbol: url("https://choptop84.github.io/abyssbox-app/icon-insertChannel.png");
+					--delete-channel-symbol: url("https://choptop84.github.io/abyssbox-app/icon-deleteChannel.png");
+					--select-all-symbol: url("https://choptop84.github.io/abyssbox-app/icon-SelectAll.png");
+					--duplicate-symbol: url("https://choptop84.github.io/abyssbox-app/icon-duplicate.png");
+					--notes-up-symbol: url("https://choptop84.github.io/abyssbox-app/moveNotesUp.png");
+					--notes-down-symbol: url("https://choptop84.github.io/abyssbox-app/moveNotesDown.png");
+					--loop-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-singleBarLoop.png");
+					--fullscreen-symbol: url("https://choptop84.github.io/abyssbox-app/icon-fullscreen.png");
+					--loop-within-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-bar.png");
+	--loop-full-song-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-song.png");
+	--dont-loop-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-once.png");
 					}
 					
 						@font-face {
@@ -9851,6 +9956,21 @@ var beepbox = (function (exports) {
 						--export-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-export.png");
 						--export-instrument-symbol: var(--export-symbol);
 						--import-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-import.png");
+						--undo-symbol: url("https://choptop84.github.io/abyssbox-app/icon-undo.png");
+						--redo-symbol: url("https://choptop84.github.io/abyssbox-app/icon-redo.png");
+						--copy-symbol: url("https://choptop84.github.io/abyssbox-app/icon-copy.png");
+						--paste-symbol: url("https://choptop84.github.io/abyssbox-app/icon-paste.png");
+						--insert-channel-symbol: url("https://choptop84.github.io/abyssbox-app/icon-insertChannel.png");
+						--delete-channel-symbol: url("https://choptop84.github.io/abyssbox-app/icon-deleteChannel.png");
+						--select-all-symbol: url("https://choptop84.github.io/abyssbox-app/icon-SelectAll.png");
+						--duplicate-symbol: url("https://choptop84.github.io/abyssbox-app/icon-duplicate.png");
+						--notes-up-symbol: url("https://choptop84.github.io/abyssbox-app/moveNotesUp.png");
+						--notes-down-symbol: url("https://choptop84.github.io/abyssbox-app/moveNotesDown.png");
+						--loop-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-singleBarLoop.png");
+						--fullscreen-symbol: url("https://choptop84.github.io/abyssbox-app/icon-fullscreen.png");
+						--loop-within-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-bar.png");
+	--loop-full-song-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-song.png");
+	--dont-loop-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-once.png");
 						} 
 							@font-face {
 						   font-family: "AbyssType";
@@ -10135,6 +10255,21 @@ var beepbox = (function (exports) {
 				--export-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-export.png");
 				--export-instrument-symbol: var(--export-symbol);
 				--import-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-import.png");
+				--undo-symbol: url("https://choptop84.github.io/abyssbox-app/icon-undo.png");
+				--redo-symbol: url("https://choptop84.github.io/abyssbox-app/icon-redo.png");
+				--copy-symbol: url("https://choptop84.github.io/abyssbox-app/icon-copy.png");
+				--paste-symbol: url("https://choptop84.github.io/abyssbox-app/icon-paste.png");
+				--insert-channel-symbol: url("https://choptop84.github.io/abyssbox-app/icon-insertChannel.png");
+				--delete-channel-symbol: url("https://choptop84.github.io/abyssbox-app/icon-deleteChannel.png");
+				--select-all-symbol: url("https://choptop84.github.io/abyssbox-app/icon-SelectAll.png");
+				--duplicate-symbol: url("https://choptop84.github.io/abyssbox-app/icon-duplicate.png");
+				--notes-up-symbol: url("https://choptop84.github.io/abyssbox-app/moveNotesUp.png");
+				--notes-down-symbol: url("https://choptop84.github.io/abyssbox-app/moveNotesDown.png");
+				--loop-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-singleBarLoop.png");
+				--fullscreen-symbol: url("https://choptop84.github.io/abyssbox-app/icon-fullscreen.png");
+				--loop-within-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-bar.png");
+	--loop-full-song-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-song.png");
+	--dont-loop-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-once.png");
 				} 
 			
 			@font-face {
@@ -12360,6 +12495,21 @@ var beepbox = (function (exports) {
 				--export-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-export.png");
 				--export-instrument-symbol: var(--export-symbol);
 				--import-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-import.png");
+				--undo-symbol: url("https://choptop84.github.io/abyssbox-app/icon-undo.png");
+				--redo-symbol: url("https://choptop84.github.io/abyssbox-app/icon-redo.png");
+				--copy-symbol: url("https://choptop84.github.io/abyssbox-app/icon-copy.png");
+				--paste-symbol: url("https://choptop84.github.io/abyssbox-app/icon-paste.png");
+				--insert-channel-symbol: url("https://choptop84.github.io/abyssbox-app/icon-insertChannel.png");
+				--delete-channel-symbol: url("https://choptop84.github.io/abyssbox-app/icon-deleteChannel.png");
+				--select-all-symbol: url("https://choptop84.github.io/abyssbox-app/icon-SelectAll.png");
+				--duplicate-symbol: url("https://choptop84.github.io/abyssbox-app/icon-duplicate.png");
+				--notes-up-symbol: url("https://choptop84.github.io/abyssbox-app/moveNotesUp.png");
+				--notes-down-symbol: url("https://choptop84.github.io/abyssbox-app/moveNotesDown.png");
+				--loop-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-singleBarLoop.png");
+				--fullscreen-symbol: url("https://choptop84.github.io/abyssbox-app/icon-fullscreen.png");
+				--loop-within-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-bar.png");
+	--loop-full-song-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-song.png");
+	--dont-loop-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-once.png");
 				} 
 					@font-face {
 				   font-family: "AbyssType";
@@ -13377,6 +13527,21 @@ var beepbox = (function (exports) {
 		--export-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-export.png");
 		--export-instrument-symbol: var(--export-symbol);
 		--import-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-import.png");
+		--undo-symbol: url("https://choptop84.github.io/abyssbox-app/icon-undo.png");
+		--redo-symbol: url("https://choptop84.github.io/abyssbox-app/icon-redo.png");
+		--copy-symbol: url("https://choptop84.github.io/abyssbox-app/icon-copy.png");
+		--paste-symbol: url("https://choptop84.github.io/abyssbox-app/icon-paste.png");
+		--insert-channel-symbol: url("https://choptop84.github.io/abyssbox-app/icon-insertChannel.png");
+		--delete-channel-symbol: url("https://choptop84.github.io/abyssbox-app/icon-deleteChannel.png");
+		--select-all-symbol: url("https://choptop84.github.io/abyssbox-app/icon-SelectAll.png");
+		--duplicate-symbol: url("https://choptop84.github.io/abyssbox-app/icon-duplicate.png");
+		--notes-up-symbol: url("https://choptop84.github.io/abyssbox-app/moveNotesUp.png");
+		--notes-down-symbol: url("https://choptop84.github.io/abyssbox-app/moveNotesDown.png");
+		--loop-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-singleBarLoop.png");
+		--fullscreen-symbol: url("https://choptop84.github.io/abyssbox-app/icon-fullscreen.png");
+		--loop-within-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-bar.png");
+	--loop-full-song-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-song.png");
+	--dont-loop-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-once.png");
 		} 
 			@font-face {
 		   font-family: "AbyssType";
@@ -22082,7 +22247,7 @@ var beepbox = (function (exports) {
             return (_a = EditorConfig.presetCategories[0].presets.dictionary) === null || _a === void 0 ? void 0 : _a[TypePresets === null || TypePresets === void 0 ? void 0 : TypePresets[instrument]];
         }
     }
-    EditorConfig.version = "1.4.5";
+    EditorConfig.version = "1.5";
     EditorConfig.versionDisplayName = "AbyssBox " + EditorConfig.version;
     EditorConfig.releaseNotesURL = "./patch_notes.html";
     EditorConfig.isOnMac = /^Mac/i.test(navigator.platform) || /Mac OS X/i.test(navigator.userAgent) || /^(iPhone|iPad|iPod)/i.test(navigator.platform) || /(iPhone|iPad|iPod)/i.test(navigator.userAgent);
@@ -22460,6 +22625,8 @@ var beepbox = (function (exports) {
                 { name: "Shamisen 2", generalMidi: false, settings: { "type": "FM6op", "eqFilter": [], "eqFilterType": false, "eqSimpleCut": 10, "eqSimplePeak": 0, "envelopeSpeed": 12, "discreteEnvelope": false, "eqSubFilters0": [], "effects": ["chord type", "note filter", "reverb"], "chord": "strum", "fastTwoNoteArp": true, "arpeggioSpeed": 12, "noteFilterType": true, "noteSimpleCut": 8, "noteSimplePeak": 1, "noteFilter": [{ "type": "low-pass", "cutoffHz": 6000, "linearGain": 0.5 }], "noteSubFilters1": [{ "type": "low-pass", "cutoffHz": 6000, "linearGain": 0.5 }], "panDelay": 10, "reverb": 0, "fadeInSeconds": 0, "fadeOutTicks": 48, "algorithm": "Custom", "feedbackType": "Custom", "feedbackAmplitude": 4, "customAlgorithm": { "mods": [[6, 2, 3, 4, 5], [], [], [], [], []], "carrierCount": 2 }, "customFeedback": { "mods": [[1], [], [], [], [], []] }, "operators": [{ "frequency": "1×", "amplitude": 15, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "2×", "amplitude": 12, "waveform": "rounded", "pulseWidth": 5 }, { "frequency": "6×", "amplitude": 6, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "0.5×", "amplitude": 11, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "16×", "amplitude": 5, "waveform": "triangle", "pulseWidth": 5 }, { "frequency": "4×", "amplitude": 7, "waveform": "sine", "pulseWidth": 5 }], "envelopes": [{ "target": "noteFilterAllFreqs", "envelope": "twang 1" }] } },
                 { name: "Picked Dist Guitar", generalMidi: false, settings: { "type": "Picked String", "eqFilter": [], "eqFilterType": false, "eqSimpleCut": 10, "eqSimplePeak": 0, "envelopeSpeed": 12, "discreteEnvelope": false, "eqSubFilters0": [], "effects": ["vibrato", "note filter", "distortion", "bitcrusher"], "vibrato": "custom", "vibratoDepth": 0.32, "vibratoDelay": 19, "vibratoSpeed": 10, "vibratoType": 0, "noteFilterType": false, "noteSimpleCut": 10, "noteSimplePeak": 0, "noteFilter": [{ "type": "low-pass", "cutoffHz": 13454.34, "linearGain": 0.7071 }, { "type": "low-pass", "cutoffHz": 9513.66, "linearGain": 0.5 }], "noteSubFilters0": [{ "type": "low-pass", "cutoffHz": 13454.34, "linearGain": 0.7071 }, { "type": "low-pass", "cutoffHz": 9513.66, "linearGain": 0.5 }], "distortion": 43, "aliases": false, "bitcrusherOctave": 5.5, "bitcrusherQuantization": 14, "panDelay": 10, "fadeInSeconds": 0, "fadeOutTicks": 12, "harmonics": [86, 86, 86, 86, 71, 57, 71, 71, 14, 14, 14, 29, 57, 43, 43, 57, 43, 29, 29, 29, 29, 29, 29, 43, 43, 43, 0, 71], "unison": "none", "stringSustain": 71, "envelopes": [{ "target": "noteFilterAllFreqs", "envelope": "twang 3" }, { "target": "noteVolume", "envelope": "punch" }] } },
                 { name: "Heavy Knock", generalMidi: false, isNoise: true, settings: { "type": "noise", "eqFilter": [], "eqFilterType": false, "eqSimpleCut": 10, "eqSimplePeak": 0, "envelopeSpeed": 12, "discreteEnvelope": false, "eqSubFilters0": [], "effects": ["vibrato", "note filter", "reverb"], "vibrato": "delayed", "vibratoDepth": 0.3, "vibratoDelay": 18.5, "vibratoSpeed": 10, "vibratoType": 0, "noteFilterType": true, "noteSimpleCut": 7, "noteSimplePeak": 1, "noteFilter": [{ "type": "low-pass", "cutoffHz": 3828.43, "linearGain": 0.5 }], "noteSubFilters1": [{ "type": "low-pass", "cutoffHz": 3828.43, "linearGain": 0.5 }], "panDelay": 10, "reverb": 0, "fadeInSeconds": 0, "fadeOutTicks": 48, "wave": "white", "unison": "none", "envelopes": [{ "target": "noteFilterAllFreqs", "envelope": "twang 2" }] } },
+                { name: "Future Keys", generalMidi: false, settings: { "type": "harmonics", "eqFilter": [{ "type": "high-pass", "cutoffHz": 125, "linearGain": 0.25 }], "eqFilterType": false, "eqSimpleCut": 10, "eqSimplePeak": 0, "envelopeSpeed": 1, "discreteEnvelope": false, "eqSubFilters0": [{ "type": "high-pass", "cutoffHz": 125, "linearGain": 0.25 }], "effects": ["chorus", "echo", "reverb", "phaser"], "panDelay": 10, "chorus": 43, "echoSustain": 43, "echoDelayBeats": 0.75, "reverb": 19, "fadeInSeconds": 0, "fadeOutTicks": -1, "harmonics": [100, 100, 100, 86, 86, 86, 71, 71, 57, 29, 14, 14, 14, 0, 29, 57, 29, 0, 29, 43, 57, 57, 29, 14, 14, 29, 43, 29], "unison": "none", "envelopes": [{ "target": "phaserFreq", "envelope": "tremolo6" }, { "target": "noteVolume", "envelope": "twang -1" }] } },
+                { name: "Light Bell", generalMidi: false, settings: { "type": "Picked String", "eqFilter": [{ "type": "low-pass", "cutoffHz": 8000, "linearGain": 1 }, { "type": "high-pass", "cutoffHz": 88.39, "linearGain": 1 }], "eqFilterType": false, "eqSimpleCut": 10, "eqSimplePeak": 0, "envelopeSpeed": 12, "discreteEnvelope": false, "effects": ["reverb", "ring modulation"], "panDelay": 10, "reverb": 39, "fadeInSeconds": 0, "fadeOutTicks": 24, "harmonics": [43, 71, 0, 100, 0, 100, 0, 86, 0, 0, 86, 0, 14, 71, 14, 14, 57, 14, 14, 43, 14, 14, 43, 14, 14, 43, 14, 43], "unison": "shimmer", "stringSustain": 71, "envelopes": [{ "target": "noteVolume", "envelope": "twang 3" }] } },
             ]) },
     ]);
 
@@ -24063,6 +24230,7 @@ var beepbox = (function (exports) {
             this.phaserFreq = 0;
             this.phaserFeedback = 0;
             this.phaserStages = 2;
+            this.phaserMix = Config.phaserMixRange - 1;
             this.pan = Config.panCenter;
             this.panDelay = 10;
             this.pitchShift = Config.pitchShiftCenter;
@@ -25629,6 +25797,7 @@ var beepbox = (function (exports) {
                         buffer.push(base64IntToCharCode[instrument.phaserFreq]);
                         buffer.push(base64IntToCharCode[instrument.phaserFeedback]);
                         buffer.push(base64IntToCharCode[instrument.phaserStages]);
+                        buffer.push(base64IntToCharCode[instrument.phaserMix]);
                     }
                     if (effectsIncludeBitcrusher(instrument.effects)) {
                         buffer.push(base64IntToCharCode[instrument.bitcrusherFreq], base64IntToCharCode[instrument.bitcrusherQuantization]);
@@ -27225,6 +27394,7 @@ var beepbox = (function (exports) {
                                     instrument.phaserFreq = clamp(0, Config.phaserFreqRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                                     instrument.phaserFeedback = clamp(0, Config.phaserFeedbackRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                                     instrument.phaserStages = clamp(0, Config.phaserMaxStages + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                                    instrument.phaserMix = clamp(0, Config.phaserMixRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                                 }
                                 if (effectsIncludeBitcrusher(instrument.effects)) {
                                     instrument.bitcrusherFreq = clamp(0, Config.bitcrusherFreqRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
@@ -36229,6 +36399,13 @@ var beepbox = (function (exports) {
                 synth.computeLatestModValues();
                 renderPlayhead();
                 event.preventDefault();
+                break;
+            case 80:
+                if (event.shiftKey) {
+                    hashUpdatedExternally();
+                    location.href = "../#" + synth.song.toBase64String();
+                    event.preventDefault();
+                }
                 break;
         }
     }

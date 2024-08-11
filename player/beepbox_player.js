@@ -2419,6 +2419,9 @@ var beepbox = (function (exports) {
 		--notes-down-symbol: url("https://choptop84.github.io/abyssbox-app/moveNotesDown.png");
 		--loop-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-singleBarLoop.png");
 		--fullscreen-symbol: url("https://choptop84.github.io/abyssbox-app/icon-fullscreen.png");
+	--loop-within-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-bar.png");
+	--loop-full-song-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-song.png");
+	--dont-loop-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-once.png");
 		}
 		
 			@font-face {
@@ -2775,6 +2778,9 @@ var beepbox = (function (exports) {
 		--notes-down-symbol: url("https://choptop84.github.io/abyssbox-app/moveNotesDown.png");
 		--loop-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-singleBarLoop.png");
 		--fullscreen-symbol: url("https://choptop84.github.io/abyssbox-app/icon-fullscreen.png");
+		--loop-within-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-bar.png");
+	--loop-full-song-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-song.png");
+	--dont-loop-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-once.png");
 		}
 		
 			@font-face {
@@ -3195,6 +3201,9 @@ var beepbox = (function (exports) {
 		--notes-down-symbol: url("https://choptop84.github.io/abyssbox-app/moveNotesDown.png");
 		--loop-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-singleBarLoop.png");
 		--fullscreen-symbol: url("https://choptop84.github.io/abyssbox-app/icon-fullscreen.png");
+		--loop-within-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-bar.png");
+	--loop-full-song-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-song.png");
+	--dont-loop-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-once.png");
 		}
 		
 			@font-face {
@@ -3608,6 +3617,9 @@ var beepbox = (function (exports) {
 		--notes-down-symbol: url("https://choptop84.github.io/abyssbox-app/moveNotesDown.png");
 		--loop-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-singleBarLoop.png");
 		--fullscreen-symbol: url("https://choptop84.github.io/abyssbox-app/icon-fullscreen.png");
+		--loop-within-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-bar.png");
+	--loop-full-song-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-song.png");
+	--dont-loop-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-once.png");
 		}
 		
 			@font-face {
@@ -6941,6 +6953,9 @@ var beepbox = (function (exports) {
 		--notes-down-symbol: url("https://choptop84.github.io/abyssbox-app/moveNotesDown.png");
 		--loop-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-singleBarLoop.png");
 		--fullscreen-symbol: url("https://choptop84.github.io/abyssbox-app/icon-fullscreen.png");
+		--loop-within-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-bar.png");
+	--loop-full-song-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-song.png");
+	--dont-loop-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-once.png");
 		}
 		
 		.beepboxEditor input[type="range"]::-moz-range-track
@@ -8243,6 +8258,9 @@ var beepbox = (function (exports) {
 				--notes-down-symbol: url("https://choptop84.github.io/abyssbox-app/moveNotesDown.png");
 				--loop-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-singleBarLoop.png");
 				--fullscreen-symbol: url("https://choptop84.github.io/abyssbox-app/icon-fullscreen.png");
+				--loop-within-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-bar.png");
+	--loop-full-song-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-song.png");
+	--dont-loop-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-once.png");
 				} 
 					@font-face {
 				   font-family: "AbyssType";
@@ -8845,6 +8863,9 @@ var beepbox = (function (exports) {
 					--notes-down-symbol: url("https://choptop84.github.io/abyssbox-app/moveNotesDown.png");
 					--loop-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-singleBarLoop.png");
 					--fullscreen-symbol: url("https://choptop84.github.io/abyssbox-app/icon-fullscreen.png");
+					--loop-within-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-bar.png");
+	--loop-full-song-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-song.png");
+	--dont-loop-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-once.png");
 					}
 					
 						@font-face {
@@ -9947,6 +9968,9 @@ var beepbox = (function (exports) {
 						--notes-down-symbol: url("https://choptop84.github.io/abyssbox-app/moveNotesDown.png");
 						--loop-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-singleBarLoop.png");
 						--fullscreen-symbol: url("https://choptop84.github.io/abyssbox-app/icon-fullscreen.png");
+						--loop-within-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-bar.png");
+	--loop-full-song-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-song.png");
+	--dont-loop-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-once.png");
 						} 
 							@font-face {
 						   font-family: "AbyssType";
@@ -10243,6 +10267,9 @@ var beepbox = (function (exports) {
 				--notes-down-symbol: url("https://choptop84.github.io/abyssbox-app/moveNotesDown.png");
 				--loop-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-singleBarLoop.png");
 				--fullscreen-symbol: url("https://choptop84.github.io/abyssbox-app/icon-fullscreen.png");
+				--loop-within-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-bar.png");
+	--loop-full-song-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-song.png");
+	--dont-loop-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-once.png");
 				} 
 			
 			@font-face {
@@ -12480,6 +12507,9 @@ var beepbox = (function (exports) {
 				--notes-down-symbol: url("https://choptop84.github.io/abyssbox-app/moveNotesDown.png");
 				--loop-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-singleBarLoop.png");
 				--fullscreen-symbol: url("https://choptop84.github.io/abyssbox-app/icon-fullscreen.png");
+				--loop-within-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-bar.png");
+	--loop-full-song-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-song.png");
+	--dont-loop-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-once.png");
 				} 
 					@font-face {
 				   font-family: "AbyssType";
@@ -13509,6 +13539,9 @@ var beepbox = (function (exports) {
 		--notes-down-symbol: url("https://choptop84.github.io/abyssbox-app/moveNotesDown.png");
 		--loop-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-singleBarLoop.png");
 		--fullscreen-symbol: url("https://choptop84.github.io/abyssbox-app/icon-fullscreen.png");
+		--loop-within-bar-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-bar.png");
+	--loop-full-song-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-song.png");
+	--dont-loop-symbol: url("https://choptop84.github.io/abyssbox-app/icon-loop-once.png");
 		} 
 			@font-face {
 		   font-family: "AbyssType";
@@ -24197,6 +24230,7 @@ var beepbox = (function (exports) {
             this.phaserFreq = 0;
             this.phaserFeedback = 0;
             this.phaserStages = 2;
+            this.phaserMix = Config.phaserMixRange - 1;
             this.pan = Config.panCenter;
             this.panDelay = 10;
             this.pitchShift = Config.pitchShiftCenter;
@@ -25763,6 +25797,7 @@ var beepbox = (function (exports) {
                         buffer.push(base64IntToCharCode[instrument.phaserFreq]);
                         buffer.push(base64IntToCharCode[instrument.phaserFeedback]);
                         buffer.push(base64IntToCharCode[instrument.phaserStages]);
+                        buffer.push(base64IntToCharCode[instrument.phaserMix]);
                     }
                     if (effectsIncludeBitcrusher(instrument.effects)) {
                         buffer.push(base64IntToCharCode[instrument.bitcrusherFreq], base64IntToCharCode[instrument.bitcrusherQuantization]);
@@ -27359,6 +27394,7 @@ var beepbox = (function (exports) {
                                     instrument.phaserFreq = clamp(0, Config.phaserFreqRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                                     instrument.phaserFeedback = clamp(0, Config.phaserFeedbackRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                                     instrument.phaserStages = clamp(0, Config.phaserMaxStages + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                                    instrument.phaserMix = clamp(0, Config.phaserMixRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                                 }
                                 if (effectsIncludeBitcrusher(instrument.effects)) {
                                     instrument.bitcrusherFreq = clamp(0, Config.bitcrusherFreqRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
@@ -36363,6 +36399,13 @@ var beepbox = (function (exports) {
                 synth.computeLatestModValues();
                 renderPlayhead();
                 event.preventDefault();
+                break;
+            case 80:
+                if (event.shiftKey) {
+                    hashUpdatedExternally();
+                    location.href = "../#" + synth.song.toBase64String();
+                    event.preventDefault();
+                }
                 break;
         }
     }
