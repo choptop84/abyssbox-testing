@@ -493,8 +493,8 @@ var beepbox = (function (exports) {
         { name: "÷3 (triplets)", stepsPerBeat: 3, roundUpThresholds: [5, 12, 18] },
         { name: "÷4 (standard)", stepsPerBeat: 4, roundUpThresholds: [3, 9, 17, 21] },
         { name: "÷6 (sextuplets)", stepsPerBeat: 6, roundUpThresholds: null },
-        { name: "÷8 (32nd notes)", stepsPerBeat: 8, roundUpThresholds: null },
-        { name: "÷12 (doudectuplets)", stepsPerBeat: 12, roundUpThresholds: null },
+        { name: "÷8 (eighth notes)", stepsPerBeat: 8, roundUpThresholds: null },
+        { name: "÷12 (twelfth notes)", stepsPerBeat: 12, roundUpThresholds: null },
         { name: "freehand", stepsPerBeat: 24, roundUpThresholds: null },
     ]);
     Config.instrumentTypeNames = ["chip", "FM", "noise", "spectrum", "drumset", "harmonics", "PWM", "Picked String", "supersaw", "custom chip", "mod", "FM6op"];
@@ -22625,8 +22625,8 @@ var beepbox = (function (exports) {
                 { name: "Shamisen 2", generalMidi: false, settings: { "type": "FM6op", "eqFilter": [], "eqFilterType": false, "eqSimpleCut": 10, "eqSimplePeak": 0, "envelopeSpeed": 12, "discreteEnvelope": false, "eqSubFilters0": [], "effects": ["chord type", "note filter", "reverb"], "chord": "strum", "fastTwoNoteArp": true, "arpeggioSpeed": 12, "noteFilterType": true, "noteSimpleCut": 8, "noteSimplePeak": 1, "noteFilter": [{ "type": "low-pass", "cutoffHz": 6000, "linearGain": 0.5 }], "noteSubFilters1": [{ "type": "low-pass", "cutoffHz": 6000, "linearGain": 0.5 }], "panDelay": 10, "reverb": 0, "fadeInSeconds": 0, "fadeOutTicks": 48, "algorithm": "Custom", "feedbackType": "Custom", "feedbackAmplitude": 4, "customAlgorithm": { "mods": [[6, 2, 3, 4, 5], [], [], [], [], []], "carrierCount": 2 }, "customFeedback": { "mods": [[1], [], [], [], [], []] }, "operators": [{ "frequency": "1×", "amplitude": 15, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "2×", "amplitude": 12, "waveform": "rounded", "pulseWidth": 5 }, { "frequency": "6×", "amplitude": 6, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "0.5×", "amplitude": 11, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "16×", "amplitude": 5, "waveform": "triangle", "pulseWidth": 5 }, { "frequency": "4×", "amplitude": 7, "waveform": "sine", "pulseWidth": 5 }], "envelopes": [{ "target": "noteFilterAllFreqs", "envelope": "twang 1" }] } },
                 { name: "Picked Dist Guitar", generalMidi: false, settings: { "type": "Picked String", "eqFilter": [], "eqFilterType": false, "eqSimpleCut": 10, "eqSimplePeak": 0, "envelopeSpeed": 12, "discreteEnvelope": false, "eqSubFilters0": [], "effects": ["vibrato", "note filter", "distortion", "bitcrusher"], "vibrato": "custom", "vibratoDepth": 0.32, "vibratoDelay": 19, "vibratoSpeed": 10, "vibratoType": 0, "noteFilterType": false, "noteSimpleCut": 10, "noteSimplePeak": 0, "noteFilter": [{ "type": "low-pass", "cutoffHz": 13454.34, "linearGain": 0.7071 }, { "type": "low-pass", "cutoffHz": 9513.66, "linearGain": 0.5 }], "noteSubFilters0": [{ "type": "low-pass", "cutoffHz": 13454.34, "linearGain": 0.7071 }, { "type": "low-pass", "cutoffHz": 9513.66, "linearGain": 0.5 }], "distortion": 43, "aliases": false, "bitcrusherOctave": 5.5, "bitcrusherQuantization": 14, "panDelay": 10, "fadeInSeconds": 0, "fadeOutTicks": 12, "harmonics": [86, 86, 86, 86, 71, 57, 71, 71, 14, 14, 14, 29, 57, 43, 43, 57, 43, 29, 29, 29, 29, 29, 29, 43, 43, 43, 0, 71], "unison": "none", "stringSustain": 71, "envelopes": [{ "target": "noteFilterAllFreqs", "envelope": "twang 3" }, { "target": "noteVolume", "envelope": "punch" }] } },
                 { name: "Heavy Knock", generalMidi: false, isNoise: true, settings: { "type": "noise", "eqFilter": [], "eqFilterType": false, "eqSimpleCut": 10, "eqSimplePeak": 0, "envelopeSpeed": 12, "discreteEnvelope": false, "eqSubFilters0": [], "effects": ["vibrato", "note filter", "reverb"], "vibrato": "delayed", "vibratoDepth": 0.3, "vibratoDelay": 18.5, "vibratoSpeed": 10, "vibratoType": 0, "noteFilterType": true, "noteSimpleCut": 7, "noteSimplePeak": 1, "noteFilter": [{ "type": "low-pass", "cutoffHz": 3828.43, "linearGain": 0.5 }], "noteSubFilters1": [{ "type": "low-pass", "cutoffHz": 3828.43, "linearGain": 0.5 }], "panDelay": 10, "reverb": 0, "fadeInSeconds": 0, "fadeOutTicks": 48, "wave": "white", "unison": "none", "envelopes": [{ "target": "noteFilterAllFreqs", "envelope": "twang 2" }] } },
-                { name: "Future Keys", generalMidi: false, settings: { "type": "harmonics", "eqFilter": [{ "type": "high-pass", "cutoffHz": 125, "linearGain": 0.25 }], "eqFilterType": false, "eqSimpleCut": 10, "eqSimplePeak": 0, "envelopeSpeed": 1, "discreteEnvelope": false, "eqSubFilters0": [{ "type": "high-pass", "cutoffHz": 125, "linearGain": 0.25 }], "effects": ["chorus", "echo", "reverb", "phaser"], "phaserMix": 100, "phaserFreq": 94, "phaserFeedback": 42, "phaserStages": 97, "panDelay": 10, "chorus": 43, "echoSustain": 43, "echoDelayBeats": 0.75, "reverb": 19, "fadeInSeconds": 0, "fadeOutTicks": -1, "harmonics": [100, 100, 100, 86, 86, 86, 71, 71, 57, 29, 14, 14, 14, 0, 29, 57, 29, 0, 29, 43, 57, 57, 29, 14, 14, 29, 43, 29], "unison": "none", "envelopes": [{ "target": "phaserFreq", "envelope": "tremolo6" }, { "target": "noteVolume", "envelope": "twang -1" }] } },
-                { name: "Light Bell", generalMidi: false, settings: { "type": "Picked String", "eqFilter": [{ "type": "low-pass", "cutoffHz": 8000, "linearGain": 1 }, { "type": "high-pass", "cutoffHz": 88.39, "linearGain": 1 }], "eqFilterType": false, "eqSimpleCut": 10, "eqSimplePeak": 0, "envelopeSpeed": 12, "discreteEnvelope": false, "effects": ["reverb", "ring modulation"], "ringMod": 71, "ringModHz": 90, "rmWaveformIndex": 0, "rmPulseWidth": 0, "panDelay": 10, "reverb": 39, "fadeInSeconds": 0, "fadeOutTicks": 24, "harmonics": [43, 71, 0, 100, 0, 100, 0, 86, 0, 0, 86, 0, 14, 71, 14, 14, 57, 14, 14, 43, 14, 14, 43, 14, 14, 43, 14, 43], "unison": "shimmer", "stringSustain": 71, "envelopes": [{ "target": "noteVolume", "envelope": "twang 3" }] } },
+                { name: "Future Keys", generalMidi: false, settings: { "type": "harmonics", "eqFilter": [{ "type": "high-pass", "cutoffHz": 125, "linearGain": 0.25 }], "eqFilterType": false, "eqSimpleCut": 10, "eqSimplePeak": 0, "envelopeSpeed": 1, "discreteEnvelope": false, "eqSubFilters0": [{ "type": "high-pass", "cutoffHz": 125, "linearGain": 0.25 }], "effects": ["chorus", "echo", "reverb", "phaser"], "panDelay": 10, "chorus": 43, "echoSustain": 43, "echoDelayBeats": 0.75, "reverb": 19, "fadeInSeconds": 0, "fadeOutTicks": -1, "harmonics": [100, 100, 100, 86, 86, 86, 71, 71, 57, 29, 14, 14, 14, 0, 29, 57, 29, 0, 29, 43, 57, 57, 29, 14, 14, 29, 43, 29], "unison": "none", "envelopes": [{ "target": "phaserFreq", "envelope": "tremolo6" }, { "target": "noteVolume", "envelope": "twang -1" }] } },
+                { name: "Light Bell", generalMidi: false, settings: { "type": "Picked String", "eqFilter": [{ "type": "low-pass", "cutoffHz": 8000, "linearGain": 1 }, { "type": "high-pass", "cutoffHz": 88.39, "linearGain": 1 }], "eqFilterType": false, "eqSimpleCut": 10, "eqSimplePeak": 0, "envelopeSpeed": 12, "discreteEnvelope": false, "effects": ["reverb", "ring modulation"], "panDelay": 10, "reverb": 39, "fadeInSeconds": 0, "fadeOutTicks": 24, "harmonics": [43, 71, 0, 100, 0, 100, 0, 86, 0, 0, 86, 0, 14, 71, 14, 14, 57, 14, 14, 43, 14, 14, 43, 14, 14, 43, 14, 43], "unison": "shimmer", "stringSustain": 71, "envelopes": [{ "target": "noteVolume", "envelope": "twang 3" }] } },
             ]) },
     ]);
 
@@ -23386,8 +23386,7 @@ var beepbox = (function (exports) {
             }
             return patternObject;
         }
-        fromJsonObject(patternObject, song, channel, importedPartsPerBeat, isNoiseChannel, isModChannel, jsonFormat = "auto") {
-            const format = jsonFormat.toLowerCase();
+        fromJsonObject(patternObject, song, channel, importedPartsPerBeat, isNoiseChannel, isModChannel) {
             if (song.patternInstruments) {
                 if (Array.isArray(patternObject["instruments"])) {
                     const instruments = patternObject["instruments"];
@@ -23425,14 +23424,14 @@ var beepbox = (function (exports) {
                     if (note.pitches.length < 1)
                         continue;
                     let startInterval = 0;
-                    let instrument = channel.instruments[this.instruments[0]];
-                    let mod = Math.max(0, Config.modCount - note.pitches[0] - 1);
                     for (let k = 0; k < noteObject["points"].length; k++) {
                         const pointObject = noteObject["points"][k];
                         if (pointObject == undefined || pointObject["tick"] == undefined)
                             continue;
                         const interval = (pointObject["pitchBend"] == undefined) ? 0 : (pointObject["pitchBend"] | 0);
                         const time = Math.round((+pointObject["tick"]) * Config.partsPerBeat / importedPartsPerBeat);
+                        let instrument = channel.instruments[this.instruments[0]];
+                        let mod = Math.max(0, Config.modCount - note.pitches[0] - 1);
                         let volumeCap = song.getVolumeCapForSetting(isModChannel, instrument.modulators[mod], instrument.modFilterTypes[mod]);
                         let size;
                         if (pointObject["volume"] == undefined) {
@@ -23492,14 +23491,6 @@ var beepbox = (function (exports) {
                     }
                     else {
                         note.continuesLastPattern = false;
-                    }
-                    if (format != "ultrabox" && instrument.modulators[mod] == Config.modulators.dictionary["tempo"].index) {
-                        for (const pin of note.pins) {
-                            const oldMin = 30;
-                            const newMin = 1;
-                            const old = pin.size + oldMin;
-                            pin.size = old - newMin;
-                        }
                     }
                     this.notes.push(note);
                 }
@@ -24539,18 +24530,6 @@ var beepbox = (function (exports) {
                 instrumentObject["bitcrusherOctave"] = (Config.bitcrusherFreqRange - 1 - this.bitcrusherFreq) * Config.bitcrusherOctaveStep;
                 instrumentObject["bitcrusherQuantization"] = Math.round(100 * this.bitcrusherQuantization / (Config.bitcrusherQuantizationRange - 1));
             }
-            if (effectsIncludeRM(this.effects)) {
-                instrumentObject["ringMod"] = Math.round(100 * this.ringModulation / (Config.ringModRange - 1));
-                instrumentObject["ringModHz"] = Math.round(100 * this.ringModulationHz / (Config.ringModHzRange - 1));
-                instrumentObject["rmWaveformIndex"] = this.rmWaveformIndex;
-                instrumentObject["rmPulseWidth"] = Math.round(100 * this.rmPulseWidth / (Config.pulseWidthRange - 1));
-            }
-            if (effectsIncludePhaser(this.effects)) {
-                instrumentObject["phaserMix"] = Math.round(100 * this.phaserMix / (Config.phaserMixRange - 1));
-                instrumentObject["phaserFreq"] = Math.round(100 * this.phaserFreq / (Config.phaserFreqRange - 1));
-                instrumentObject["phaserFeedback"] = Math.round(100 * this.phaserFeedback / (Config.phaserFeedbackRange - 1));
-                instrumentObject["phaserStages"] = Math.round(100 * this.phaserStages / (Config.phaserMaxStages - 1));
-            }
             if (effectsIncludePanning(this.effects)) {
                 instrumentObject["pan"] = Math.round(100 * (this.pan - Config.panCenter) / Config.panCenter);
                 instrumentObject["panDelay"] = this.panDelay;
@@ -24932,7 +24911,7 @@ var beepbox = (function (exports) {
                 this.pan = clamp(0, Config.panMax + 1, Math.round(Config.panCenter + (instrumentObject["pan"] | 0) * Config.panCenter / 100));
             }
             else if (instrumentObject["ipan"] != undefined) {
-                this.pan = clamp(0, Config.panMax + 1, Config.panCenter + (instrumentObject["ipan"] * -50));
+                this.pan = clamp(0, Config.panMax + 1, Config.panCenter + (instrumentObject["ipan"] * 100));
             }
             else {
                 this.pan = Config.panCenter;
@@ -24960,30 +24939,6 @@ var beepbox = (function (exports) {
             }
             if (instrumentObject["bitcrusherQuantization"] != undefined) {
                 this.bitcrusherQuantization = clamp(0, Config.bitcrusherQuantizationRange, Math.round((Config.bitcrusherQuantizationRange - 1) * (instrumentObject["bitcrusherQuantization"] | 0) / 100));
-            }
-            if (instrumentObject["ringMod"] != undefined) {
-                this.ringModulation = clamp(0, Config.ringModRange, Math.round((Config.ringModRange - 1) * (instrumentObject["ringMod"] | 0) / 100));
-            }
-            if (instrumentObject["ringModHz"] != undefined) {
-                this.ringModulationHz = clamp(0, Config.ringModHzRange, Math.round((Config.ringModHzRange - 1) * (instrumentObject["ringModHz"] | 0) / 100));
-            }
-            if (instrumentObject["rmWaveformIndex"] != undefined) {
-                this.rmWaveformIndex = clamp(0, Config.operatorWaves.length, instrumentObject["rmWaveformIndex"]);
-            }
-            if (instrumentObject["rmPulseWidth"] != undefined) {
-                this.rmPulseWidth = clamp(0, Config.pulseWidthRange, Math.round((Config.pulseWidthRange - 1) * (instrumentObject["rmPulseWidth"] | 0) / 100));
-            }
-            if (instrumentObject["phaserMix"] != undefined) {
-                this.phaserMix = clamp(0, Config.phaserMixRange, Math.round((Config.phaserMixRange - 1) * (instrumentObject["phaserMix"] | 0) / 100));
-            }
-            if (instrumentObject["phaserFreq"] != undefined) {
-                this.phaserFreq = clamp(0, Config.phaserFreqRange, Math.round((Config.phaserFreqRange - 1) * (instrumentObject["phaserFreq"] | 0) / 100));
-            }
-            if (instrumentObject["phaserFeedback"] != undefined) {
-                this.phaserFeedback = clamp(0, Config.phaserFeedbackRange, Math.round((Config.phaserFeedbackRange - 1) * (instrumentObject["phaserFeedback"] | 0) / 100));
-            }
-            if (instrumentObject["phaserStages"] != undefined) {
-                this.phaserStages = clamp(0, Config.phaserMaxStages, Math.round((Config.phaserMaxStages - 1) * (instrumentObject["phaserStages"] | 0) / 100));
             }
             if (instrumentObject["echoSustain"] != undefined) {
                 this.echoSustain = clamp(0, Config.echoSustainRange, Math.round((Config.echoSustainRange - 1) * (instrumentObject["echoSustain"] | 0) / 100));
@@ -27941,8 +27896,6 @@ var beepbox = (function (exports) {
                             let songReverbChannel = -1;
                             let songReverbInstrument = -1;
                             let songReverbIndex = -1;
-                            const shouldCorrectTempoMods = fromJummBox;
-                            const jummboxTempoMin = 30;
                             while (true) {
                                 const channel = this.channels[channelIndex];
                                 const isNoiseChannel = this.getChannelIsNoise(channelIndex);
@@ -28195,12 +28148,6 @@ var beepbox = (function (exports) {
                                             }
                                             note.pitches.length = pitchCount;
                                             pitchBends.unshift(note.pitches[0]);
-                                            const noteIsForTempoMod = isModChannel && channel.instruments[newPattern.instruments[0]].modulators[Config.modCount - 1 - note.pitches[0]] === Config.modulators.dictionary["tempo"].index;
-                                            let tempoOffset = 0;
-                                            if (shouldCorrectTempoMods && noteIsForTempoMod) {
-                                                note.pins[0].size += tempoOffset;
-                                                tempoOffset = jummboxTempoMin - Config.tempoMin;
-                                            }
                                             if (isModChannel) {
                                                 note.pins[0].size *= detuneScaleNotes[newPattern.instruments[0]][note.pitches[0]];
                                             }
@@ -28211,7 +28158,7 @@ var beepbox = (function (exports) {
                                                 const interval = pitchBends[0] - note.pitches[0];
                                                 if (note.pins.length <= pinCount) {
                                                     if (isModChannel) {
-                                                        note.pins[pinCount++] = makeNotePin(interval, pinObj.time, pinObj.size * detuneScaleNotes[newPattern.instruments[0]][note.pitches[0]] + tempoOffset);
+                                                        note.pins[pinCount++] = makeNotePin(interval, pinObj.time, pinObj.size * detuneScaleNotes[newPattern.instruments[0]][note.pitches[0]]);
                                                     }
                                                     else {
                                                         note.pins[pinCount++] = makeNotePin(interval, pinObj.time, pinObj.size);
@@ -28222,7 +28169,7 @@ var beepbox = (function (exports) {
                                                     pin.interval = interval;
                                                     pin.time = pinObj.time;
                                                     if (isModChannel) {
-                                                        pin.size = pinObj.size * detuneScaleNotes[newPattern.instruments[0]][note.pitches[0]] + tempoOffset;
+                                                        pin.size = pinObj.size * detuneScaleNotes[newPattern.instruments[0]][note.pitches[0]];
                                                     }
                                                     else {
                                                         pin.size = pinObj.size;
@@ -29132,7 +29079,7 @@ var beepbox = (function (exports) {
                             patternObject = channelObject["patterns"][i];
                         if (patternObject == undefined)
                             continue;
-                        pattern.fromJsonObject(patternObject, this, channel, importedPartsPerBeat, isNoiseChannel, isModChannel, jsonFormat);
+                        pattern.fromJsonObject(patternObject, this, channel, importedPartsPerBeat, isNoiseChannel, isModChannel);
                     }
                     channel.patterns.length = this.patternsPerChannel;
                     for (let i = 0; i < this.barCount; i++) {

@@ -17898,6 +17898,10 @@ var beepbox = (function (exports) {
 				   line-height: 1.25;
 			   }
 
+				.trackContainer .noSelection {
+				background: black !important;
+				}
+
 			   #text-content {
 				   font-size: 32px;
 				   line-height: 40px;
@@ -18200,6 +18204,10 @@ var beepbox = (function (exports) {
 					line-height: 40px;
 				}
 
+				.trackContainer .noSelection {
+				background: black !important;
+				}
+
 				#text-content > section > h1 {
 					color: #C8C8C8;
 					}
@@ -18387,6 +18395,10 @@ var beepbox = (function (exports) {
 				   color: #C8C8C8;
 				   }
 
+				.trackContainer .noSelection {
+				background: black !important;
+				}
+				   
 			   html {
 				   font-family: monospace !important;
 				   }
@@ -18536,6 +18548,10 @@ var beepbox = (function (exports) {
 			   .beepboxEditor input[type="range"]::-moz-range-thumb {
 				   width: 8px !important;
 				 }
+
+				.trackContainer .noSelection {
+				background: black !important;
+				}
 
 			   button.playButton {
 				   width: 80px;
