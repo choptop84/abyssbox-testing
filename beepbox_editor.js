@@ -47736,9 +47736,8 @@ button.playButton::before {
             if (this.outputStarted == false) {
                 return;
             }
-            const samplesPerChunk = this.synth.samplesPerSecond * 5;
-            const currentFrame = this.currentChunk * samplesPerChunk;
-            const samplesInChunk = Math.min(samplesPerChunk, this.sampleFrames - currentFrame);
+            const currentFrame = this.currentChunk * this.samplesPerChunk;
+            const samplesInChunk = Math.min(this.samplesPerChunk, this.sampleFrames - currentFrame);
             const tempSamplesL = new Float32Array(samplesInChunk);
             const tempSamplesR = new Float32Array(samplesInChunk);
             this.synth.renderingSong = true;
@@ -47758,7 +47757,7 @@ button.playButton::before {
                     this._exportToMp3Finish();
                 }
                 else if (this.thenExportTo == "ogg") {
-                    this._exportToOgg();
+                    this._exportToOggFinish();
                 }
                 else {
                     throw new Error("Unrecognized file export type chosen!");
@@ -47779,7 +47778,7 @@ button.playButton::before {
                 this.synth.samplesPerSecond = 44100;
             }
             else if (type == "ogg") {
-                this.synth.samplesPerSecond = 44100;
+                this.synth.samplesPerSecond = 48000;
             }
             else {
                 throw new Error("Unrecognized file export type chosen!");
@@ -47796,7 +47795,8 @@ button.playButton::before {
             this.synth.computeLatestModValues();
             this.synth.warmUpSynthesizer(this._doc.song);
             this.sampleFrames = this.synth.getTotalSamples(this._enableIntro.checked, this._enableOutro.checked, this.synth.loopRepeatCount);
-            this.totalChunks = Math.ceil(this.sampleFrames / (this.synth.samplesPerSecond * 5));
+            this.samplesPerChunk = this.synth.samplesPerSecond * 5;
+            this.totalChunks = Math.ceil(this.sampleFrames / this.samplesPerChunk);
             this.recordedSamplesL = new Float32Array(this.sampleFrames);
             this.recordedSamplesR = new Float32Array(this.sampleFrames);
             setTimeout(() => { this._synthesize(); });
@@ -47894,20 +47894,65 @@ button.playButton::before {
                 document.head.appendChild(script);
             }
         }
-        _exportToOgg() {
+        _exportToOggFinish() {
+            const scripts = [
+                "https://cdn.jsdelivr.net/gh/mmig/opus-encdec@e33ca40b92ddff8c168c7f5aca34b626c9acc08a/dist/libopus-encoder.js",
+                "https://cdn.jsdelivr.net/gh/mmig/opus-encdec@e33ca40b92ddff8c168c7f5aca34b626c9acc08a/src/oggOpusEncoder.js"
+            ];
+            let scriptsLoaded = 0;
+            const scriptsToLoad = scripts.length;
             const whenEncoderIsAvailable = () => {
-                const libopusEncoder = window["opus-encdec"];
-                console.log("Is libopusEcoder? " + libopusEncoder);
+                scriptsLoaded++;
+                if (scriptsLoaded < scriptsToLoad)
+                    return;
+                const OggOpusEncoder = window["OggOpusEncoder"];
+                const OpusEncoderLib = window["OpusEncoderLib"];
+                const channelCount = 2;
+                const sampleBlockSize = 2048;
+                const oggEncoder = new OggOpusEncoder({
+                    numberOfChannels: channelCount,
+                    originalSampleRate: this.synth.samplesPerSecond,
+                    encoderSampleRate: this.synth.samplesPerSecond,
+                    bufferLength: sampleBlockSize,
+                    encoderApplication: 2049,
+                    encoderComplexity: 9,
+                    resampleQuality: 3,
+                }, OpusEncoderLib);
+                const parts = [];
+                const left = this.recordedSamplesL;
+                const right = this.recordedSamplesR;
+                parts.push(oggEncoder.generateIdPage().page);
+                parts.push(oggEncoder.generateCommentPage().page);
+                for (let i = 0; i < 2; i++) {
+                    const leftChunk = new Float32Array(sampleBlockSize);
+                    const rightChunk = new Float32Array(sampleBlockSize);
+                    const frame = ([leftChunk, rightChunk]) ;
+                    oggEncoder.encode(frame).forEach((page) => parts.push(page.page));
+                }
+                for (let i = 0; i < left.length; i += sampleBlockSize) {
+                    const leftChunk = left.subarray(i, i + sampleBlockSize);
+                    const rightChunk = right.subarray(i, i + sampleBlockSize);
+                    const frame = ([leftChunk, rightChunk]) ;
+                    oggEncoder.encode(frame).forEach((page) => parts.push(page.page));
+                }
+                oggEncoder.encodeFinalFrame().forEach((page) => parts.push(page.page));
+                oggEncoder.destroy();
+                const blob = new Blob(parts, { type: "audio/ogg" });
+                save$1(blob, this._fileName.value.trim() + ".ogg");
+                this._close();
             };
-            if ("opus-encdec" in window) {
+            if (("OggOpusEncoder" in window) && ("OpusEncoderLib" in window)) {
+                scriptsLoaded = 2;
                 whenEncoderIsAvailable();
             }
             else {
-                var script = document.createElement("script");
-                script.src = "https://cdn.jsdelivr.net/gh/mmig/opus-encdec@e33ca40/dist/libopus-encoder.js";
-                script.onload = whenEncoderIsAvailable;
-                document.head.appendChild(script);
-                console.log("Perhaps the other one failed? " + script);
+                scriptsLoaded = 0;
+                for (const src of scripts) {
+                    const script = document.createElement("script");
+                    script.src = src;
+                    script.onload = whenEncoderIsAvailable;
+                    document.head.appendChild(script);
+                }
             }
         }
         _exportToMidi() {
@@ -65681,6 +65726,29 @@ You should be redirected to the song at:<br /><br />
             this.synth = new Synth(this.song);
             this.synth.volume = this._calcVolume();
             this.synth.anticipatePoorPerformance = isMobile;
+            document.addEventListener('visibilitychange', e => {
+                if (document.visibilityState === 'visible') {
+                    if (this.song.setSongTheme == "none") {
+                        if (window.localStorage.getItem("colorTheme") != null) {
+                            ColorConfig.setTheme(String(window.localStorage.getItem("colorTheme")));
+                            if (window.localStorage.getItem("colorTheme") == "custom") {
+                                CustomThemeBases.setFont(String(window.localStorage.getItem("customFontName")));
+                                CustomThemeBases.setBackground(String(window.localStorage.getItem("customBackground")));
+                                CustomThemeBases.setIcons(String(window.localStorage.getItem("customIconsName")));
+                                CustomThemeBases.setBorder(String(window.localStorage.getItem("customBorderName")));
+                                CustomThemeBases.setCursor(String(window.localStorage.getItem("customCursorName")));
+                            }
+                            else {
+                                CustomThemeBases.setFont("none");
+                                CustomThemeBases.setBackground("none");
+                                CustomThemeBases.setIcons("none");
+                                CustomThemeBases.setBorder("none");
+                                CustomThemeBases.setCursor("none");
+                            }
+                        }
+                    }
+                }
+            });
             if (this.song.setSongTheme == "none") {
                 ColorConfig.setTheme(this.prefs.colorTheme);
                 if (window.localStorage.getItem("colorTheme") == "custom") {
