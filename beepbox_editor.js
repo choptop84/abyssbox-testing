@@ -47907,31 +47907,67 @@ button.playButton::before {
                     return;
                 const OggOpusEncoder = window["OggOpusEncoder"];
                 const OpusEncoderLib = window["OpusEncoderLib"];
+                OggOpusEncoder.prototype.getOpusControl = function (control) {
+                    let result = null;
+                    const location = this._malloc(4);
+                    const outputLocation = this._malloc(4);
+                    this.HEAP32[location >> 2] = outputLocation;
+                    const returnCode = this._opus_encoder_ctl(this.encoder, control, location);
+                    if (returnCode === 0) {
+                        result = this.HEAP32[outputLocation >> 2];
+                    }
+                    this._free(outputLocation);
+                    this._free(location);
+                    return result;
+                };
+                OggOpusEncoder.prototype.getLookahead = function () {
+                    var _a;
+                    return (_a = this.getOpusControl(4027)) !== null && _a !== void 0 ? _a : 0;
+                };
+                OggOpusEncoder.prototype.generateIdPage2 = function (lookahead) {
+                    const segmentDataView = new DataView(this.segmentData.buffer);
+                    segmentDataView.setUint32(0, 1937076303, true);
+                    segmentDataView.setUint32(4, 1684104520, true);
+                    segmentDataView.setUint8(8, 1);
+                    segmentDataView.setUint8(9, this.config.numberOfChannels);
+                    segmentDataView.setUint16(10, lookahead, true);
+                    segmentDataView.setUint32(12, this.config.originalSampleRateOverride || this.config.originalSampleRate, true);
+                    segmentDataView.setUint16(16, 0, true);
+                    segmentDataView.setUint8(18, 0);
+                    this.segmentTableIndex = 1;
+                    this.segmentDataIndex = this.segmentTable[0] = 19;
+                    this.headerType = 2;
+                    return this.generatePage();
+                };
                 const channelCount = 2;
-                const sampleBlockSize = 2048;
+                const frameSizeInMilliseconds = 20 / 1000;
+                const frameSizeInSeconds = frameSizeInMilliseconds / 1000;
+                const sampleBlockSize = Math.floor(this.synth.samplesPerSecond * frameSizeInSeconds);
                 const oggEncoder = new OggOpusEncoder({
                     numberOfChannels: channelCount,
                     originalSampleRate: this.synth.samplesPerSecond,
                     encoderSampleRate: this.synth.samplesPerSecond,
                     bufferLength: sampleBlockSize,
                     encoderApplication: 2049,
-                    encoderComplexity: 9,
+                    encoderComplexity: 10,
                     resampleQuality: 3,
                 }, OpusEncoderLib);
                 const parts = [];
                 const left = this.recordedSamplesL;
                 const right = this.recordedSamplesR;
-                parts.push(oggEncoder.generateIdPage().page);
+                parts.push(oggEncoder.generateIdPage2(oggEncoder.getLookahead()).page);
                 parts.push(oggEncoder.generateCommentPage().page);
-                for (let i = 0; i < 2; i++) {
-                    const leftChunk = new Float32Array(sampleBlockSize);
-                    const rightChunk = new Float32Array(sampleBlockSize);
+                let sampleIndex = 0;
+                for (; sampleIndex < left.length; sampleIndex += sampleBlockSize) {
+                    const leftChunk = left.subarray(sampleIndex, sampleIndex + sampleBlockSize);
+                    const rightChunk = right.subarray(sampleIndex, sampleIndex + sampleBlockSize);
                     const frame = ([leftChunk, rightChunk]) ;
                     oggEncoder.encode(frame).forEach((page) => parts.push(page.page));
                 }
-                for (let i = 0; i < left.length; i += sampleBlockSize) {
-                    const leftChunk = left.subarray(i, i + sampleBlockSize);
-                    const rightChunk = right.subarray(i, i + sampleBlockSize);
+                {
+                    const paddingSize = sampleIndex - left.length;
+                    const leftChunk = new Float32Array(paddingSize);
+                    const rightChunk = new Float32Array(paddingSize);
                     const frame = ([leftChunk, rightChunk]) ;
                     oggEncoder.encode(frame).forEach((page) => parts.push(page.page));
                 }
@@ -62009,10 +62045,18 @@ You should be redirected to the song at:<br /><br />
                     case 77:
                         if (canPlayNotes)
                             break;
-                        if (needControlForShortcuts == (event.ctrlKey || event.metaKey)) {
+                        if (event.altKey) {
                             if (this._doc.prefs.enableChannelMuting) {
-                                this._doc.selection.muteChannels(event.shiftKey);
+                                this._doc.selection.invertMuteChannels();
                                 event.preventDefault();
+                            }
+                        }
+                        else {
+                            if ((needControlForShortcuts == (event.ctrlKey || event.metaKey))) {
+                                if (this._doc.prefs.enableChannelMuting) {
+                                    this._doc.selection.muteChannels(event.shiftKey);
+                                    event.preventDefault();
+                                }
                             }
                         }
                         break;
@@ -65187,6 +65231,17 @@ You should be redirected to the song at:<br /><br />
                 }
                 for (const channelIndex of this._eachSelectedChannel()) {
                     this._doc.song.channels[channelIndex].muted = anyUnmuted;
+                }
+            }
+            this._doc.notifier.changed();
+        }
+        invertMuteChannels() {
+            for (let channelIndex = 0; channelIndex < this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount; channelIndex++) {
+                if (this._doc.song.channels[channelIndex].muted == true) {
+                    this._doc.song.channels[channelIndex].muted = false;
+                }
+                else {
+                    this._doc.song.channels[channelIndex].muted = true;
                 }
             }
             this._doc.notifier.changed();
