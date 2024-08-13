@@ -47580,7 +47580,7 @@ button.playButton::before {
             this._enableIntro = input$c({ type: "checkbox" });
             this._loopDropDown = input$c({ style: "width: 3em;", type: "number", min: "1", max: "16", step: "1" });
             this._enableOutro = input$c({ type: "checkbox" });
-            this._formatSelect = select$d({ style: "width: 100%;" }, option$d({ value: "wav" }, "Export to .wav file."), option$d({ value: "mp3" }, "Export to .mp3 file."), option$d({ value: "ogg" }, "Export to .ogg file."), option$d({ value: "midi" }, "Export to .mid file."), option$d({ value: "json" }, "Export to .json file."), option$d({ value: "html" }, "Export to .html file."));
+            this._formatSelect = select$d({ style: "width: 100%;" }, option$d({ value: "wav" }, "Export to .wav file."), option$d({ value: "mp3" }, "Export to .mp3 file."), option$d({ value: "midi" }, "Export to .mid file."), option$d({ value: "json" }, "Export to .json file."), option$d({ value: "html" }, "Export to .html file."));
             this._removeWhitespace = input$c({ type: "checkbox" });
             this._removeWhitespaceDiv = div$k({ style: "vertical-align: middle; align-items: center; justify-content: space-between; margin-bottom: 14px;" }, "Remove Whitespace: ", this._removeWhitespace);
             this._oggWarning = div$k({ style: "vertical-align: middle; align-items: center; justify-content: space-between; margin-bottom: 14px;" }, "Warning: .ogg files aren't supported on as many devices as mp3 or wav. So Playback might not be possible on specific devices.");
