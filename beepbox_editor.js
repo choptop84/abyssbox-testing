@@ -47580,10 +47580,10 @@ button.playButton::before {
             this._enableIntro = input$c({ type: "checkbox" });
             this._loopDropDown = input$c({ style: "width: 3em;", type: "number", min: "1", max: "16", step: "1" });
             this._enableOutro = input$c({ type: "checkbox" });
-            this._formatSelect = select$d({ style: "width: 100%;" }, option$d({ value: "wav" }, "Export to .wav file."), option$d({ value: "mp3" }, "Export to .mp3 file."), option$d({ value: "midi" }, "Export to .mid file."), option$d({ value: "json" }, "Export to .json file."), option$d({ value: "html" }, "Export to .html file."));
+            this._formatSelect = select$d({ style: "width: 100%;" }, option$d({ value: "wav" }, "Export to .wav file."), option$d({ value: "mp3" }, "Export to .mp3 file."), option$d({ value: "ogg" }, "Export to .ogg file."), option$d({ value: "midi" }, "Export to .mid file."), option$d({ value: "json" }, "Export to .json file."), option$d({ value: "html" }, "Export to .html file."));
             this._removeWhitespace = input$c({ type: "checkbox" });
             this._removeWhitespaceDiv = div$k({ style: "vertical-align: middle; align-items: center; justify-content: space-between; margin-bottom: 14px;" }, "Remove Whitespace: ", this._removeWhitespace);
-            this._oggWarning = div$k({ style: "vertical-align: middle; align-items: center; justify-content: space-between; margin-bottom: 14px;" }, "Warning: .ogg files aren't supported on as many devices as mp3 or wav. IOS is an example of this, exporting is still possible, but playback is not.");
+            this._oggWarning = div$k({ style: "vertical-align: middle; align-items: center; justify-content: space-between; margin-bottom: 14px;" }, "Warning: .ogg files aren't supported on as many devices as mp3 or wav. So Playback might not be possible on specific devices.");
             this._cancelButton = button$k({ class: "cancelButton" });
             this._exportButton = button$k({ class: "exportButton", style: "width:45%;" }, "Export");
             this._outputProgressBar = div$k({ style: `width: 0%; background: ${ColorConfig.loopAccent}; height: 100%; position: absolute; z-index: 2;` });
@@ -47909,20 +47909,24 @@ button.playButton::before {
                 const OpusEncoderLib = window["OpusEncoderLib"];
                 OggOpusEncoder.prototype.getOpusControl = function (control) {
                     let result = null;
-                    const location = this._malloc(4);
-                    const outputLocation = this._malloc(4);
+                    const doNotMangle = Math.random() > 2 ? "" : "";
+                    const location = this["_" + doNotMangle + "malloc"](4);
+                    const outputLocation = this["_" + doNotMangle + "malloc"](4);
                     this.HEAP32[location >> 2] = outputLocation;
-                    const returnCode = this._opus_encoder_ctl(this.encoder, control, location);
+                    const returnCode = this["_" + doNotMangle + "opus_encoder_ctl"](this.encoder, control, location);
                     if (returnCode === 0) {
                         result = this.HEAP32[outputLocation >> 2];
                     }
-                    this._free(outputLocation);
-                    this._free(location);
+                    this["_" + doNotMangle + "free"](outputLocation);
+                    this["_" + doNotMangle + "free"](location);
                     return result;
                 };
                 OggOpusEncoder.prototype.getLookahead = function () {
                     var _a;
                     return (_a = this.getOpusControl(4027)) !== null && _a !== void 0 ? _a : 0;
+                };
+                OggOpusEncoder.prototype.setBitrate = function (value) {
+                    this.setOpusControl(4002, value);
                 };
                 OggOpusEncoder.prototype.generateIdPage2 = function (lookahead) {
                     const segmentDataView = new DataView(this.segmentData.buffer);
@@ -47940,7 +47944,7 @@ button.playButton::before {
                     return this.generatePage();
                 };
                 const channelCount = 2;
-                const frameSizeInMilliseconds = 20 / 1000;
+                const frameSizeInMilliseconds = 20;
                 const frameSizeInSeconds = frameSizeInMilliseconds / 1000;
                 const sampleBlockSize = Math.floor(this.synth.samplesPerSecond * frameSizeInSeconds);
                 const oggEncoder = new OggOpusEncoder({
@@ -47955,6 +47959,7 @@ button.playButton::before {
                 const parts = [];
                 const left = this.recordedSamplesL;
                 const right = this.recordedSamplesR;
+                oggEncoder.setBitrate(256000);
                 parts.push(oggEncoder.generateIdPage2(oggEncoder.getLookahead()).page);
                 parts.push(oggEncoder.generateCommentPage().page);
                 let sampleIndex = 0;
@@ -47978,7 +47983,7 @@ button.playButton::before {
                 this._close();
             };
             if (("OggOpusEncoder" in window) && ("OpusEncoderLib" in window)) {
-                scriptsLoaded = 2;
+                scriptsLoaded = scripts.length;
                 whenEncoderIsAvailable();
             }
             else {
@@ -65236,12 +65241,24 @@ You should be redirected to the song at:<br /><br />
             this._doc.notifier.changed();
         }
         invertMuteChannels() {
-            for (let channelIndex = 0; channelIndex < this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount; channelIndex++) {
-                if (this._doc.song.channels[channelIndex].muted == true) {
-                    this._doc.song.channels[channelIndex].muted = false;
+            if (this.boxSelectionHeight == 1) {
+                for (let channelIndex = 0; channelIndex < this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount; channelIndex++) {
+                    if (this._doc.song.channels[channelIndex].muted == true) {
+                        this._doc.song.channels[channelIndex].muted = false;
+                    }
+                    else {
+                        this._doc.song.channels[channelIndex].muted = true;
+                    }
                 }
-                else {
-                    this._doc.song.channels[channelIndex].muted = true;
+            }
+            else {
+                for (let channelIndex = 0; channelIndex < this.boxSelectionHeight; channelIndex++) {
+                    if (this._doc.song.channels[channelIndex + this.boxSelectionChannel].muted == true) {
+                        this._doc.song.channels[channelIndex + this.boxSelectionChannel].muted = false;
+                    }
+                    else {
+                        this._doc.song.channels[channelIndex + this.boxSelectionChannel].muted = true;
+                    }
                 }
             }
             this._doc.notifier.changed();
