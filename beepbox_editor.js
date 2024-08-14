@@ -43234,7 +43234,7 @@ li.select2-results__option[role=group] > strong:hover {
         }
     }
 
-    const { button: button$p, div: div$p, h2: h2$o, p: p$b } = HTML;
+    const { button: button$p, div: div$p, h2: h2$o, p: p$a } = HTML;
     class CustomFilterPrompt {
         constructor(_doc, _songEditor, _useNoteFilter) {
             this._doc = _doc;
@@ -43264,7 +43264,7 @@ li.select2-results__option[role=group] > strong:hover {
                 ]),
             ]);
             this._filterCopyPasteContainer = div$p({ style: "width: 185px;" }, this._filterCopyButton, this._filterPasteButton);
-            this._filterCoordinateText = div$p({ style: "text-align: left; margin-bottom: 0px; font-size: x-small; height: 1.3em; color: " + ColorConfig.secondaryText + ";" }, p$b(""));
+            this._filterCoordinateText = div$p({ style: "text-align: left; margin-bottom: 0px; font-size: x-small; height: 1.3em; color: " + ColorConfig.secondaryText + ";" }, p$a(""));
             this.container = div$p({ class: "prompt noSelection", style: "width: 600px;" }, this._editorTitle, div$p({ style: "display: flex; width: 55%; align-self: center; flex-direction: row; align-items: center; justify-content: center;" }, this._playButton), this._filterButtonContainer, this._filterContainer, div$p({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" }, this._okayButton, this._filterCopyPasteContainer), this._cancelButton);
             this._setSubfilter = (index, useHistory = true, doSwap = true) => {
                 this._filterButtons[this._subfilterIndex].classList.remove("selected-instrument");
@@ -47547,7 +47547,7 @@ button.playButton::before {
         return Math.pow(volumeMult, 0.25) * 127;
     }
 
-    const { button: button$k, div: div$k, h2: h2$j, input: input$c, select: select$d, option: option$d, p: p$a } = HTML;
+    const { button: button$k, div: div$k, h2: h2$j, input: input$c, select: select$d, option: option$d } = HTML;
     function lerp(low, high, t) {
         return low + t * (high - low);
     }
@@ -47575,25 +47575,22 @@ button.playButton::before {
         constructor(_doc) {
             this._doc = _doc;
             this.outputStarted = false;
-            this._opusButton = button$k({ style: "border-image-source: none !important; height: auto; min-height: var(--button-size); margin: 0.5em; flex: 1; border-bottom: solid; border-bottom-color: var(--link-accent);" }, "Opus");
-            this._vorbisButton = button$k({ style: "border-image-source: none !important; height: auto; min-height: var(--button-size); margin: 0.5em; flex: 1; color: red;" }, "Vorbis");
             this._fileName = input$c({ type: "text", style: "width: 10em;", value: "BeepBox-Song", maxlength: 250, "autofocus": "autofocus" });
             this._computedSamplesLabel = div$k({ style: "width: 10em;" }, new Text("0:00"));
             this._enableIntro = input$c({ type: "checkbox" });
             this._loopDropDown = input$c({ style: "width: 3em;", type: "number", min: "1", max: "16", step: "1" });
             this._enableOutro = input$c({ type: "checkbox" });
-            this._formatSelect = select$d({ style: "width: 100%;" }, option$d({ value: "wav" }, "Export to .wav file."), option$d({ value: "mp3" }, "Export to .mp3 file."), option$d({ value: "ogg" }, "Export to  .ogg file."), option$d({ value: "midi" }, "Export to .mid file."), option$d({ value: "json" }, "Export to .json file."), option$d({ value: "html" }, "Export to .html file."));
+            this._formatSelect = select$d({ style: "width: 100%;" }, option$d({ value: "wav" }, "Export to .wav file."), option$d({ value: "mp3" }, "Export to .mp3 file."), option$d({ value: "ogg" }, "Export to .ogg file."), option$d({ value: "opus" }, "Export to .opus file."), option$d({ value: "midi" }, "Export to .mid file."), option$d({ value: "json" }, "Export to .json file."), option$d({ value: "html" }, "Export to .html file."));
             this._removeWhitespace = input$c({ type: "checkbox" });
             this._removeWhitespaceDiv = div$k({ style: "vertical-align: middle; align-items: center; justify-content: space-between; margin-bottom: 14px;" }, "Remove Whitespace: ", this._removeWhitespace);
             this._oggWarning = div$k({ style: "vertical-align: middle; align-items: center; justify-content: space-between; margin-bottom: 14px;" }, "Warning: .ogg files aren't supported on as many devices as mp3 or wav. So Playback might not be possible on specific devices.");
-            this._oggWarning2 = div$k({ style: "vertical-align: middle; align-items: center; justify-content: space-between; margin-bottom: 14px;" }, "For Clarification, ogg opus is different from ogg vorbis, older programs use vorbis while newer programs sometimes uses opus.");
+            this._opusWarning = div$k({ style: "vertical-align: middle; align-items: center; justify-content: space-between; margin-bottom: 14px;" }, "Warning: .opus files aren't supported on as many devices as mp3 or wav. So Playback might not be possible on specific devices.");
             this._cancelButton = button$k({ class: "cancelButton" });
             this._exportButton = button$k({ class: "exportButton", style: "width:45%;" }, "Export");
             this._outputProgressBar = div$k({ style: `width: 0%; background: ${ColorConfig.loopAccent}; height: 100%; position: absolute; z-index: 2;` });
             this._outputProgressLabel = div$k({ style: `position: relative; top: -1px; z-index: 3;` }, "0%");
             this._outputProgressContainer = div$k({ style: `height: 12px; background: ${ColorConfig.uiWidgetBackground}; display: block; position: relative; z-index: 1; margin-bottom: 14px;` }, this._outputProgressBar, this._outputProgressLabel);
-            this.opusPickerDiv = div$k({ style: "width: 100%;" }, p$a({ style: "text-align: center; margin: 1em 0; display:flex; flex-direction: row;" }, this._opusButton, this._vorbisButton));
-            this._exportPrompt = div$k({}, div$k({ class: "promptTitle", style: "margin-bottom: 14px;" }, h2$j({ class: "exportExt", style: "text-align: inherit;" }, ""), h2$j({ class: "exportTitle" }, "Export Options")), div$k({ style: "display: flex; flex-direction: row; align-items: center; justify-content: space-between; margin-bottom: 14px;" }, "File name:", this._fileName), div$k({ style: "display: flex; flex-direction: row; align-items: center; justify-content: space-between; margin-bottom: 14px;" }, "Length:", this._computedSamplesLabel), div$k({ style: "display: table; width: 100%; margin-bottom: 14px;" }, div$k({ style: "display: table-row;" }, div$k({ style: "display: table-cell;" }, "Intro:"), div$k({ style: "display: table-cell;" }, "Loop Count:"), div$k({ style: "display: table-cell;" }, "Outro:")), div$k({ style: "display: table-row; margin-bottom: 14px;" }, div$k({ style: "display: table-cell; vertical-align: middle;" }, this._enableIntro), div$k({ style: "display: table-cell; vertical-align: middle;" }, this._loopDropDown), div$k({ style: "display: table-cell; vertical-align: middle;" }, this._enableOutro))), this._removeWhitespaceDiv, this._oggWarning, this.opusPickerDiv, div$k({ class: "selectContainer", style: "width: 100%; margin-bottom: 14px;" }, this._formatSelect), div$k({ style: "text-align: left; margin-bottom: 14px;" }, "Exporting can be slow. Reloading the page or clicking the X will cancel it. Please be patient."), this._outputProgressContainer, div$k({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between; margin-bottom: 14px;" }, this._exportButton), this._cancelButton);
+            this._exportPrompt = div$k({}, div$k({ class: "promptTitle", style: "margin-bottom: 14px;" }, h2$j({ class: "exportExt", style: "text-align: inherit;" }, ""), h2$j({ class: "exportTitle" }, "Export Options")), div$k({ style: "display: flex; flex-direction: row; align-items: center; justify-content: space-between; margin-bottom: 14px;" }, "File name:", this._fileName), div$k({ style: "display: flex; flex-direction: row; align-items: center; justify-content: space-between; margin-bottom: 14px;" }, "Length:", this._computedSamplesLabel), div$k({ style: "display: table; width: 100%; margin-bottom: 14px;" }, div$k({ style: "display: table-row;" }, div$k({ style: "display: table-cell;" }, "Intro:"), div$k({ style: "display: table-cell;" }, "Loop Count:"), div$k({ style: "display: table-cell;" }, "Outro:")), div$k({ style: "display: table-row; margin-bottom: 14px;" }, div$k({ style: "display: table-cell; vertical-align: middle;" }, this._enableIntro), div$k({ style: "display: table-cell; vertical-align: middle;" }, this._loopDropDown), div$k({ style: "display: table-cell; vertical-align: middle;" }, this._enableOutro))), this._removeWhitespaceDiv, this._oggWarning, div$k({ class: "selectContainer", style: "width: 100%; margin-bottom: 14px;" }, this._formatSelect), div$k({ style: "text-align: left; margin-bottom: 14px;" }, "Exporting can be slow. Reloading the page or clicking the X will cancel it. Please be patient."), this._outputProgressContainer, div$k({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between; margin-bottom: 14px;" }, this._exportButton), this._cancelButton);
             this.container = div$k({ class: "prompt noSelection", style: "width: 200px;" }, this._exportPrompt);
             this._close = () => {
                 if (this.synth != null)
@@ -47631,6 +47628,10 @@ button.playButton::before {
                     case "ogg":
                         this.outputStarted = true;
                         this._exportTo("ogg");
+                        break;
+                    case "opus":
+                        this.outputStarted = true;
+                        this._exportTo("opus");
                         break;
                     case "midi":
                         this.outputStarted = true;
@@ -47678,6 +47679,18 @@ button.playButton::before {
             else {
                 this._removeWhitespaceDiv.style.display = "none";
             }
+            if (this._formatSelect.value == "ogg") {
+                this._oggWarning.style.display = "block";
+            }
+            else {
+                this._oggWarning.style.display = "none";
+            }
+            if (this._formatSelect.value == "opus") {
+                this._oggWarning.style.display = "block";
+            }
+            else {
+                this._oggWarning.style.display = "none";
+            }
             this._fileName.select();
             setTimeout(() => this._fileName.focus());
             this._fileName.addEventListener("input", ExportPrompt._validateFileName);
@@ -47696,13 +47709,15 @@ button.playButton::before {
             this._formatSelect.addEventListener("change", () => {
                 if (this._formatSelect.value == "ogg") {
                     this._oggWarning.style.display = "block";
-                    this._oggWarning2.style.display = "block";
-                    this.opusPickerDiv.style.display = "block";
                 }
                 else {
                     this._oggWarning.style.display = "none";
-                    this._oggWarning2.style.display = "none";
-                    this.opusPickerDiv.style.display = "none";
+                }
+                if (this._formatSelect.value == "opus") {
+                    this._opusWarning.style.display = "block";
+                }
+                else {
+                    this._opusWarning.style.display = "none";
                 }
             });
             this.container.addEventListener("keydown", this._whenKeyPressed);
@@ -47769,6 +47784,9 @@ button.playButton::before {
                 else if (this.thenExportTo == "ogg") {
                     this._exportToOggFinish();
                 }
+                else if (this.thenExportTo == "opus") {
+                    this._exportToOpusFinish();
+                }
                 else {
                     throw new Error("Unrecognized file export type chosen!");
                 }
@@ -47788,6 +47806,9 @@ button.playButton::before {
                 this.synth.samplesPerSecond = 44100;
             }
             else if (type == "ogg") {
+                this.synth.samplesPerSecond = 48000;
+            }
+            else if (type == "opus") {
                 this.synth.samplesPerSecond = 48000;
             }
             else {
@@ -47906,6 +47927,56 @@ button.playButton::before {
         }
         _exportToOggFinish() {
             const scripts = [
+                "https://unpkg.com/wasm-media-encoders/dist/umd/WasmMediaEncoder.min.js",
+            ];
+            let scriptsLoaded = 0;
+            const scriptsToLoad = scripts.length;
+            const whenEncoderIsAvailable = () => {
+                scriptsLoaded++;
+                if (scriptsLoaded < scriptsToLoad)
+                    return;
+                const WasmMediaEncoder = window["WasmMediaEncoder"];
+                const channelCount = 2;
+                const quality = 10;
+                const sampleBlockSize = 4096;
+                WasmMediaEncoder.createOggEncoder().then((oggEncoder) => {
+                    oggEncoder.configure({
+                        channels: channelCount,
+                        sampleRate: this.synth.samplesPerSecond,
+                        vbrQuality: quality,
+                    });
+                    const left = this.recordedSamplesL;
+                    const right = this.recordedSamplesR;
+                    const parts = [];
+                    let sampleIndex = 0;
+                    for (; sampleIndex < left.length; sampleIndex += sampleBlockSize) {
+                        const leftChunk = left.subarray(sampleIndex, sampleIndex + sampleBlockSize);
+                        const rightChunk = right.subarray(sampleIndex, sampleIndex + sampleBlockSize);
+                        const frame = ([leftChunk, rightChunk]) ;
+                        parts.push(oggEncoder.encode(frame).slice());
+                    }
+                    parts.push(oggEncoder.finalize().slice());
+                    const blob = new Blob(parts, { type: "audio/ogg" });
+                    save$1(blob, this._fileName.value.trim() + ".ogg");
+                    this._close();
+                });
+            };
+            if ("WasmMediaEncoder" in window) {
+                scriptsLoaded = scripts.length;
+                whenEncoderIsAvailable();
+            }
+            else {
+                scriptsLoaded = 0;
+                for (const src of scripts) {
+                    const script = document.createElement("script");
+                    script.src = src;
+                    script.onload = whenEncoderIsAvailable;
+                    document.head.appendChild(script);
+                }
+            }
+        }
+        _exportToOpusFinish() {
+            const scripts = [
                 "https://cdn.jsdelivr.net/gh/mmig/opus-encdec@e33ca40b92ddff8c168c7f5aca34b626c9acc08a/dist/libopus-encoder.js",
                 "https://cdn.jsdelivr.net/gh/mmig/opus-encdec@e33ca40b92ddff8c168c7f5aca34b626c9acc08a/src/oggOpusEncoder.js"
             ];
@@ -47988,8 +48059,8 @@ button.playButton::before {
                 }
                 oggEncoder.encodeFinalFrame().forEach((page) => parts.push(page.page));
                 oggEncoder.destroy();
-                const blob = new Blob(parts, { type: "audio/ogg" });
-                save$1(blob, this._fileName.value.trim() + ".ogg");
+                const blob = new Blob(parts, { type: "audio/opus" });
+                save$1(blob, this._fileName.value.trim() + ".opus");
                 this._close();
             };
             if (("OggOpusEncoder" in window) && ("OpusEncoderLib" in window)) {
