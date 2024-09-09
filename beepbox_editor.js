@@ -47370,6 +47370,1091 @@ button.playButton::before {
         }
     }
 
+    class Layout {
+        static setLayout(layout) {
+            this._styleElement.textContent = this._layoutMap[layout];
+        }
+    }
+    Layout._layoutMap = {
+        "small": "",
+        "long": `\
+
+			/* long layout */
+			@media (min-width: 711px) {
+				#beepboxEditorContainer {
+					max-width: initial;
+					height: 100vh;
+					padding-top: 0px !important;
+				}
+				.beepboxEditor {
+					width: 100%;
+					height: 100vh;
+					grid-template-columns: minmax(0, 1fr) 390px; /* minmax(0, 1fr) min-content; Chrome 80 grid layout regression. https://bugs.chromium.org/p/chromium/issues/detail?id=1050307 */
+					grid-template-rows: minmax(481px, 1fr) minmax(0, min-content);
+					grid-template-areas: "pattern-area settings-area" "track-area track-area";
+				}
+				.beepboxEditor .pattern-area {
+					width: 100%;
+					height: 100%;
+				}
+				.beepboxEditor .track-area {
+					width: 100%;
+					display: flex;
+					flex-direction: column;
+				}
+				.beepboxEditor .trackAndMuteContainer {
+					width: 100%;
+					min-height: 0;
+					flex: 1;
+					overflow: auto;
+					max-height: 97.5vh;
+				}
+				.beepboxEditor .instrument-settings-area {
+					overflow-y: auto;
+					position: relative;
+				}
+				.beepboxEditor .instrument-settings-area > .editor-controls {
+					position: absolute;
+					width: 100%;
+				}
+				.beepboxEditor .song-settings-area {
+					overflow-y: auto;
+				}
+				
+				.beepboxEditor .settings-area {
+					width: 390px;
+					grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+					grid-template-rows: auto auto auto minmax(0, 1fr);
+					grid-template-areas:
+						"instrument-settings-area version-area"
+						"instrument-settings-area play-pause-area"
+						"instrument-settings-area menu-area"
+						"instrument-settings-area song-settings-area";
+				}
+				
+				.beepboxEditor .barScrollBar {
+					display: none;
+				}
+				.beepboxEditor.selectRow {
+					height: 2em;
+				}
+				.beepboxEditor .operatorRow {
+					heiht: 2em;
+				}
+				.beepboxEditor .trackAndMuteContainer {
+					max-height: 446px;
+				}
+
+				.beepboxEditor .trackContainer {
+					overflow: visible;
+				}
+				.beepboxEditor .trackAndMuteContainer {
+					scrollbar-width: auto;
+				}
+				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar {
+					width: 20px;
+					height: 20px;
+				}
+				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-track {
+					background: ${ColorConfig.editorBackground};
+				}
+				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-thumb {
+					background-color: ${ColorConfig.uiWidgetBackground};
+					border: 3px solid ${ColorConfig.editorBackground};
+				}
+				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-corner {
+					background-color: ${ColorConfig.editorBackground};
+				}
+			}
+		`,
+        "tall": `\
+			/* tall layout */
+			@media (min-width: 711px) {
+				#beepboxEditorContainer {
+					max-width: initial;
+					height: 100vh;
+					padding-top: 0px !important;
+				}
+				.beepboxEditor {
+					width: 100%;
+					height: 100vh;
+					grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 192px;
+					grid-template-rows: 1fr;
+					grid-template-areas: "track-area pattern-area settings-area";
+				}
+				.beepboxEditor .pattern-area {
+					width: 100%;
+					height: 100%;
+				}
+				.beepboxEditor .track-area {
+					width: 100%;
+					height: 100%;
+					display: flex;
+					flex-direction: column;
+					justify-content: center;
+				}
+				.beepboxEditor .trackAndMuteContainer {
+					width: 100%;
+					min-height: 0;
+					flex: 0;
+					overflow: auto;
+					flex-basis: initial;
+					flex-grow: 0;
+					max-height: 97.5vh;
+				}
+				.beepboxEditor .instrument-settings-area > .editor-controls {
+					position: absolute;
+					width: 100%;
+				}
+				
+				.beepboxEditor .settings-area {
+					width: 192px;
+					position: relative;
+					overflow-y: auto;
+					grid-template-columns: minmax(0, 1fr);
+					grid-template-rows: auto auto auto auto minmax(0, 1fr);
+					grid-template-areas:
+						"version-area"
+						"play-pause-area"
+						"menu-area"
+						"song-settings-area"
+						"instrument-settings-area";
+				}
+				.beepboxEditor .version-area {
+					position: sticky;
+					top: 0;
+					z-index: 1;
+					background: ${ColorConfig.editorBackground};
+				}
+				.beepboxEditor .play-pause-area {
+					position: sticky;
+					top: 22px;
+					z-index: 1;
+					background: ${ColorConfig.editorBackground};
+				}
+				.beepboxEditor .menu-area {
+					position: sticky;
+					top: 82px;
+					z-index: 1;
+					background: ${ColorConfig.editorBackground};
+				}
+				
+				.beepboxEditor .barScrollBar {
+					display: none;
+				}
+				.beepboxEditor .trackContainer {
+					overflow: visible;
+				}
+				.beepboxEditor .trackAndMuteContainer {
+					scrollbar-width: auto;
+				}
+				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar {
+					width: 20px;
+					height: 20px;
+				}
+				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-track {
+					background: ${ColorConfig.editorBackground};
+				}
+				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-thumb {
+					background-color: ${ColorConfig.uiWidgetBackground};
+					border: 3px solid ${ColorConfig.editorBackground};
+				}
+				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-corner {
+					background-color: ${ColorConfig.editorBackground};
+				}
+			}
+		`,
+        "wide": `\
+			/* wide (JB) layout */
+			@media (min-width: 1001px) {
+				#beepboxEditorContainer {
+					max-width: initial;
+					height: 100vh;
+					padding-top: 0px !important;
+				}
+				.beepboxEditor {
+					width: 100%;
+					height: 100vh;
+					grid-template-columns: 512px minmax(0, 1fr) 30em;
+					grid-template-rows: minmax(481px, 1fr) min-content;
+					grid-template-areas: "track-area pattern-area settings-area";
+				}
+				.beepboxEditor .pattern-area {
+					width: 100%;
+					height: 100%;
+				}
+				.beepboxEditor .track-area {
+					width: 100%;
+					height: 100%;
+					max-height: 100%
+				}
+				.beepboxEditor .editor-widget-column {
+					flex: 0;
+				}
+				.beepboxEditor .trackAndMuteContainer {
+					width: 100%;
+					flex: 0;
+					flex-basis: initial;
+					flex-grow: 0;
+					overflow-y: auto;
+					max-height: 97.5vh;
+				}
+				.beepboxEditor .instrument-settings-area {
+					overflow-y: auto;
+					position: relative;
+				}
+				.beepboxEditor .instrument-settings-area > .editor-controls {
+					position: absolute;
+					width: 100%;
+				}
+				
+				.beepboxEditor .song-settings-area {
+					overflow-y: auto;
+				}
+				
+				.beepboxEditor .settings-area {
+					width: 30em;
+					grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+					grid-template-rows: auto auto auto minmax(0, 1fr);
+					grid-template-areas:
+						"instrument-settings-area version-area"
+						"instrument-settings-area play-pause-area"
+						"instrument-settings-area menu-area"
+						"instrument-settings-area song-settings-area";
+				}
+				.beepboxEditor .version-area {
+					position: sticky;
+					top: 0;
+					z-index: 1;
+					background: ${ColorConfig.editorBackground};
+				}
+				.beepboxEditor .play-pause-area {
+					position: sticky;
+					top: 22px;
+					z-index: 1;
+					background: ${ColorConfig.editorBackground};
+				}
+				.beepboxEditor .menu-area {
+					position: sticky;
+					top: 82px;
+					z-index: 1;
+					background: ${ColorConfig.editorBackground};
+				}
+				
+				.beepboxEditor .trackContainer {
+					overflow: visible;
+				}
+			}
+		`,
+        "AbyssBox Special": `\
+
+            	/* AB Special layout */
+			@media (min-width: 711px) {
+				#beepboxEditorContainer {
+					max-width: initial;
+					height: 100vh;
+					padding-top: 0px !important;
+				}
+				.beepboxEditor {
+					width: 100%;
+					height: 100vh;
+					grid-template-columns: 390px minmax(0, 1fr);
+					grid-template-rows: minmax(481px, 1fr) minmax(0, min-content);
+					grid-template-areas: "settings-area pattern-area" "track-area track-area";
+				}
+				.beepboxEditor .pattern-area {
+					width: 100%;
+					height: 100%;
+				}
+				.beepboxEditor .track-area {
+					width: 100%;
+					display: flex;
+					flex-direction: column;
+				}
+				.beepboxEditor .trackAndMuteContainer {
+					width: 100%;
+					min-height: 0;
+					flex: 1;
+					overflow: auto;
+					max-height: 97.5vh;
+				}
+				.beepboxEditor .instrument-settings-area {
+					overflow-y: auto;
+					position: relative;
+				}
+				.beepboxEditor .instrument-settings-area > .editor-controls {
+					position: absolute;
+					width: 100%;
+				}
+				.beepboxEditor .song-settings-area {
+					overflow-y: auto;
+				}
+				
+				.beepboxEditor .settings-area {
+					width: 30em;
+					grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+					grid-template-rows: auto auto auto minmax(0, 1fr);
+					grid-template-areas:
+						"version-area instrument-settings-area"
+						"play-pause-area instrument-settings-area"
+						"menu-area instrument-settings-area"
+						"song-settings-area instrument-settings-area";
+				}
+				
+				.beepboxEditor .barScrollBar {
+					display: none;
+				}
+				.beepboxEditor.selectRow {
+					height: 2em;
+				}
+				.beepboxEditor .operatorRow {
+					heiht: 2em;
+				}
+				.beepboxEditor .trackAndMuteContainer {
+					max-height: 446px;
+				}
+
+				.beepboxEditor .trackContainer {
+					overflow: visible;
+				}
+				.beepboxEditor .trackAndMuteContainer {
+					scrollbar-width: auto;
+					scrollbar-color: ${ColorConfig.scrollbarColor} ${ColorConfig.uiWidgetBackground} ${ColorConfig.editorBackground};
+				}
+				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar {
+					width: 20px;
+					height: 20px;
+				}
+				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-track {
+					background: ${ColorConfig.editorBackground};
+				}
+				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-thumb {
+					background-color: ${ColorConfig.uiWidgetBackground};
+					border: 3px solid ${ColorConfig.editorBackground};
+				}
+				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-corner {
+					background-color: ${ColorConfig.editorBackground};
+				}
+			}
+		`,
+        "long (AB)": `\
+
+			/* focus layout */
+			@media (min-width: 711px) {
+				#beepboxEditorContainer {
+					max-width: initial;
+					height: 100vh;
+					padding-top: 0px !important;
+				}
+				.beepboxEditor {
+					width: 100%;
+					height: 100vh;
+					grid-template-columns: minmax(0, 1fr) 390px; /* minmax(0, 1fr) min-content; Chrome 80 grid layout regression. https://bugs.chromium.org/p/chromium/issues/detail?id=1050307 */
+					grid-template-rows: minmax(481px, 1fr) minmax(0, min-content);
+					grid-template-areas: "pattern-area settings-area" "track-area";
+				}
+				.beepboxEditor .pattern-area {
+					width: 100%;
+					height: 100%;
+				}
+				.beepboxEditor .trackAndMuteContainer {
+					width: 100%;
+					min-height: 0;
+					flex: 1;
+					overflow: auto;
+					max-height: 97.5vh;
+				}
+				.beepboxEditor .instrument-settings-area {
+					overflow-y: auto;
+					position: relative;
+				}
+				.beepboxEditor .instrument-settings-area > .editor-controls {
+					position: absolute;
+					width: 100%;
+				}
+				
+				.beepboxEditor .song-settings-area {
+					overflow-y: auto;
+				}
+				
+				.beepboxEditor .settings-area {
+					width: 30em;
+					grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+					grid-template-rows: auto auto auto minmax(0, 1fr);
+					grid-template-areas:
+						"instrument-settings-area version-area"
+						"instrument-settings-area play-pause-area"
+						"instrument-settings-area menu-area"
+						"instrument-settings-area song-settings-area";
+				}				
+				.beepboxEditor .barScrollBar {
+					display: none;
+				}
+				.beepboxEditor.selectRow {
+					height: 2em;
+				}
+				.beepboxEditor .operatorRow {
+					heiht: 2em;
+				}
+				.beepboxEditor .trackAndMuteContainer {
+					max-height: 446px;
+				}
+
+				.beepboxEditor .trackContainer {
+					overflow: visible;
+				}
+				.beepboxEditor .trackAndMuteContainer {
+					scrollbar-width: auto;
+					scrollbar-color: ${ColorConfig.scrollbarColor} ${ColorConfig.uiWidgetBackground} ${ColorConfig.editorBackground};
+				}
+				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar {
+					width: 20px;
+					height: 20px;
+				}
+				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-track {
+					background: ${ColorConfig.editorBackground};
+				}
+				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-thumb {
+					background-color: ${ColorConfig.uiWidgetBackground};
+					border: 3px solid ${ColorConfig.editorBackground};
+				}
+				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-corner {
+					background-color: ${ColorConfig.editorBackground};
+				}
+			}
+		`,
+        "focus": `\
+
+			/* focus layout */
+			@media (min-width: 711px) {
+				#beepboxEditorContainer {
+					max-width: initial;
+					height: 100vh;
+					padding-top: 0px !important;
+				}
+				.beepboxEditor {
+					width: 100%;
+					height: 100vh;
+					grid-template-columns: minmax(0, 1fr) 190px; 
+					grid-template-rows: minmax(481px, 1fr) minmax(0, min-content);
+					grid-template-areas: "pattern-area settings-area" "track-area";
+				}
+				.beepboxEditor .pattern-area {
+					width: 100%;
+					height: 100%;
+				}
+				.beepboxEditor .trackAndMuteContainer {
+					width: 100%;
+					min-height: 0;
+					flex: 1;
+					overflow: auto;
+					max-height: 97.5vh;
+				}
+				.beepboxEditor .instrument-settings-area {
+					overflow-y: auto;
+					position: relative;
+				}
+				.beepboxEditor .instrument-settings-area > .editor-controls {
+					position: absolute;
+					width: 100%;
+				}
+				
+				.beepboxEditor .instrument-settings-area > .editor-controls {
+					position: absolute;
+					width: 100%;
+				}
+				
+				.beepboxEditor .settings-area {
+					width: 100%;
+					position: relative;
+					overflow-y: auto;
+					grid-template-columns: minmax(0, 1fr);
+					grid-template-rows: auto auto auto auto minmax(0, 1fr);
+					grid-template-areas:
+						"version-area"
+						"play-pause-area"
+						"menu-area"
+						"song-settings-area"
+						"instrument-settings-area";
+				}
+				.beepboxEditor .barScrollBar {
+					display: none;
+				}
+				.beepboxEditor.selectRow {
+					height: 2em;
+				}
+				.beepboxEditor .operatorRow {
+					heiht: 2em;
+				}
+				.beepboxEditor .trackAndMuteContainer {
+					max-height: 446px;
+				}
+
+				.beepboxEditor .trackContainer {
+					overflow: visible;
+				}
+				.beepboxEditor .trackAndMuteContainer {
+					scrollbar-width: auto;
+					scrollbar-color: ${ColorConfig.scrollbarColor} ${ColorConfig.uiWidgetBackground} ${ColorConfig.editorBackground};
+				}
+				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar {
+					width: 20px;
+					height: 20px;
+				}
+				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-track {
+					background: ${ColorConfig.editorBackground};
+				}
+				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-thumb {
+					background-color: ${ColorConfig.uiWidgetBackground};
+					border: 3px solid ${ColorConfig.editorBackground};
+				}
+				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-corner {
+					background-color: ${ColorConfig.editorBackground};
+				}
+			}
+		`,
+        "theatre": `\
+
+		/* Theatre layout */
+		@media (min-width: 711px) {
+			#beepboxEditorContainer {
+				max-width: initial;
+				height: 100vh;
+				padding-top: 0px !important;
+			}
+			.beepboxEditor {
+				width: 100%;
+				height: 200vh;
+				grid-template-columns: minmax(0, 1fr) 390px;
+				grid-template-rows: minmax(480px, 50%) minmax(0, 50%);
+				grid-template-areas:
+			"pattern-area pattern-area " 
+			"track-area settings-area";
+			  }			
+			.beepboxEditor .pattern-area {
+				width: 100%;
+				height: 100%;
+			}
+			.beepboxEditor .track-area {
+				width: 100%;
+				display: flex;
+				flex-direction: column;
+			}
+			.beepboxEditor .trackAndMuteContainer {
+				width: 100%;
+				min-height: 0;
+				flex: 1;
+				overflow: auto;
+				max-height: 97.5vh;
+			}
+			.beepboxEditor .instrument-settings-area {
+				overflow-y: auto;
+				position: relative;
+			}
+			.beepboxEditor .instrument-settings-area > .editor-controls {
+				position: absolute;
+				width: 100%;
+			}
+			.beepboxEditor .song-settings-area {
+				overflow-y: auto;
+			}
+			
+			.beepboxEditor .settings-area {
+				width: 390px;
+				grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+				grid-template-rows: auto auto auto minmax(0, 1fr);
+				grid-template-areas:
+					"instrument-settings-area version-area"
+					"instrument-settings-area play-pause-area"
+					"instrument-settings-area menu-area"
+					"instrument-settings-area song-settings-area";
+			}
+			
+			.beepboxEditor .barScrollBar {
+				display: none;
+			}
+			.beepboxEditor.selectRow {
+				height: 2em;
+			}
+			.beepboxEditor .operatorRow {
+				heiht: 2em;
+			}
+			.beepboxEditor .trackAndMuteContainer {
+				max-height: 100%;
+			}
+
+			.beepboxEditor .trackContainer {
+				overflow: visible;
+			}
+			.beepboxEditor .trackAndMuteContainer {
+				scrollbar-width: auto;
+				scrollbar-color: ${ColorConfig.scrollbarColor} ${ColorConfig.uiWidgetBackground} ${ColorConfig.editorBackground};
+			}
+			.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar {
+				width: 20px;
+				height: 20px;
+			}
+			.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-track {
+				background: ${ColorConfig.editorBackground};
+			}
+			.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-thumb {
+				background-color: ${ColorConfig.uiWidgetBackground};
+				border: 3px solid ${ColorConfig.editorBackground};
+			}
+			.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-corner {
+				background-color: ${ColorConfig.editorBackground};
+			}
+		}
+	`,
+        "Upside Down": `\
+
+				/* Upside Down */
+			@media (min-width: 711px) {
+				#beepboxEditorContainer {
+					max-width: initial;
+					height: 100vh;
+					padding-top: 0px !important;
+				}
+				.beepboxEditor {
+					width: 100%;
+					height: 100vh;
+					grid-template-columns: 195px minmax(0, 1fr);
+					grid-template-rows: minmax(0, min-content) minmax(481px, 1fr);
+					grid-template-areas: "settings-area track-area" "settings-area pattern-area";
+				}
+				.beepboxEditor .pattern-area {
+					width: 100%;
+					height: 100%;
+				}
+				.beepboxEditor .track-area {
+					width: 100%;
+					display: flex;
+					flex-direction: column;
+				}
+				.beepboxEditor .trackAndMuteContainer {
+					width: 100%;
+					min-height: 0;
+					flex: 1;
+					overflow: auto;
+					max-height: 97.5vh;
+				}
+				.beepboxEditor .instrument-settings-area {
+					overflow-y: auto;
+					position: relative;
+				}
+				.beepboxEditor .instrument-settings-area > .editor-controls {
+					position: absolute;
+					width: 100%;
+				}
+				.beepboxEditor .song-settings-area {
+					overflow-y: auto;
+				}
+				
+				.beepboxEditor .settings-area {
+					width: 100%;
+					position: relative;
+					overflow-y: auto;
+					grid-template-columns: minmax(0, 1fr);
+					grid-template-rows: auto auto auto auto minmax(0, 1fr);
+					grid-template-areas:
+						"version-area"
+						"play-pause-area"
+						"menu-area"
+						"song-settings-area"
+						"instrument-settings-area";
+				}
+				
+				.beepboxEditor .barScrollBar {
+					display: none;
+				}
+				.beepboxEditor.selectRow {
+					height: 2em;
+				}
+				.beepboxEditor .operatorRow {
+					heiht: 2em;
+				}
+				.beepboxEditor .trackAndMuteContainer {
+					max-height: 446px;
+				}
+
+				.beepboxEditor .trackContainer {
+					overflow: visible;
+				}
+				.beepboxEditor .trackAndMuteContainer {
+					scrollbar-width: auto;
+					scrollbar-color: ${ColorConfig.scrollbarColor} ${ColorConfig.uiWidgetBackground} ${ColorConfig.editorBackground};
+				}
+				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar {
+					width: 20px;
+					height: 20px;
+				}
+				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-track {
+					background: ${ColorConfig.editorBackground};
+				}
+				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-thumb {
+					background-color: ${ColorConfig.uiWidgetBackground};
+					border: 3px solid ${ColorConfig.editorBackground};
+				}
+				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-corner {
+					background-color: ${ColorConfig.editorBackground};
+				}
+			}
+			`,
+    };
+    Layout._styleElement = document.head.appendChild(HTML.style({ type: "text/css" }));
+
+    class HarmonicsEditor {
+        constructor(_doc) {
+            this._doc = _doc;
+            this._editorWidth = 120;
+            this._editorHeight = 26;
+            this._octaves = SVG.svg({ "pointer-events": "none" });
+            this._fifths = SVG.svg({ "pointer-events": "none" });
+            this._curve = SVG.path({ fill: "none", stroke: "currentColor", "stroke-width": 2, "pointer-events": "none" });
+            this._lastControlPoints = [];
+            this._lastControlPointContainer = SVG.svg({ "pointer-events": "none" });
+            this._svg = SVG.svg({ style: "background-color: ${ColorConfig.editorBackground}; touch-action: none; cursor: crosshair;", width: "100%", height: "100%", viewBox: "0 0 " + this._editorWidth + " " + this._editorHeight, preserveAspectRatio: "none" }, this._octaves, this._fifths, this._curve, this._lastControlPointContainer);
+            this.container = HTML.div({ class: "harmonics", style: "height: 100%;" }, this._svg);
+            this._mouseX = 0;
+            this._mouseY = 0;
+            this._freqPrev = 0;
+            this._ampPrev = 0;
+            this._mouseDown = false;
+            this._change = null;
+            this._renderedPath = "";
+            this._renderedFifths = true;
+            this._whenMousePressed = (event) => {
+                event.preventDefault();
+                this._mouseDown = true;
+                const boundingRect = this._svg.getBoundingClientRect();
+                this._mouseX = ((event.clientX || event.pageX) - boundingRect.left) * this._editorWidth / (boundingRect.right - boundingRect.left);
+                this._mouseY = ((event.clientY || event.pageY) - boundingRect.top) * this._editorHeight / (boundingRect.bottom - boundingRect.top);
+                if (isNaN(this._mouseX))
+                    this._mouseX = 0;
+                if (isNaN(this._mouseY))
+                    this._mouseY = 0;
+                this._freqPrev = this._xToFreq(this._mouseX);
+                this._ampPrev = this._yToAmp(this._mouseY);
+                this._whenCursorMoved();
+            };
+            this._whenTouchPressed = (event) => {
+                event.preventDefault();
+                this._mouseDown = true;
+                const boundingRect = this._svg.getBoundingClientRect();
+                this._mouseX = (event.touches[0].clientX - boundingRect.left) * this._editorWidth / (boundingRect.right - boundingRect.left);
+                this._mouseY = (event.touches[0].clientY - boundingRect.top) * this._editorHeight / (boundingRect.bottom - boundingRect.top);
+                if (isNaN(this._mouseX))
+                    this._mouseX = 0;
+                if (isNaN(this._mouseY))
+                    this._mouseY = 0;
+                this._freqPrev = this._xToFreq(this._mouseX);
+                this._ampPrev = this._yToAmp(this._mouseY);
+                this._whenCursorMoved();
+            };
+            this._whenMouseMoved = (event) => {
+                if (this.container.offsetParent == null)
+                    return;
+                const boundingRect = this._svg.getBoundingClientRect();
+                this._mouseX = ((event.clientX || event.pageX) - boundingRect.left) * this._editorWidth / (boundingRect.right - boundingRect.left);
+                this._mouseY = ((event.clientY || event.pageY) - boundingRect.top) * this._editorHeight / (boundingRect.bottom - boundingRect.top);
+                if (isNaN(this._mouseX))
+                    this._mouseX = 0;
+                if (isNaN(this._mouseY))
+                    this._mouseY = 0;
+                this._whenCursorMoved();
+            };
+            this._whenTouchMoved = (event) => {
+                if (this.container.offsetParent == null)
+                    return;
+                if (!this._mouseDown)
+                    return;
+                event.preventDefault();
+                const boundingRect = this._svg.getBoundingClientRect();
+                this._mouseX = (event.touches[0].clientX - boundingRect.left) * this._editorWidth / (boundingRect.right - boundingRect.left);
+                this._mouseY = (event.touches[0].clientY - boundingRect.top) * this._editorHeight / (boundingRect.bottom - boundingRect.top);
+                if (isNaN(this._mouseX))
+                    this._mouseX = 0;
+                if (isNaN(this._mouseY))
+                    this._mouseY = 0;
+                this._whenCursorMoved();
+            };
+            this._whenCursorReleased = (event) => {
+                if (this._mouseDown) {
+                    this._doc.record(this._change);
+                    this._change = null;
+                }
+                this._mouseDown = false;
+            };
+            for (let i = 1; i <= Config.harmonicsControlPoints; i = i * 2) {
+                this._octaves.appendChild(SVG.rect({ fill: ColorConfig.tonic, x: (i - 0.5) * (this._editorWidth - 8) / (Config.harmonicsControlPoints - 1) - 1, y: 0, width: 2, height: this._editorHeight }));
+            }
+            for (let i = 3; i <= Config.harmonicsControlPoints; i = i * 2) {
+                this._fifths.appendChild(SVG.rect({ fill: ColorConfig.fifthNote, x: (i - 0.5) * (this._editorWidth - 8) / (Config.harmonicsControlPoints - 1) - 1, y: 0, width: 2, height: this._editorHeight }));
+            }
+            for (let i = 0; i < 4; i++) {
+                const rect = SVG.rect({ fill: "currentColor", x: (this._editorWidth - i * 2 - 1), y: 0, width: 1, height: this._editorHeight });
+                this._lastControlPoints.push(rect);
+                this._lastControlPointContainer.appendChild(rect);
+            }
+            this.container.addEventListener("mousedown", this._whenMousePressed);
+            document.addEventListener("mousemove", this._whenMouseMoved);
+            document.addEventListener("mouseup", this._whenCursorReleased);
+            this.container.addEventListener("touchstart", this._whenTouchPressed);
+            this.container.addEventListener("touchmove", this._whenTouchMoved);
+            this.container.addEventListener("touchend", this._whenCursorReleased);
+            this.container.addEventListener("touchcancel", this._whenCursorReleased);
+        }
+        _xToFreq(x) {
+            return (Config.harmonicsControlPoints - 1) * x / (this._editorWidth - 8) - 0.5;
+        }
+        _yToAmp(y) {
+            return Config.harmonicsMax * (1 - y / this._editorHeight);
+        }
+        _whenCursorMoved() {
+            if (this._mouseDown) {
+                const freq = this._xToFreq(this._mouseX);
+                const amp = this._yToAmp(this._mouseY);
+                const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
+                const harmonicsWave = instrument.harmonicsWave;
+                if (freq != this._freqPrev) {
+                    const slope = (amp - this._ampPrev) / (freq - this._freqPrev);
+                    const offset = this._ampPrev - this._freqPrev * slope;
+                    const lowerFreq = Math.ceil(Math.min(this._freqPrev, freq));
+                    const upperFreq = Math.floor(Math.max(this._freqPrev, freq));
+                    for (let i = lowerFreq; i <= upperFreq; i++) {
+                        if (i < 0 || i >= Config.harmonicsControlPoints)
+                            continue;
+                        harmonicsWave.harmonics[i] = Math.max(0, Math.min(Config.harmonicsMax, Math.round(i * slope + offset)));
+                    }
+                }
+                harmonicsWave.harmonics[Math.max(0, Math.min(Config.harmonicsControlPoints - 1, Math.round(freq)))] = Math.max(0, Math.min(Config.harmonicsMax, Math.round(amp)));
+                this._freqPrev = freq;
+                this._ampPrev = amp;
+                this._change = new ChangeHarmonics(this._doc, instrument, harmonicsWave);
+                this._doc.setProspectiveChange(this._change);
+            }
+        }
+        render() {
+            const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
+            const harmonicsWave = instrument.harmonicsWave;
+            const controlPointToHeight = (point) => {
+                return (1 - (point / Config.harmonicsMax)) * this._editorHeight;
+            };
+            let bottom = prettyNumber(this._editorHeight);
+            let path = "";
+            for (let i = 0; i < Config.harmonicsControlPoints - 1; i++) {
+                if (harmonicsWave.harmonics[i] == 0)
+                    continue;
+                let xPos = prettyNumber((i + 0.5) * (this._editorWidth - 8) / (Config.harmonicsControlPoints - 1));
+                path += "M " + xPos + " " + bottom + " ";
+                path += "L " + xPos + " " + prettyNumber(controlPointToHeight(harmonicsWave.harmonics[i])) + " ";
+            }
+            const lastHeight = controlPointToHeight(harmonicsWave.harmonics[Config.harmonicsControlPoints - 1]);
+            for (let i = 0; i < 4; i++) {
+                const rect = this._lastControlPoints[i];
+                rect.setAttribute("y", prettyNumber(lastHeight));
+                rect.setAttribute("height", prettyNumber(this._editorHeight - lastHeight));
+            }
+            if (this._renderedPath != path) {
+                this._renderedPath = path;
+                this._curve.setAttribute("d", path);
+            }
+            if (this._renderedFifths != this._doc.prefs.showFifth) {
+                this._renderedFifths = this._doc.prefs.showFifth;
+                this._fifths.style.display = this._doc.prefs.showFifth ? "" : "none";
+            }
+        }
+    }
+
+    const { span: span$5 } = HTML;
+    class InputBox {
+        constructor(input, _doc, _getChange) {
+            this.input = input;
+            this._doc = _doc;
+            this._getChange = _getChange;
+            this._change = null;
+            this._value = "";
+            this._oldValue = "";
+            this._whenInput = () => {
+                const continuingProspectiveChange = this._doc.lastChangeWas(this._change);
+                if (!continuingProspectiveChange)
+                    this._oldValue = this._value;
+                this._change = this._getChange(this._oldValue, this.input.value);
+                this._doc.setProspectiveChange(this._change);
+            };
+            this._whenChange = () => {
+                this._doc.record(this._change);
+                this._change = null;
+            };
+            input.addEventListener("input", this._whenInput);
+            input.addEventListener("change", this._whenChange);
+        }
+        updateValue(value) {
+            this._value = value;
+            this.input.value = String(value);
+        }
+    }
+    class Slider {
+        constructor(input, _doc, _getChange, midTick) {
+            this.input = input;
+            this._doc = _doc;
+            this._getChange = _getChange;
+            this._change = null;
+            this._value = 0;
+            this._oldValue = 0;
+            this._whenInput = () => {
+                const continuingProspectiveChange = this._doc.lastChangeWas(this._change);
+                if (!continuingProspectiveChange)
+                    this._oldValue = this._value;
+                if (this._getChange != null) {
+                    this._change = this._getChange(this._oldValue, parseInt(this.input.value));
+                    this._doc.setProspectiveChange(this._change);
+                }
+            };
+            this._whenChange = () => {
+                if (this._getChange != null) {
+                    this._doc.record(this._change);
+                    this._change = null;
+                }
+            };
+            this.container = (midTick) ? span$5({ class: "midTick", style: "position: sticky; width: 61.5%;" }, input) : span$5({ style: "position: sticky;" }, input);
+            input.addEventListener("input", this._whenInput);
+            input.addEventListener("change", this._whenChange);
+        }
+        updateValue(value) {
+            this._value = value;
+            this.input.value = String(value);
+        }
+        getValueBeforeProspectiveChange() {
+            return this._oldValue;
+        }
+    }
+
+    const defaultMidiExpression = 0x7F;
+    const defaultMidiPitchBend = 0x2000;
+    const analogousDrumMap = {
+        35: { frequency: 0, duration: 2, volume: 3 },
+        36: { frequency: 0, duration: 2, volume: 3 },
+        37: { frequency: 5, duration: 1, volume: 3 },
+        38: { frequency: 4, duration: 2, volume: 3 },
+        39: { frequency: 5, duration: 2, volume: 3 },
+        40: { frequency: 4, duration: 2, volume: 3 },
+        41: { frequency: 1, duration: 2, volume: 3 },
+        42: { frequency: 8, duration: 1, volume: 3 },
+        43: { frequency: 1, duration: 2, volume: 3 },
+        44: { frequency: 8, duration: 1, volume: 2 },
+        45: { frequency: 2, duration: 2, volume: 3 },
+        46: { frequency: 8, duration: 4, volume: 3 },
+        47: { frequency: 2, duration: 2, volume: 3 },
+        48: { frequency: 3, duration: 2, volume: 3 },
+        49: { frequency: 7, duration: 4, volume: 3 },
+        50: { frequency: 3, duration: 2, volume: 3 },
+        51: { frequency: 6, duration: 4, volume: 2 },
+        52: { frequency: 7, duration: 4, volume: 3 },
+        53: { frequency: 6, duration: 2, volume: 3 },
+        54: { frequency: 11, duration: 2, volume: 3 },
+        55: { frequency: 9, duration: 4, volume: 3 },
+        56: { frequency: 7, duration: 1, volume: 2 },
+        57: { frequency: 7, duration: 4, volume: 3 },
+        58: { frequency: 10, duration: 2, volume: 2 },
+        59: { frequency: 6, duration: 4, volume: 3 },
+        69: { frequency: 10, duration: 2, volume: 3 },
+        70: { frequency: 10, duration: 2, volume: 3 },
+        73: { frequency: 10, duration: 1, volume: 2 },
+        74: { frequency: 10, duration: 2, volume: 2 },
+    };
+    function midiVolumeToVolumeMult(volume) {
+        return Math.pow(volume / 127, 4.0) / 0.3844015376046128;
+    }
+    function volumeMultToMidiVolume(volumeMult) {
+        return Math.pow(volumeMult * 0.3844015376046128, 0.25) * 127;
+    }
+    function midiExpressionToVolumeMult(expression) {
+        return Math.pow(expression / 127, 4.0);
+    }
+    function volumeMultToMidiExpression(volumeMult) {
+        return Math.pow(volumeMult, 0.25) * 127;
+    }
+
+    class ArrayBufferReader {
+        constructor(data) {
+            this._readIndex = 0;
+            this._data = data;
+        }
+        getReadIndex() {
+            return this._readIndex;
+        }
+        readUint32() {
+            if (this._readIndex + 4 > this._data.byteLength)
+                throw new Error("Reading past the end of the buffer.");
+            const result = this._data.getUint32(this._readIndex, false);
+            this._readIndex += 4;
+            return result;
+        }
+        readUint24() {
+            return (this.readUint8() << 16) | (this.readUint8() << 8) | (this.readUint8());
+        }
+        readUint16() {
+            if (this._readIndex + 2 > this._data.byteLength)
+                throw new Error("Reading past the end of the buffer.");
+            const result = this._data.getUint16(this._readIndex, false);
+            this._readIndex += 2;
+            return result;
+        }
+        readUint8() {
+            if (this._readIndex + 1 > this._data.byteLength)
+                throw new Error("Reading past the end of the buffer.");
+            const result = this._data.getUint8(this._readIndex);
+            this._readIndex++;
+            return result;
+        }
+        readInt8() {
+            if (this._readIndex + 1 > this._data.byteLength)
+                throw new Error("Reading past the end of the buffer.");
+            const result = this._data.getInt8(this._readIndex);
+            this._readIndex++;
+            return result;
+        }
+        peakUint8() {
+            if (this._readIndex + 1 > this._data.byteLength)
+                throw new Error("Reading past the end of the buffer.");
+            return this._data.getUint8(this._readIndex);
+        }
+        readMidi7Bits() {
+            const result = this.readUint8();
+            if (result >= 0x80)
+                console.log("7 bit value contained 8th bit! value " + result + ", index " + this._readIndex);
+            return result & 0x7f;
+        }
+        readMidiVariableLength() {
+            let result = 0;
+            for (let i = 0; i < 4; i++) {
+                const nextByte = this.readUint8();
+                result += nextByte & 0x7f;
+                if (nextByte & 0x80) {
+                    result = result << 7;
+                }
+                else {
+                    break;
+                }
+            }
+            return result;
+        }
+        skipBytes(length) {
+            this._readIndex += length;
+        }
+        hasMore() {
+            return this._data.byteLength > this._readIndex;
+        }
+        getReaderForNextBytes(length) {
+            if (this._readIndex + length > this._data.byteLength)
+                throw new Error("Reading past the end of the buffer.");
+            const result = new ArrayBufferReader(new DataView(this._data.buffer, this._data.byteOffset + this._readIndex, length));
+            this.skipBytes(length);
+            return result;
+        }
+    }
+
     function transfer(source, length) {
         const dest = new ArrayBuffer(length);
         let nextOffset = 0;
@@ -47499,52 +48584,6 @@ button.playButton::before {
         toCompactArrayBuffer() {
             return transfer(this._arrayBuffer, this._fileSize);
         }
-    }
-
-    const defaultMidiExpression = 0x7F;
-    const defaultMidiPitchBend = 0x2000;
-    const analogousDrumMap = {
-        35: { frequency: 0, duration: 2, volume: 3 },
-        36: { frequency: 0, duration: 2, volume: 3 },
-        37: { frequency: 5, duration: 1, volume: 3 },
-        38: { frequency: 4, duration: 2, volume: 3 },
-        39: { frequency: 5, duration: 2, volume: 3 },
-        40: { frequency: 4, duration: 2, volume: 3 },
-        41: { frequency: 1, duration: 2, volume: 3 },
-        42: { frequency: 8, duration: 1, volume: 3 },
-        43: { frequency: 1, duration: 2, volume: 3 },
-        44: { frequency: 8, duration: 1, volume: 2 },
-        45: { frequency: 2, duration: 2, volume: 3 },
-        46: { frequency: 8, duration: 4, volume: 3 },
-        47: { frequency: 2, duration: 2, volume: 3 },
-        48: { frequency: 3, duration: 2, volume: 3 },
-        49: { frequency: 7, duration: 4, volume: 3 },
-        50: { frequency: 3, duration: 2, volume: 3 },
-        51: { frequency: 6, duration: 4, volume: 2 },
-        52: { frequency: 7, duration: 4, volume: 3 },
-        53: { frequency: 6, duration: 2, volume: 3 },
-        54: { frequency: 11, duration: 2, volume: 3 },
-        55: { frequency: 9, duration: 4, volume: 3 },
-        56: { frequency: 7, duration: 1, volume: 2 },
-        57: { frequency: 7, duration: 4, volume: 3 },
-        58: { frequency: 10, duration: 2, volume: 2 },
-        59: { frequency: 6, duration: 4, volume: 3 },
-        69: { frequency: 10, duration: 2, volume: 3 },
-        70: { frequency: 10, duration: 2, volume: 3 },
-        73: { frequency: 10, duration: 1, volume: 2 },
-        74: { frequency: 10, duration: 2, volume: 2 },
-    };
-    function midiVolumeToVolumeMult(volume) {
-        return Math.pow(volume / 127, 4.0) / 0.3844015376046128;
-    }
-    function volumeMultToMidiVolume(volumeMult) {
-        return Math.pow(volumeMult * 0.3844015376046128, 0.25) * 127;
-    }
-    function midiExpressionToVolumeMult(expression) {
-        return Math.pow(expression / 127, 4.0);
-    }
-    function volumeMultToMidiExpression(volumeMult) {
-        return Math.pow(volumeMult, 0.25) * 127;
     }
 
     const { button: button$k, div: div$k, h2: h2$j, input: input$c, select: select$d, option: option$d } = HTML;
@@ -48506,1045 +49545,6 @@ You should be redirected to the song at:<br /><br />
         0x51,
     ];
 
-    class Layout {
-        static setLayout(layout) {
-            this._styleElement.textContent = this._layoutMap[layout];
-        }
-    }
-    Layout._layoutMap = {
-        "small": "",
-        "long": `\
-
-			/* long layout */
-			@media (min-width: 711px) {
-				#beepboxEditorContainer {
-					max-width: initial;
-					height: 100vh;
-					padding-top: 0px !important;
-				}
-				.beepboxEditor {
-					width: 100%;
-					height: 100vh;
-					grid-template-columns: minmax(0, 1fr) 390px; /* minmax(0, 1fr) min-content; Chrome 80 grid layout regression. https://bugs.chromium.org/p/chromium/issues/detail?id=1050307 */
-					grid-template-rows: minmax(481px, 1fr) minmax(0, min-content);
-					grid-template-areas: "pattern-area settings-area" "track-area track-area";
-				}
-				.beepboxEditor .pattern-area {
-					width: 100%;
-					height: 100%;
-				}
-				.beepboxEditor .track-area {
-					width: 100%;
-					display: flex;
-					flex-direction: column;
-				}
-				.beepboxEditor .trackAndMuteContainer {
-					width: 100%;
-					min-height: 0;
-					flex: 1;
-					overflow: auto;
-					max-height: 97.5vh;
-				}
-				.beepboxEditor .instrument-settings-area {
-					overflow-y: auto;
-					position: relative;
-				}
-				.beepboxEditor .instrument-settings-area > .editor-controls {
-					position: absolute;
-					width: 100%;
-				}
-				.beepboxEditor .song-settings-area {
-					overflow-y: auto;
-				}
-				
-				.beepboxEditor .settings-area {
-					width: 390px;
-					grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-					grid-template-rows: auto auto auto minmax(0, 1fr);
-					grid-template-areas:
-						"instrument-settings-area version-area"
-						"instrument-settings-area play-pause-area"
-						"instrument-settings-area menu-area"
-						"instrument-settings-area song-settings-area";
-				}
-				
-				.beepboxEditor .barScrollBar {
-					display: none;
-				}
-				.beepboxEditor.selectRow {
-					height: 2em;
-				}
-				.beepboxEditor .operatorRow {
-					heiht: 2em;
-				}
-				.beepboxEditor .trackAndMuteContainer {
-					max-height: 446px;
-				}
-
-				.beepboxEditor .trackContainer {
-					overflow: visible;
-				}
-				.beepboxEditor .trackAndMuteContainer {
-					scrollbar-width: auto;
-				}
-				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar {
-					width: 20px;
-					height: 20px;
-				}
-				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-track {
-					background: ${ColorConfig.editorBackground};
-				}
-				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-thumb {
-					background-color: ${ColorConfig.uiWidgetBackground};
-					border: 3px solid ${ColorConfig.editorBackground};
-				}
-				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-corner {
-					background-color: ${ColorConfig.editorBackground};
-				}
-			}
-		`,
-        "tall": `\
-			/* tall layout */
-			@media (min-width: 711px) {
-				#beepboxEditorContainer {
-					max-width: initial;
-					height: 100vh;
-					padding-top: 0px !important;
-				}
-				.beepboxEditor {
-					width: 100%;
-					height: 100vh;
-					grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 192px;
-					grid-template-rows: 1fr;
-					grid-template-areas: "track-area pattern-area settings-area";
-				}
-				.beepboxEditor .pattern-area {
-					width: 100%;
-					height: 100%;
-				}
-				.beepboxEditor .track-area {
-					width: 100%;
-					height: 100%;
-					display: flex;
-					flex-direction: column;
-					justify-content: center;
-				}
-				.beepboxEditor .trackAndMuteContainer {
-					width: 100%;
-					min-height: 0;
-					flex: 0;
-					overflow: auto;
-					flex-basis: initial;
-					flex-grow: 0;
-					max-height: 97.5vh;
-				}
-				.beepboxEditor .instrument-settings-area > .editor-controls {
-					position: absolute;
-					width: 100%;
-				}
-				
-				.beepboxEditor .settings-area {
-					width: 192px;
-					position: relative;
-					overflow-y: auto;
-					grid-template-columns: minmax(0, 1fr);
-					grid-template-rows: auto auto auto auto minmax(0, 1fr);
-					grid-template-areas:
-						"version-area"
-						"play-pause-area"
-						"menu-area"
-						"song-settings-area"
-						"instrument-settings-area";
-				}
-				.beepboxEditor .version-area {
-					position: sticky;
-					top: 0;
-					z-index: 1;
-					background: ${ColorConfig.editorBackground};
-				}
-				.beepboxEditor .play-pause-area {
-					position: sticky;
-					top: 22px;
-					z-index: 1;
-					background: ${ColorConfig.editorBackground};
-				}
-				.beepboxEditor .menu-area {
-					position: sticky;
-					top: 82px;
-					z-index: 1;
-					background: ${ColorConfig.editorBackground};
-				}
-				
-				.beepboxEditor .barScrollBar {
-					display: none;
-				}
-				.beepboxEditor .trackContainer {
-					overflow: visible;
-				}
-				.beepboxEditor .trackAndMuteContainer {
-					scrollbar-width: auto;
-				}
-				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar {
-					width: 20px;
-					height: 20px;
-				}
-				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-track {
-					background: ${ColorConfig.editorBackground};
-				}
-				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-thumb {
-					background-color: ${ColorConfig.uiWidgetBackground};
-					border: 3px solid ${ColorConfig.editorBackground};
-				}
-				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-corner {
-					background-color: ${ColorConfig.editorBackground};
-				}
-			}
-		`,
-        "wide": `\
-			/* wide (JB) layout */
-			@media (min-width: 1001px) {
-				#beepboxEditorContainer {
-					max-width: initial;
-					height: 100vh;
-					padding-top: 0px !important;
-				}
-				.beepboxEditor {
-					width: 100%;
-					height: 100vh;
-					grid-template-columns: 512px minmax(0, 1fr) 30em;
-					grid-template-rows: minmax(481px, 1fr) min-content;
-					grid-template-areas: "track-area pattern-area settings-area";
-				}
-				.beepboxEditor .pattern-area {
-					width: 100%;
-					height: 100%;
-				}
-				.beepboxEditor .track-area {
-					width: 100%;
-					height: 100%;
-					max-height: 100%
-				}
-				.beepboxEditor .editor-widget-column {
-					flex: 0;
-				}
-				.beepboxEditor .trackAndMuteContainer {
-					width: 100%;
-					flex: 0;
-					flex-basis: initial;
-					flex-grow: 0;
-					overflow-y: auto;
-					max-height: 97.5vh;
-				}
-				.beepboxEditor .instrument-settings-area {
-					overflow-y: auto;
-					position: relative;
-				}
-				.beepboxEditor .instrument-settings-area > .editor-controls {
-					position: absolute;
-					width: 100%;
-				}
-				
-				.beepboxEditor .song-settings-area {
-					overflow-y: auto;
-				}
-				
-				.beepboxEditor .settings-area {
-					width: 30em;
-					grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-					grid-template-rows: auto auto auto minmax(0, 1fr);
-					grid-template-areas:
-						"instrument-settings-area version-area"
-						"instrument-settings-area play-pause-area"
-						"instrument-settings-area menu-area"
-						"instrument-settings-area song-settings-area";
-				}
-				.beepboxEditor .version-area {
-					position: sticky;
-					top: 0;
-					z-index: 1;
-					background: ${ColorConfig.editorBackground};
-				}
-				.beepboxEditor .play-pause-area {
-					position: sticky;
-					top: 22px;
-					z-index: 1;
-					background: ${ColorConfig.editorBackground};
-				}
-				.beepboxEditor .menu-area {
-					position: sticky;
-					top: 82px;
-					z-index: 1;
-					background: ${ColorConfig.editorBackground};
-				}
-				
-				.beepboxEditor .trackContainer {
-					overflow: visible;
-				}
-			}
-		`,
-        "AbyssBox Special": `\
-
-            	/* AB Special layout */
-			@media (min-width: 711px) {
-				#beepboxEditorContainer {
-					max-width: initial;
-					height: 100vh;
-					padding-top: 0px !important;
-				}
-				.beepboxEditor {
-					width: 100%;
-					height: 100vh;
-					grid-template-columns: 390px minmax(0, 1fr);
-					grid-template-rows: minmax(481px, 1fr) minmax(0, min-content);
-					grid-template-areas: "settings-area pattern-area" "track-area track-area";
-				}
-				.beepboxEditor .pattern-area {
-					width: 100%;
-					height: 100%;
-				}
-				.beepboxEditor .track-area {
-					width: 100%;
-					display: flex;
-					flex-direction: column;
-				}
-				.beepboxEditor .trackAndMuteContainer {
-					width: 100%;
-					min-height: 0;
-					flex: 1;
-					overflow: auto;
-					max-height: 97.5vh;
-				}
-				.beepboxEditor .instrument-settings-area {
-					overflow-y: auto;
-					position: relative;
-				}
-				.beepboxEditor .instrument-settings-area > .editor-controls {
-					position: absolute;
-					width: 100%;
-				}
-				.beepboxEditor .song-settings-area {
-					overflow-y: auto;
-				}
-				
-				.beepboxEditor .settings-area {
-					width: 30em;
-					grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-					grid-template-rows: auto auto auto minmax(0, 1fr);
-					grid-template-areas:
-						"version-area instrument-settings-area"
-						"play-pause-area instrument-settings-area"
-						"menu-area instrument-settings-area"
-						"song-settings-area instrument-settings-area";
-				}
-				
-				.beepboxEditor .barScrollBar {
-					display: none;
-				}
-				.beepboxEditor.selectRow {
-					height: 2em;
-				}
-				.beepboxEditor .operatorRow {
-					heiht: 2em;
-				}
-				.beepboxEditor .trackAndMuteContainer {
-					max-height: 446px;
-				}
-
-				.beepboxEditor .trackContainer {
-					overflow: visible;
-				}
-				.beepboxEditor .trackAndMuteContainer {
-					scrollbar-width: auto;
-					scrollbar-color: ${ColorConfig.scrollbarColor} ${ColorConfig.uiWidgetBackground} ${ColorConfig.editorBackground};
-				}
-				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar {
-					width: 20px;
-					height: 20px;
-				}
-				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-track {
-					background: ${ColorConfig.editorBackground};
-				}
-				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-thumb {
-					background-color: ${ColorConfig.uiWidgetBackground};
-					border: 3px solid ${ColorConfig.editorBackground};
-				}
-				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-corner {
-					background-color: ${ColorConfig.editorBackground};
-				}
-			}
-		`,
-        "long (AB)": `\
-
-			/* focus layout */
-			@media (min-width: 711px) {
-				#beepboxEditorContainer {
-					max-width: initial;
-					height: 100vh;
-					padding-top: 0px !important;
-				}
-				.beepboxEditor {
-					width: 100%;
-					height: 100vh;
-					grid-template-columns: minmax(0, 1fr) 390px; /* minmax(0, 1fr) min-content; Chrome 80 grid layout regression. https://bugs.chromium.org/p/chromium/issues/detail?id=1050307 */
-					grid-template-rows: minmax(481px, 1fr) minmax(0, min-content);
-					grid-template-areas: "pattern-area settings-area" "track-area";
-				}
-				.beepboxEditor .pattern-area {
-					width: 100%;
-					height: 100%;
-				}
-				.beepboxEditor .trackAndMuteContainer {
-					width: 100%;
-					min-height: 0;
-					flex: 1;
-					overflow: auto;
-					max-height: 97.5vh;
-				}
-				.beepboxEditor .instrument-settings-area {
-					overflow-y: auto;
-					position: relative;
-				}
-				.beepboxEditor .instrument-settings-area > .editor-controls {
-					position: absolute;
-					width: 100%;
-				}
-				
-				.beepboxEditor .song-settings-area {
-					overflow-y: auto;
-				}
-				
-				.beepboxEditor .settings-area {
-					width: 30em;
-					grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-					grid-template-rows: auto auto auto minmax(0, 1fr);
-					grid-template-areas:
-						"instrument-settings-area version-area"
-						"instrument-settings-area play-pause-area"
-						"instrument-settings-area menu-area"
-						"instrument-settings-area song-settings-area";
-				}				
-				.beepboxEditor .barScrollBar {
-					display: none;
-				}
-				.beepboxEditor.selectRow {
-					height: 2em;
-				}
-				.beepboxEditor .operatorRow {
-					heiht: 2em;
-				}
-				.beepboxEditor .trackAndMuteContainer {
-					max-height: 446px;
-				}
-
-				.beepboxEditor .trackContainer {
-					overflow: visible;
-				}
-				.beepboxEditor .trackAndMuteContainer {
-					scrollbar-width: auto;
-					scrollbar-color: ${ColorConfig.scrollbarColor} ${ColorConfig.uiWidgetBackground} ${ColorConfig.editorBackground};
-				}
-				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar {
-					width: 20px;
-					height: 20px;
-				}
-				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-track {
-					background: ${ColorConfig.editorBackground};
-				}
-				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-thumb {
-					background-color: ${ColorConfig.uiWidgetBackground};
-					border: 3px solid ${ColorConfig.editorBackground};
-				}
-				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-corner {
-					background-color: ${ColorConfig.editorBackground};
-				}
-			}
-		`,
-        "focus": `\
-
-			/* focus layout */
-			@media (min-width: 711px) {
-				#beepboxEditorContainer {
-					max-width: initial;
-					height: 100vh;
-					padding-top: 0px !important;
-				}
-				.beepboxEditor {
-					width: 100%;
-					height: 100vh;
-					grid-template-columns: minmax(0, 1fr) 190px; 
-					grid-template-rows: minmax(481px, 1fr) minmax(0, min-content);
-					grid-template-areas: "pattern-area settings-area" "track-area";
-				}
-				.beepboxEditor .pattern-area {
-					width: 100%;
-					height: 100%;
-				}
-				.beepboxEditor .trackAndMuteContainer {
-					width: 100%;
-					min-height: 0;
-					flex: 1;
-					overflow: auto;
-					max-height: 97.5vh;
-				}
-				.beepboxEditor .instrument-settings-area {
-					overflow-y: auto;
-					position: relative;
-				}
-				.beepboxEditor .instrument-settings-area > .editor-controls {
-					position: absolute;
-					width: 100%;
-				}
-				
-				.beepboxEditor .instrument-settings-area > .editor-controls {
-					position: absolute;
-					width: 100%;
-				}
-				
-				.beepboxEditor .settings-area {
-					width: 100%;
-					position: relative;
-					overflow-y: auto;
-					grid-template-columns: minmax(0, 1fr);
-					grid-template-rows: auto auto auto auto minmax(0, 1fr);
-					grid-template-areas:
-						"version-area"
-						"play-pause-area"
-						"menu-area"
-						"song-settings-area"
-						"instrument-settings-area";
-				}
-				.beepboxEditor .barScrollBar {
-					display: none;
-				}
-				.beepboxEditor.selectRow {
-					height: 2em;
-				}
-				.beepboxEditor .operatorRow {
-					heiht: 2em;
-				}
-				.beepboxEditor .trackAndMuteContainer {
-					max-height: 446px;
-				}
-
-				.beepboxEditor .trackContainer {
-					overflow: visible;
-				}
-				.beepboxEditor .trackAndMuteContainer {
-					scrollbar-width: auto;
-					scrollbar-color: ${ColorConfig.scrollbarColor} ${ColorConfig.uiWidgetBackground} ${ColorConfig.editorBackground};
-				}
-				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar {
-					width: 20px;
-					height: 20px;
-				}
-				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-track {
-					background: ${ColorConfig.editorBackground};
-				}
-				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-thumb {
-					background-color: ${ColorConfig.uiWidgetBackground};
-					border: 3px solid ${ColorConfig.editorBackground};
-				}
-				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-corner {
-					background-color: ${ColorConfig.editorBackground};
-				}
-			}
-		`,
-        "theatre": `\
-
-		/* Theatre layout */
-		@media (min-width: 711px) {
-			#beepboxEditorContainer {
-				max-width: initial;
-				height: 100vh;
-				padding-top: 0px !important;
-			}
-			.beepboxEditor {
-				width: 100%;
-				height: 200vh;
-				grid-template-columns: minmax(0, 1fr) 390px;
-				grid-template-rows: minmax(480px, 50%) minmax(0, 50%);
-				grid-template-areas:
-			"pattern-area pattern-area " 
-			"track-area settings-area";
-			  }			
-			.beepboxEditor .pattern-area {
-				width: 100%;
-				height: 100%;
-			}
-			.beepboxEditor .track-area {
-				width: 100%;
-				display: flex;
-				flex-direction: column;
-			}
-			.beepboxEditor .trackAndMuteContainer {
-				width: 100%;
-				min-height: 0;
-				flex: 1;
-				overflow: auto;
-				max-height: 97.5vh;
-			}
-			.beepboxEditor .instrument-settings-area {
-				overflow-y: auto;
-				position: relative;
-			}
-			.beepboxEditor .instrument-settings-area > .editor-controls {
-				position: absolute;
-				width: 100%;
-			}
-			.beepboxEditor .song-settings-area {
-				overflow-y: auto;
-			}
-			
-			.beepboxEditor .settings-area {
-				width: 390px;
-				grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-				grid-template-rows: auto auto auto minmax(0, 1fr);
-				grid-template-areas:
-					"instrument-settings-area version-area"
-					"instrument-settings-area play-pause-area"
-					"instrument-settings-area menu-area"
-					"instrument-settings-area song-settings-area";
-			}
-			
-			.beepboxEditor .barScrollBar {
-				display: none;
-			}
-			.beepboxEditor.selectRow {
-				height: 2em;
-			}
-			.beepboxEditor .operatorRow {
-				heiht: 2em;
-			}
-			.beepboxEditor .trackAndMuteContainer {
-				max-height: 100%;
-			}
-
-			.beepboxEditor .trackContainer {
-				overflow: visible;
-			}
-			.beepboxEditor .trackAndMuteContainer {
-				scrollbar-width: auto;
-				scrollbar-color: ${ColorConfig.scrollbarColor} ${ColorConfig.uiWidgetBackground} ${ColorConfig.editorBackground};
-			}
-			.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar {
-				width: 20px;
-				height: 20px;
-			}
-			.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-track {
-				background: ${ColorConfig.editorBackground};
-			}
-			.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-thumb {
-				background-color: ${ColorConfig.uiWidgetBackground};
-				border: 3px solid ${ColorConfig.editorBackground};
-			}
-			.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-corner {
-				background-color: ${ColorConfig.editorBackground};
-			}
-		}
-	`,
-        "Upside Down": `\
-
-				/* Upside Down */
-			@media (min-width: 711px) {
-				#beepboxEditorContainer {
-					max-width: initial;
-					height: 100vh;
-					padding-top: 0px !important;
-				}
-				.beepboxEditor {
-					width: 100%;
-					height: 100vh;
-					grid-template-columns: 195px minmax(0, 1fr);
-					grid-template-rows: minmax(0, min-content) minmax(481px, 1fr);
-					grid-template-areas: "settings-area track-area" "settings-area pattern-area";
-				}
-				.beepboxEditor .pattern-area {
-					width: 100%;
-					height: 100%;
-				}
-				.beepboxEditor .track-area {
-					width: 100%;
-					display: flex;
-					flex-direction: column;
-				}
-				.beepboxEditor .trackAndMuteContainer {
-					width: 100%;
-					min-height: 0;
-					flex: 1;
-					overflow: auto;
-					max-height: 97.5vh;
-				}
-				.beepboxEditor .instrument-settings-area {
-					overflow-y: auto;
-					position: relative;
-				}
-				.beepboxEditor .instrument-settings-area > .editor-controls {
-					position: absolute;
-					width: 100%;
-				}
-				.beepboxEditor .song-settings-area {
-					overflow-y: auto;
-				}
-				
-				.beepboxEditor .settings-area {
-					width: 100%;
-					position: relative;
-					overflow-y: auto;
-					grid-template-columns: minmax(0, 1fr);
-					grid-template-rows: auto auto auto auto minmax(0, 1fr);
-					grid-template-areas:
-						"version-area"
-						"play-pause-area"
-						"menu-area"
-						"song-settings-area"
-						"instrument-settings-area";
-				}
-				
-				.beepboxEditor .barScrollBar {
-					display: none;
-				}
-				.beepboxEditor.selectRow {
-					height: 2em;
-				}
-				.beepboxEditor .operatorRow {
-					heiht: 2em;
-				}
-				.beepboxEditor .trackAndMuteContainer {
-					max-height: 446px;
-				}
-
-				.beepboxEditor .trackContainer {
-					overflow: visible;
-				}
-				.beepboxEditor .trackAndMuteContainer {
-					scrollbar-width: auto;
-					scrollbar-color: ${ColorConfig.scrollbarColor} ${ColorConfig.uiWidgetBackground} ${ColorConfig.editorBackground};
-				}
-				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar {
-					width: 20px;
-					height: 20px;
-				}
-				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-track {
-					background: ${ColorConfig.editorBackground};
-				}
-				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-thumb {
-					background-color: ${ColorConfig.uiWidgetBackground};
-					border: 3px solid ${ColorConfig.editorBackground};
-				}
-				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-corner {
-					background-color: ${ColorConfig.editorBackground};
-				}
-			}
-			`,
-    };
-    Layout._styleElement = document.head.appendChild(HTML.style({ type: "text/css" }));
-
-    class HarmonicsEditor {
-        constructor(_doc) {
-            this._doc = _doc;
-            this._editorWidth = 120;
-            this._editorHeight = 26;
-            this._octaves = SVG.svg({ "pointer-events": "none" });
-            this._fifths = SVG.svg({ "pointer-events": "none" });
-            this._curve = SVG.path({ fill: "none", stroke: "currentColor", "stroke-width": 2, "pointer-events": "none" });
-            this._lastControlPoints = [];
-            this._lastControlPointContainer = SVG.svg({ "pointer-events": "none" });
-            this._svg = SVG.svg({ style: "background-color: ${ColorConfig.editorBackground}; touch-action: none; cursor: crosshair;", width: "100%", height: "100%", viewBox: "0 0 " + this._editorWidth + " " + this._editorHeight, preserveAspectRatio: "none" }, this._octaves, this._fifths, this._curve, this._lastControlPointContainer);
-            this.container = HTML.div({ class: "harmonics", style: "height: 100%;" }, this._svg);
-            this._mouseX = 0;
-            this._mouseY = 0;
-            this._freqPrev = 0;
-            this._ampPrev = 0;
-            this._mouseDown = false;
-            this._change = null;
-            this._renderedPath = "";
-            this._renderedFifths = true;
-            this._whenMousePressed = (event) => {
-                event.preventDefault();
-                this._mouseDown = true;
-                const boundingRect = this._svg.getBoundingClientRect();
-                this._mouseX = ((event.clientX || event.pageX) - boundingRect.left) * this._editorWidth / (boundingRect.right - boundingRect.left);
-                this._mouseY = ((event.clientY || event.pageY) - boundingRect.top) * this._editorHeight / (boundingRect.bottom - boundingRect.top);
-                if (isNaN(this._mouseX))
-                    this._mouseX = 0;
-                if (isNaN(this._mouseY))
-                    this._mouseY = 0;
-                this._freqPrev = this._xToFreq(this._mouseX);
-                this._ampPrev = this._yToAmp(this._mouseY);
-                this._whenCursorMoved();
-            };
-            this._whenTouchPressed = (event) => {
-                event.preventDefault();
-                this._mouseDown = true;
-                const boundingRect = this._svg.getBoundingClientRect();
-                this._mouseX = (event.touches[0].clientX - boundingRect.left) * this._editorWidth / (boundingRect.right - boundingRect.left);
-                this._mouseY = (event.touches[0].clientY - boundingRect.top) * this._editorHeight / (boundingRect.bottom - boundingRect.top);
-                if (isNaN(this._mouseX))
-                    this._mouseX = 0;
-                if (isNaN(this._mouseY))
-                    this._mouseY = 0;
-                this._freqPrev = this._xToFreq(this._mouseX);
-                this._ampPrev = this._yToAmp(this._mouseY);
-                this._whenCursorMoved();
-            };
-            this._whenMouseMoved = (event) => {
-                if (this.container.offsetParent == null)
-                    return;
-                const boundingRect = this._svg.getBoundingClientRect();
-                this._mouseX = ((event.clientX || event.pageX) - boundingRect.left) * this._editorWidth / (boundingRect.right - boundingRect.left);
-                this._mouseY = ((event.clientY || event.pageY) - boundingRect.top) * this._editorHeight / (boundingRect.bottom - boundingRect.top);
-                if (isNaN(this._mouseX))
-                    this._mouseX = 0;
-                if (isNaN(this._mouseY))
-                    this._mouseY = 0;
-                this._whenCursorMoved();
-            };
-            this._whenTouchMoved = (event) => {
-                if (this.container.offsetParent == null)
-                    return;
-                if (!this._mouseDown)
-                    return;
-                event.preventDefault();
-                const boundingRect = this._svg.getBoundingClientRect();
-                this._mouseX = (event.touches[0].clientX - boundingRect.left) * this._editorWidth / (boundingRect.right - boundingRect.left);
-                this._mouseY = (event.touches[0].clientY - boundingRect.top) * this._editorHeight / (boundingRect.bottom - boundingRect.top);
-                if (isNaN(this._mouseX))
-                    this._mouseX = 0;
-                if (isNaN(this._mouseY))
-                    this._mouseY = 0;
-                this._whenCursorMoved();
-            };
-            this._whenCursorReleased = (event) => {
-                if (this._mouseDown) {
-                    this._doc.record(this._change);
-                    this._change = null;
-                }
-                this._mouseDown = false;
-            };
-            for (let i = 1; i <= Config.harmonicsControlPoints; i = i * 2) {
-                this._octaves.appendChild(SVG.rect({ fill: ColorConfig.tonic, x: (i - 0.5) * (this._editorWidth - 8) / (Config.harmonicsControlPoints - 1) - 1, y: 0, width: 2, height: this._editorHeight }));
-            }
-            for (let i = 3; i <= Config.harmonicsControlPoints; i = i * 2) {
-                this._fifths.appendChild(SVG.rect({ fill: ColorConfig.fifthNote, x: (i - 0.5) * (this._editorWidth - 8) / (Config.harmonicsControlPoints - 1) - 1, y: 0, width: 2, height: this._editorHeight }));
-            }
-            for (let i = 0; i < 4; i++) {
-                const rect = SVG.rect({ fill: "currentColor", x: (this._editorWidth - i * 2 - 1), y: 0, width: 1, height: this._editorHeight });
-                this._lastControlPoints.push(rect);
-                this._lastControlPointContainer.appendChild(rect);
-            }
-            this.container.addEventListener("mousedown", this._whenMousePressed);
-            document.addEventListener("mousemove", this._whenMouseMoved);
-            document.addEventListener("mouseup", this._whenCursorReleased);
-            this.container.addEventListener("touchstart", this._whenTouchPressed);
-            this.container.addEventListener("touchmove", this._whenTouchMoved);
-            this.container.addEventListener("touchend", this._whenCursorReleased);
-            this.container.addEventListener("touchcancel", this._whenCursorReleased);
-        }
-        _xToFreq(x) {
-            return (Config.harmonicsControlPoints - 1) * x / (this._editorWidth - 8) - 0.5;
-        }
-        _yToAmp(y) {
-            return Config.harmonicsMax * (1 - y / this._editorHeight);
-        }
-        _whenCursorMoved() {
-            if (this._mouseDown) {
-                const freq = this._xToFreq(this._mouseX);
-                const amp = this._yToAmp(this._mouseY);
-                const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
-                const harmonicsWave = instrument.harmonicsWave;
-                if (freq != this._freqPrev) {
-                    const slope = (amp - this._ampPrev) / (freq - this._freqPrev);
-                    const offset = this._ampPrev - this._freqPrev * slope;
-                    const lowerFreq = Math.ceil(Math.min(this._freqPrev, freq));
-                    const upperFreq = Math.floor(Math.max(this._freqPrev, freq));
-                    for (let i = lowerFreq; i <= upperFreq; i++) {
-                        if (i < 0 || i >= Config.harmonicsControlPoints)
-                            continue;
-                        harmonicsWave.harmonics[i] = Math.max(0, Math.min(Config.harmonicsMax, Math.round(i * slope + offset)));
-                    }
-                }
-                harmonicsWave.harmonics[Math.max(0, Math.min(Config.harmonicsControlPoints - 1, Math.round(freq)))] = Math.max(0, Math.min(Config.harmonicsMax, Math.round(amp)));
-                this._freqPrev = freq;
-                this._ampPrev = amp;
-                this._change = new ChangeHarmonics(this._doc, instrument, harmonicsWave);
-                this._doc.setProspectiveChange(this._change);
-            }
-        }
-        render() {
-            const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
-            const harmonicsWave = instrument.harmonicsWave;
-            const controlPointToHeight = (point) => {
-                return (1 - (point / Config.harmonicsMax)) * this._editorHeight;
-            };
-            let bottom = prettyNumber(this._editorHeight);
-            let path = "";
-            for (let i = 0; i < Config.harmonicsControlPoints - 1; i++) {
-                if (harmonicsWave.harmonics[i] == 0)
-                    continue;
-                let xPos = prettyNumber((i + 0.5) * (this._editorWidth - 8) / (Config.harmonicsControlPoints - 1));
-                path += "M " + xPos + " " + bottom + " ";
-                path += "L " + xPos + " " + prettyNumber(controlPointToHeight(harmonicsWave.harmonics[i])) + " ";
-            }
-            const lastHeight = controlPointToHeight(harmonicsWave.harmonics[Config.harmonicsControlPoints - 1]);
-            for (let i = 0; i < 4; i++) {
-                const rect = this._lastControlPoints[i];
-                rect.setAttribute("y", prettyNumber(lastHeight));
-                rect.setAttribute("height", prettyNumber(this._editorHeight - lastHeight));
-            }
-            if (this._renderedPath != path) {
-                this._renderedPath = path;
-                this._curve.setAttribute("d", path);
-            }
-            if (this._renderedFifths != this._doc.prefs.showFifth) {
-                this._renderedFifths = this._doc.prefs.showFifth;
-                this._fifths.style.display = this._doc.prefs.showFifth ? "" : "none";
-            }
-        }
-    }
-
-    const { span: span$5 } = HTML;
-    class InputBox {
-        constructor(input, _doc, _getChange) {
-            this.input = input;
-            this._doc = _doc;
-            this._getChange = _getChange;
-            this._change = null;
-            this._value = "";
-            this._oldValue = "";
-            this._whenInput = () => {
-                const continuingProspectiveChange = this._doc.lastChangeWas(this._change);
-                if (!continuingProspectiveChange)
-                    this._oldValue = this._value;
-                this._change = this._getChange(this._oldValue, this.input.value);
-                this._doc.setProspectiveChange(this._change);
-            };
-            this._whenChange = () => {
-                this._doc.record(this._change);
-                this._change = null;
-            };
-            input.addEventListener("input", this._whenInput);
-            input.addEventListener("change", this._whenChange);
-        }
-        updateValue(value) {
-            this._value = value;
-            this.input.value = String(value);
-        }
-    }
-    class Slider {
-        constructor(input, _doc, _getChange, midTick) {
-            this.input = input;
-            this._doc = _doc;
-            this._getChange = _getChange;
-            this._change = null;
-            this._value = 0;
-            this._oldValue = 0;
-            this._whenInput = () => {
-                const continuingProspectiveChange = this._doc.lastChangeWas(this._change);
-                if (!continuingProspectiveChange)
-                    this._oldValue = this._value;
-                if (this._getChange != null) {
-                    this._change = this._getChange(this._oldValue, parseInt(this.input.value));
-                    this._doc.setProspectiveChange(this._change);
-                }
-            };
-            this._whenChange = () => {
-                if (this._getChange != null) {
-                    this._doc.record(this._change);
-                    this._change = null;
-                }
-            };
-            this.container = (midTick) ? span$5({ class: "midTick", style: "position: sticky; width: 61.5%;" }, input) : span$5({ style: "position: sticky;" }, input);
-            input.addEventListener("input", this._whenInput);
-            input.addEventListener("change", this._whenChange);
-        }
-        updateValue(value) {
-            this._value = value;
-            this.input.value = String(value);
-        }
-        getValueBeforeProspectiveChange() {
-            return this._oldValue;
-        }
-    }
-
-    class ArrayBufferReader {
-        constructor(data) {
-            this._readIndex = 0;
-            this._data = data;
-        }
-        getReadIndex() {
-            return this._readIndex;
-        }
-        readUint32() {
-            if (this._readIndex + 4 > this._data.byteLength)
-                throw new Error("Reading past the end of the buffer.");
-            const result = this._data.getUint32(this._readIndex, false);
-            this._readIndex += 4;
-            return result;
-        }
-        readUint24() {
-            return (this.readUint8() << 16) | (this.readUint8() << 8) | (this.readUint8());
-        }
-        readUint16() {
-            if (this._readIndex + 2 > this._data.byteLength)
-                throw new Error("Reading past the end of the buffer.");
-            const result = this._data.getUint16(this._readIndex, false);
-            this._readIndex += 2;
-            return result;
-        }
-        readUint8() {
-            if (this._readIndex + 1 > this._data.byteLength)
-                throw new Error("Reading past the end of the buffer.");
-            const result = this._data.getUint8(this._readIndex);
-            this._readIndex++;
-            return result;
-        }
-        readInt8() {
-            if (this._readIndex + 1 > this._data.byteLength)
-                throw new Error("Reading past the end of the buffer.");
-            const result = this._data.getInt8(this._readIndex);
-            this._readIndex++;
-            return result;
-        }
-        peakUint8() {
-            if (this._readIndex + 1 > this._data.byteLength)
-                throw new Error("Reading past the end of the buffer.");
-            return this._data.getUint8(this._readIndex);
-        }
-        readMidi7Bits() {
-            const result = this.readUint8();
-            if (result >= 0x80)
-                console.log("7 bit value contained 8th bit! value " + result + ", index " + this._readIndex);
-            return result & 0x7f;
-        }
-        readMidiVariableLength() {
-            let result = 0;
-            for (let i = 0; i < 4; i++) {
-                const nextByte = this.readUint8();
-                result += nextByte & 0x7f;
-                if (nextByte & 0x80) {
-                    result = result << 7;
-                }
-                else {
-                    break;
-                }
-            }
-            return result;
-        }
-        skipBytes(length) {
-            this._readIndex += length;
-        }
-        hasMore() {
-            return this._data.byteLength > this._readIndex;
-        }
-        getReaderForNextBytes(length) {
-            if (this._readIndex + length > this._data.byteLength)
-                throw new Error("Reading past the end of the buffer.");
-            const result = new ArrayBufferReader(new DataView(this._data.buffer, this._data.byteOffset + this._readIndex, length));
-            this.skipBytes(length);
-            return result;
-        }
-    }
-
     const { button: button$j, p: p$9, div: div$j, h2: h2$i, input: input$b, select: select$c, option: option$c } = HTML;
     class ImportPrompt {
         constructor(_doc) {
@@ -49622,6 +49622,9 @@ You should be redirected to the song at:<br /><br />
             this._cancelButton.addEventListener("click", this._close);
             this._importButton.addEventListener("click", this._importCategoryButton);
             this._exportButton.addEventListener("click", this._exportCategoryButton);
+            if (this._doc.prompt == "export") {
+                this._exportCategoryButton();
+            }
         }
         _parseMidiFile(buffer) {
             const reader = new ArrayBufferReader(new DataView(buffer));
@@ -62229,7 +62232,7 @@ You should be redirected to the song at:<br /><br />
                         if (canPlayNotes)
                             break;
                         if (event.ctrlKey || event.metaKey) {
-                            this._openPrompt("import");
+                            this._openPrompt("export");
                             event.preventDefault();
                         }
                         else {
@@ -62247,6 +62250,10 @@ You should be redirected to the song at:<br /><br />
                     case 79:
                         if (canPlayNotes)
                             break;
+                        if (event.ctrlKey || event.metaKey) {
+                            this._openPrompt("import");
+                            event.preventDefault();
+                        }
                         break;
                     case 86:
                         if (canPlayNotes)
@@ -63885,7 +63892,7 @@ You should be redirected to the song at:<br /><br />
             if (promptName) {
                 switch (promptName) {
                     case "export":
-                        this.prompt = new ExportPrompt(this._doc);
+                        this.prompt = new ImportPrompt(this._doc);
                         break;
                     case "import":
                         this.prompt = new ImportPrompt(this._doc);
