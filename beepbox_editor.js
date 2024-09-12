@@ -51398,7 +51398,7 @@ You should be redirected to the song at:<br /><br />
                 }
                 this._doc.setProspectiveChange(this._change);
             }
-            else if (this._cursor.mode == this._bothMode) {
+            else {
                 this._updateCursorStatus();
                 this._updatePreview();
             }
@@ -51416,7 +51416,7 @@ You should be redirected to the song at:<br /><br />
                 else if (this._cursor.mode == this._endMode) {
                     highlightStart = (this._doc.song.loopStart + this._doc.song.loopLength) * this._barWidth - radius * 2;
                 }
-                else {
+                else if (this._cursor.mode == this._bothMode) {
                     const endPoints = this._findEndPoints(this._cursor.startBar);
                     highlightStart = (endPoints.start) * this._barWidth;
                     highlightStop = (endPoints.start + endPoints.length) * this._barWidth;
