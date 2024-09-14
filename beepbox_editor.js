@@ -59323,7 +59323,7 @@ You should be redirected to the song at:<br /><br />
             this.container = div$1({ class: "prompt noSelection", id: "updateContainerPrompt", style: "width: 350px;" }, this.startingContainer, div$1({ style: "display:flex; flex-direction:row-reverse;" }, this.okayButton));
             this._close = () => {
                 window.localStorage.setItem("updateSeen", "true");
-                window.localStorage.setItem("curVer", "1.4.5");
+                window.localStorage.setItem("curVer", "1.5");
                 this._doc.prompt = null;
                 this._doc.undo();
             };
@@ -60386,7 +60386,7 @@ You should be redirected to the song at:<br /><br />
                 if (!isMobile) {
                     this._playPauseAreaMobile.style.display = "none";
                     if (window.localStorage.getItem("tutorialComplete") != "true") ;
-                    if (window.localStorage.getItem("curVer") != "1.4.5") {
+                    if (window.localStorage.getItem("curVer") != "1.5") {
                         window.localStorage.setItem("updateSeen", "false");
                     }
                     if (window.localStorage.getItem("updateSeen") != "true") {
