@@ -6961,7 +6961,7 @@ var beepbox = (function (exports) {
 		}
 		
 		.spIcon {
-		--ui-widget-background: #222;
+		--ui-widget-background: #93090f;
 		}
 
 		.beepboxEditor input[type="range"]::-moz-range-track
