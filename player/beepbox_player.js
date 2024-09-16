@@ -7022,7 +7022,12 @@ var beepbox = (function (exports) {
 				}
 
 				.beepboxEditor select:focus,
-				.beepboxEditor .selectContainer:focus-within
+				.beepboxEditor select:hover,
+				.beepboxEditor .selectContainer:focus-within,
+				.beepboxEditor button:hover,
+				.beepboxEditor button:focus,
+				#select2-pitchPresetSelect-container:hover,
+				#select2-pitchPresetSelect-container:focus
 				{
 					--ui-widget-background: black !important;
 					
