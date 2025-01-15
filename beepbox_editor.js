@@ -29040,7 +29040,7 @@ li.select2-results__option[role=group] > strong:hover {
                             }
                         }
                         else {
-                            const parseOldSyntax = beforeThree;
+                            const parseOldSyntax = (fromUltraBox && beforeThree);
                             const ok = Song._parseAndConfigureCustomSample(url, customSampleUrls, customSamplePresets, sampleLoadingState, parseOldSyntax);
                             if (!ok) {
                                 continue;

@@ -26671,7 +26671,7 @@ var beepbox = (function (exports) {
                             }
                         }
                         else {
-                            const parseOldSyntax = beforeThree;
+                            const parseOldSyntax = (fromUltraBox && beforeThree);
                             const ok = Song._parseAndConfigureCustomSample(url, customSampleUrls, customSamplePresets, sampleLoadingState, parseOldSyntax);
                             if (!ok) {
                                 continue;
