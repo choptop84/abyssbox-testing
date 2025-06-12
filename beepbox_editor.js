@@ -48089,6 +48089,9 @@ button.playButton::before {
 				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-corner {
 					background-color: ${ColorConfig.editorBackground};
 				}
+				div.track-area {
+				display: flex;
+				}
 			}
 		`,
         "focus": `\
@@ -48178,6 +48181,9 @@ button.playButton::before {
 				}
 				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-corner {
 					background-color: ${ColorConfig.editorBackground};
+				}
+				div.track-area {
+				display: flex;
 				}
 			}
 		`,
@@ -52450,7 +52456,7 @@ You should be redirected to the song at:<br /><br />
                     pitchOffset = y * 5 + x * 2 - 2;
                     break;
                 case "songScale":
-                    const scaleFlags = Config.scales[doc.song.scale].flags;
+                    const scaleFlags = doc.song.scale == Config.scales.dictionary["Custom"].index ? doc.song.scaleCustom : Config.scales[doc.song.scale].flags;
                     const scaleIndices = scaleFlags.map((flag, index) => flag ? index : null).filter((index) => index != null);
                     pitchOffset = (y - 1 + Math.floor(x / scaleIndices.length)) * Config.pitchesPerOctave + scaleIndices[(x + scaleIndices.length) % scaleIndices.length];
                     break;
@@ -56051,7 +56057,7 @@ You should be redirected to the song at:<br /><br />
                     this._keyboardLayoutPreview.removeChild(this._keyboardLayoutPreview.firstChild);
                 }
                 const rowLengths = [12, 12, 11, 10];
-                const scale = Config.scales[this._doc.song.scale].flags;
+                const scale = this._doc.song.scale == Config.scales.dictionary["Custom"].index ? this._doc.song.scaleCustom : Config.scales[this._doc.song.scale].flags;
                 for (let rowIndex = 0; rowIndex < 4; rowIndex++) {
                     const row = div$b({ style: "display: flex;" });
                     this._keyboardLayoutPreview.appendChild(row);
