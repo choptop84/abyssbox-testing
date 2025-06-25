@@ -31077,7 +31077,7 @@ li.select2-results__option[role=group] > strong:hover {
                             else {
                                 const instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                                 if (instrument.type == 2) {
-                                    instrument.chipWave = clamp(0, Config.chipWaves.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                                    instrument.chipNoise = clamp(0, Config.chipNoiseLength, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                                 }
                                 else {
                                     if (fromUltraBox || fromAbyssBox || fromSlarmoosBox) {
