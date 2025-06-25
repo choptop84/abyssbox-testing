@@ -63298,7 +63298,7 @@ You should be redirected to the song at:<br /><br />
             this.patchNotesLink = a({ href: "https://choptop84.github.io/abyssbox-app/patch-notes/", target: "_blank", }, "Patch Notes!");
             this.updatePopupDiv = div$1({ class: "updatePopup load" }, div$1({}, "Seems that AbyssBox has gotten an update. You can check it out what it adds in the ", this.patchNotesLink), this.closeButton);
             this._close = () => {
-                window.localStorage.setItem("curVer", "1.5.1");
+                window.localStorage.setItem("curVer", "1.6");
                 this.updatePopupDiv.style.display = "none";
             };
             this.closeButton.addEventListener("click", this._close);
