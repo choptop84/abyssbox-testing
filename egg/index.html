@@ -224,11 +224,25 @@
             }
         }
 
-        var explosion = new Audio('../explosion.mp3');
+        var explosion = new Audio('../image_assets/explosion.mp3');
         var egg = new Audio('eg.mp3');
         var eggCrack = new Audio('eggCrack.mp3');
         var image = document.getElementById('egg');
         var text = document.getElementById('text');
+        const theme = localStorage.getItem("colorTheme");
+        if (theme == "modbox egg") {
+            image.src = ("pretty_egg.png");
+        }
+        if ((theme == "roe light")||(theme == "roe")) {
+            image.src = ("roe.png");
+            text.innerHTML = "A plate of roe blocks your path..."
+            document.title = "Estranged Roe"
+        }
+        if ((theme == "Undertale")||(theme == "deltarune")) {
+            image.src = ("gasterEgg.png");
+            document.documentElement.style.setProperty("--page-margin", "rgb(11, 11, 11)");
+            text.innerHTML = "*(You recieved an egg)";
+        }
         function playEggAudio() {
 
             if (clickCount == 0) {
@@ -240,13 +254,18 @@
             clickCount++;
             eggCrack.play();
 
+
             } else if (clickCount == 20) {
                 explosion.play();
-                image.src = ("../explosion.gif");
+                image.src = ("explosion.gif");
                 egg.pause();
                 clickCount++;
                 text.innerHTML = "NOOOOOOOOOOOOOOOOOOO!!!!!!!!!!!!!!";
-                document.title = "NOT THE EGG!!!"
+                if ((theme == "roe light")||(theme == "roe")) {
+                    document.title = "NOT THE ROE!!!"
+                } else {
+                    document.title = "NOT THE EGG!!!"    
+                }
 
             } else if (clickCount > 20) {
                 egg.pause();
