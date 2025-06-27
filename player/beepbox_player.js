@@ -28778,7 +28778,9 @@ var beepbox = (function (exports) {
                                 instrument.unisonSign = unisonSign / 1000;
                                 if (unisonSignNegative == 0)
                                     instrument.unisonSign *= -1;
-                                instrument.unisonBuzzes = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] ? true : false;
+                                if ((fromUltraBox && !beforeSix) || (fromAbyssBox && !beforeThree)) {
+                                    instrument.unisonBuzzes = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] ? true : false;
+                                }
                             }
                             else {
                                 instrument.unisonVoices = Config.unisons[instrument.unison].voices;
