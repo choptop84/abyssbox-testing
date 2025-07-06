@@ -37235,12 +37235,14 @@ var beepbox = (function (exports) {
     SongPlayerLayout._spLayoutMap = {
         "classic": `
         .songPlayerContainer {
-            display:grid; 
-            grid-template-areas: 'visualizer visualizer' 'control-center control-center'; 
-            grid-template-rows: 92.6vh 7.4vh; 
-            grid-template-columns: minmax(0px,0px);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
         }
-        
+        .piano {
+        height: 0;
+        display: none;
+        }
         div.visualizer {
             transform: scale(1);
             }
@@ -37250,10 +37252,13 @@ var beepbox = (function (exports) {
         `,
         "top": `
         .songPlayerContainer {
-            display:grid; 
-            grid-template-areas: 'control-center control-center' 'visualizer visualizer'; 
-            grid-template-rows: 7.4vh 92.6vh; 
-            grid-template-columns: minmax(0px,0px);
+            display: flex;
+            flex-direction: column-reverse;
+            height: 100%;
+        }
+        .piano {
+        height: 0;
+        display: none;
         }
         div.visualizer {
             transform: scale(1);
@@ -37264,10 +37269,13 @@ var beepbox = (function (exports) {
         `,
         "shitbox4": `
         .songPlayerContainer {
-            display:grid; 
-            grid-template-areas: 'visualizer visualizer' 'control-center control-center'; 
-            grid-template-rows: 92.6vh 7.4vh; 
-            grid-template-columns: minmax(0px,0px);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        .piano {
+        height: 0;
+        display: none;
         }
         div.visualizer {
             transform: skew(30deg,20deg) scale(0.5);
@@ -37278,10 +37286,13 @@ var beepbox = (function (exports) {
         `,
         "boxbeep": `
         .songPlayerContainer {
-            display:grid; 
-            grid-template-areas: 'visualizer visualizer' 'control-center control-center'; 
-            grid-template-rows: 92.6vh 7.4vh; 
-            grid-template-columns: minmax(0px,0px);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        .piano {
+        height: 0;
+        display: none;
         }
         div.visualizer {
             transform: scale(-1);
@@ -37292,10 +37303,9 @@ var beepbox = (function (exports) {
         `,
         "piano": `
         .songPlayerContainer {
-            display:grid; 
-            grid-template-areas: 'visualizer visualizer' 'control-center control-center'; 
-            grid-template-rows: 92.6vh 7.4vh; 
-            grid-template-columns: minmax(0px,0px);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
         }
         div.visualizer {
             transform: scale(1);
@@ -37306,10 +37316,13 @@ var beepbox = (function (exports) {
         `,
         "vertical": `
         .songPlayerContainer {
-            display:grid; 
-            grid-template-areas: 'visualizer visualizer' 'piano piano' 'control-center control-center'; 
-            grid-template-rows: 82.6vh 10vh 7.4vh; 
-            grid-template-columns: minmax(0px,0px);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        .piano {
+        min-height: 140px;
+        display: flex;
         }
         div.visualizer {
             transform: scale(1);
@@ -37320,10 +37333,13 @@ var beepbox = (function (exports) {
         `,
         "middle": `
         .songPlayerContainer {
-            display:grid; 
-            grid-template-areas: 'visualizer visualizer' 'control-center control-center'; 
-            grid-template-rows: 92.6vh 7.4vh; 
-            grid-template-columns: minmax(0px,0px);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        .piano {
+        height: 0;
+        display: none;
         }
         div.visualizer {
             transform: scale(1);
@@ -37886,23 +37902,20 @@ var beepbox = (function (exports) {
             timelineWidth = Math.max(boundingRect.width, targetBeatWidth * synth.song.barCount * synth.song.beatsPerBar);
             if (useVertical) {
                 timelineContainer.style.transform = `translateX(-${timelineWidth / 2}px) rotate(-90deg) translateX(${timelineWidth / 2}px) translateY(${timelineHeight / 2}px) scaleY(-1)`;
-                pianoContainer.style.display = "unset";
-                if (!isMobile) {
-                    songPlayerContainer.style.gridTemplateRows = "";
-                }
-                else {
-                    songPlayerContainer.style.gridTemplateRows = "78vh 0vh 7.4vh";
+                pianoContainer.style.minHeight = "140px";
+                if (isMobile) {
+                    pianoContainer.style.display = "none";
+                    pianoContainer.style.minHeight = "0px";
                 }
                 timelineContainer.style.left = "0px";
             }
             else {
                 timelineContainer.style.transform = '';
-                pianoContainer.style.display = "none";
+                pianoContainer.style.minHeight = "0px";
                 songPlayerContainer.style.gridTemplateRows = "";
             }
         }
         else {
-            pianoContainer.style.display = "none";
             timelineWidth = boundingRect.width;
             const targetSemitoneHeight = Math.max(1, timelineWidth / (synth.song.barCount * synth.song.beatsPerBar) / 6.0);
             timelineHeight = Math.min(boundingRect.height, targetSemitoneHeight * (Config.maxPitch + 1) + 1);
@@ -37910,15 +37923,16 @@ var beepbox = (function (exports) {
             windowPitchCount = windowOctaves * 12 + 1;
             if (useVertical) {
                 timelineContainer.style.transform = `translateX(-${timelineWidth / 2}px) rotate(-90deg) translateX(${timelineWidth / 2}px) translateY(${timelineWidth / 2}px) scaleY(-1)`;
+                pianoContainer.style.height = "0";
+                pianoContainer.style.minHeight = "0";
                 if (isMobile) {
-                    songPlayerContainer.style.gridTemplateRows = "78vh 0vh 7.4vh";
-                }
-                else {
-                    songPlayerContainer.style.gridTemplateRows = "92.6vh 0vh 7.4vh";
+                    pianoContainer.style.display = "none";
+                    pianoContainer.style.minHeight = "0px";
                 }
                 timelineContainer.style.left = "0px";
             }
             else {
+                pianoContainer.style.minHeight = "0px";
                 timelineContainer.style.transform = '';
                 songPlayerContainer.style.gridTemplateRows = "";
             }
