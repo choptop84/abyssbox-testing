@@ -37032,7 +37032,12 @@ var beepbox = (function (exports) {
 	}
 	.songPlayerContainer {
 		display:flex; 
+		flex-direction: column;
 		height: 100%;
+	}
+	.piano {
+	display: none;
+	min-height = 0px;
 	}
 	.layout-option {
 		width: 25%;
