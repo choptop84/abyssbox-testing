@@ -37526,10 +37526,14 @@ var beepbox = (function (exports) {
     const gradient = SVG.linearGradient({ id: "volumeGrad2", gradientUnits: "userSpaceOnUse" }, stop1, stop2, stop3);
     const defs = SVG.defs({}, gradient);
     const volumeBarContainer = SVG.svg({ style: `touch-action: none; overflow: hidden; margin: auto;`, width: "160px", height: "10px", preserveAspectRatio: "none" }, defs, outVolumeBarBg, outVolumeBar, outVolumeCap);
-    const timelineBarProgress = div({ class: `timeline-bar-progress`, style: `pointer-events: none; overflow: hidden; width: 5%; height: 100%; z-index: 5;` });
+    const sampleLoadingBar = div({ style: `width: 0%; height: 100%; background-color: ${ColorConfig.indicatorPrimary};` });
+    const sampleFailedBar = div({ style: `width: 0%; height: 100%; background-color: ${ColorConfig.sampleFailed};` });
+    const sampleLoadingBarContainer = div({ class: `sampleLoadingContainer`, style: `overflow: hidden; margin: auto; width: 90%; height: 50%; background-color: var(--empty-sample-bar, ${ColorConfig.indicatorSecondary});` }, sampleLoadingBar, sampleFailedBar);
+    const sampleLoadingStatusContainer = div({}, div({ class: "selectRow", style: "overflow: hidden; margin: auto; width: 160px; height: 10px; " }, sampleLoadingBarContainer));
+    const timelineBarProgress = div({ class: `timeline-bar-progress`, style: `overflow: hidden; width: 5%; height: 100%; z-index: 5;` });
     const timelineBar = div({ style: `overflow: hidden; margin: auto; width: 90%; height: 50%; background: var(--ui-widget-background);` }, timelineBarProgress);
-    const timelineBarContainer = div({ style: `pointer-events: none; overflow: hidden; margin: auto; width: 160px; height: 10px; ` }, timelineBar);
-    const volumeBarContainerDiv = div({ class: `volBarContainer`, style: "display:flex; flex-direction:column;" }, volumeBarContainer, timelineBarContainer);
+    const timelineBarContainer = div({ style: `overflow: hidden; margin: auto; width: 160px; height: 10px; ` }, timelineBar);
+    const volumeBarContainerDiv = div({ class: `volBarContainer`, style: "display:flex; flex-direction:column;" }, volumeBarContainer, timelineBarContainer, sampleLoadingStatusContainer);
     const promptContainer = div({ class: "promptContainer", style: "display:none; backdrop-filter: saturate(1.5) blur(4px); width: 100%; height: 100%; position: fixed; z-index: 999; display: flex; justify-content: center; align-items: center;" });
     promptContainer.style.display = "none";
     const songPlayerContainer = div({ class: "songPlayerContainer" });
@@ -37718,6 +37722,26 @@ var beepbox = (function (exports) {
     }
     function onLayoutButton() {
         promptContainer.style.display = "flex";
+    }
+    function updateSampleLoadingBar(_e) {
+        const e = _e;
+        let sampleNum = false;
+        const percent = (e.totalSamples === 0
+            ? 0
+            : Math.floor((e.samplesLoaded / e.totalSamples) * 100));
+        const failedPercent = (e.totalSamples === 0
+            ? 0
+            : Math.floor((e.samplesFailed / e.totalSamples) * 100));
+        sampleNum = Boolean(percent > 0 && failedPercent > 0);
+        sampleLoadingBarContainer.title = "Total Samples: " + String(e.totalSamples) + "; Loaded Samples: " + String(e.samplesLoaded) + "; Samples Failed: " + String(e.samplesFailed) + ";";
+        sampleLoadingBar.style.width = `${percent}%`;
+        sampleFailedBar.style.width = `${failedPercent + Number(sampleNum)}%`;
+        if (e.totalSamples != 0) {
+            sampleLoadingBarContainer.style.backgroundColor = "var(--indicator-secondary)";
+        }
+        else {
+            sampleLoadingBarContainer.style.backgroundColor = "var(--empty-sample-bar, var(--indicator-secondary))";
+        }
     }
     function onExitButton() {
         promptContainer.style.display = "none";
@@ -38167,6 +38191,7 @@ var beepbox = (function (exports) {
     shareLink.addEventListener("click", onShareClicked);
     window.addEventListener("hashchange", hashUpdatedExternally);
     shortenSongLink.addEventListener("click", shortenSongPlayerUrl);
+    sampleLoadEvents.addEventListener("sampleloaded", updateSampleLoadingBar.bind(exports));
     hashUpdatedExternally();
     renderLoopIcon();
     renderZoomIcon();
