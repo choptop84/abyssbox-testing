@@ -37503,6 +37503,7 @@ var beepbox = (function (exports) {
     let fullscreenLink = a({ target: "_top", class: "fullscreenLink", style: "margin: 0 4px;" }, "⇱ Fullscreen");
     let shortenSongLink = a({ href: "javascript:void(0)", target: "_top", class: "shortUrlLink", style: "margin: 0 4px;" }, "… Shorten URL");
     let draggingPlayhead = false;
+    let draggingTimelineBar = false;
     const playButton = button({ style: "width: 100%; height: 100%; max-height: 50px;" });
     const playButtonContainer = div({ class: "playButtonContainer", style: "flex-shrink: 0; display: flex; padding: 2px; width: 80px; height: 100%; box-sizing: border-box; align-items: center;" }, playButton);
     const loopIcon = path({ d: "M 4 2 L 4 0 L 7 3 L 4 6 L 4 4 Q 2 4 2 6 Q 2 8 4 8 L 4 10 Q 0 10 0 6 Q 0 2 4 2 M 8 10 L 8 12 L 5 9 L 8 6 L 8 8 Q 10 8 10 6 Q 10 4 8 4 L 8 2 Q 12 2 12 6 Q 12 10 8 10 z" });
@@ -37536,14 +37537,15 @@ var beepbox = (function (exports) {
     const sampleLoadingBarContainer = div({ class: `sampleLoadingContainer`, style: `overflow: hidden; margin: auto; width: 90%; height: 50%; background-color: var(--empty-sample-bar, ${ColorConfig.indicatorSecondary});` }, sampleLoadingBar, sampleFailedBar);
     const sampleLoadingStatusContainer = div({}, div({ class: "selectRow", style: "overflow: hidden; margin: auto; width: 160px; height: 10px; " }, sampleLoadingBarContainer));
     const timelineBarProgress = div({ class: `timeline-bar-progress`, style: `overflow: hidden; width: 5%; height: 100%; z-index: 5;` });
-    const timelineBar = div({ style: `overflow: hidden; margin: auto; width: 90%; height: 50%; background: var(--ui-widget-background);` }, timelineBarProgress);
-    const timelineBarContainer = div({ style: `overflow: hidden; margin: auto; width: 160px; height: 10px; ` }, timelineBar);
-    const volumeBarContainerDiv = div({ class: `volBarContainer`, style: "display:flex; flex-direction:column;" }, volumeBarContainer, timelineBarContainer, sampleLoadingStatusContainer);
+    const timelineBar = div({ style: `overflow: hidden; height: 100%; margin: auto; background: var(--ui-widget-background);` }, timelineBarProgress);
+    const timelineBarContainer = div({ style: `overflow: hidden; height: 4px; ` }, timelineBar);
+    const volumeBarContainerDiv = div({ class: `volBarContainer`, style: "display:flex; flex-direction:column;" }, volumeBarContainer, sampleLoadingStatusContainer);
     const promptContainer = div({ class: "promptContainer", style: "display:none; backdrop-filter: saturate(1.5) blur(4px); width: 100%; height: 100%; position: fixed; z-index: 999; display: flex; justify-content: center; align-items: center;" });
     promptContainer.style.display = "none";
     const songPlayerContainer = div({ class: "songPlayerContainer" });
     songPlayerContainer.appendChild(visualizationContainer);
     songPlayerContainer.appendChild(pianoContainer);
+    songPlayerContainer.appendChild(timelineBarContainer);
     songPlayerContainer.appendChild(div({ class: "control-center", id: "control-center", style: `flex-shrink: 0; height: 20vh; min-height: 22px; max-height: 70px; display: flex; align-items: center; grid-area: control-center;` }, div({ class: "control-center row", id: "row1", style: `display: flex; align-items: center;` }, playButtonContainer, loopButton, volumeIcon, volumeSlider, zoomButton, volumeBarContainerDiv, oscilascope.canvas), div({ class: "control-center row", id: "row2", style: `display: flex; align-items: center;` }, titleText, layoutStuffs, editLink, copyLink, shareLink, shortenSongLink), div({ class: "control-center row", id: "row3", style: `display: flex; align-items: center;` })));
     document.body.appendChild(songPlayerContainer);
     songPlayerContainer.appendChild(promptContainer);
@@ -37779,13 +37781,23 @@ var beepbox = (function (exports) {
         draggingPlayhead = true;
         onTimelineMouseMove(event);
     }
+    function onTimelineBarMouseDown(event) {
+        draggingPlayhead = true;
+        draggingTimelineBar = true;
+        onTimelineMouseMove(event);
+    }
     function onTimelineMouseMove(event) {
         if (!draggingPlayhead)
             return;
         event.preventDefault();
         const useVertical = (_form.elements["spLayout"].value == "vertical") || (window.localStorage.getItem("spLayout") == "vertical");
         if (useVertical) {
-            onTimelineCursorMove(event.clientY || event.pageY);
+            if (!draggingTimelineBar) {
+                onTimelineCursorMove(event.clientY || event.pageY);
+            }
+            else {
+                onTimelineCursorMove(event.clientX || event.pageX);
+            }
         }
         else {
             onTimelineCursorMove(event.clientX || event.pageX);
@@ -37813,7 +37825,12 @@ var beepbox = (function (exports) {
                 synth.playhead = synth.song.barCount * (mouseX - boundingRect.left) / (boundingRect.right - boundingRect.left);
             }
             else if (useVertical) {
-                synth.playhead = synth.song.barCount * (mouseX - boundingRect.bottom) / (boundingRect.top - boundingRect.bottom);
+                if (!draggingTimelineBar) {
+                    synth.playhead = synth.song.barCount * (mouseX - boundingRect.bottom) / (boundingRect.top - boundingRect.bottom);
+                }
+                else {
+                    synth.playhead = synth.song.barCount * (mouseX - boundingRect.left) / (boundingRect.right - boundingRect.left);
+                }
             }
             else if (useBoxBeep) {
                 synth.playhead = synth.song.barCount * (mouseX - boundingRect.right) / (boundingRect.left - boundingRect.right);
@@ -37824,6 +37841,7 @@ var beepbox = (function (exports) {
     }
     function onTimelineCursorUp() {
         draggingPlayhead = false;
+        draggingTimelineBar = false;
     }
     function setSynthVolume() {
         const volume = +volumeSlider.value;
@@ -37833,7 +37851,7 @@ var beepbox = (function (exports) {
         const maxPer = 144;
         if (synth.song != null) {
             let pos = synth.playhead / synth.song.barCount;
-            timelineBarProgress.style.width = Math.round((maxPer * pos / maxPer) * 100) + "%";
+            timelineBarProgress.style.width = Math.round((maxPer * pos / maxPer) * 1000) / 10 + "%";
             const usePiano = (_form.elements["spLayout"].value == "piano") || (window.localStorage.getItem("spLayout") == "piano");
             const useMiddle = (_form.elements["spLayout"].value == "middle") || (window.localStorage.getItem("spLayout") == "middle");
             const useVertical = (_form.elements["spLayout"].value == "vertical") || (window.localStorage.getItem("spLayout") == "vertical");
@@ -38170,12 +38188,17 @@ var beepbox = (function (exports) {
     window.addEventListener("resize", onWindowResize);
     window.addEventListener("keydown", onKeyPressed);
     timeline.addEventListener("mousedown", onTimelineMouseDown);
+    timelineBar.addEventListener("mousedown", onTimelineBarMouseDown);
     window.addEventListener("mousemove", onTimelineMouseMove);
     window.addEventListener("mouseup", onTimelineCursorUp);
     timeline.addEventListener("touchstart", onTimelineTouchDown);
     timeline.addEventListener("touchmove", onTimelineTouchMove);
     timeline.addEventListener("touchend", onTimelineCursorUp);
     timeline.addEventListener("touchcancel", onTimelineCursorUp);
+    timelineBar.addEventListener("touchstart", onTimelineTouchDown);
+    timelineBar.addEventListener("touchmove", onTimelineTouchMove);
+    timelineBar.addEventListener("touchend", onTimelineCursorUp);
+    timelineBar.addEventListener("touchcancel", onTimelineCursorUp);
     document.addEventListener('visibilitychange', e => {
         if (document.visibilityState === 'visible') {
             if (getLocalStorage("spLayout") != _form.elements["spLayout"].value) {
