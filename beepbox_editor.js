@@ -534,6 +534,7 @@ var beepbox = (function (exports) {
     Config.pickedStringBaseExpression = 0.025;
     Config.distortionBaseVolume = 0.011;
     Config.bitcrusherBaseVolume = 0.010;
+    Config.granularOutputLoudnessCompensation = 0.5;
     Config.rawChipWaves = toNameMap([
         { name: "rounded", expression: 0.94, samples: centerWave([0.0, 0.2, 0.4, 0.5, 0.6, 0.7, 0.8, 0.85, 0.9, 0.95, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.95, 0.9, 0.85, 0.8, 0.7, 0.6, 0.5, 0.4, 0.2, 0.0, -0.2, -0.4, -0.5, -0.6, -0.7, -0.8, -0.85, -0.9, -0.95, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -0.95, -0.9, -0.85, -0.8, -0.7, -0.6, -0.5, -0.4, -0.2]) },
         { name: "triangle", expression: 1.0, samples: centerWave([1.0 / 15.0, 3.0 / 15.0, 5.0 / 15.0, 7.0 / 15.0, 9.0 / 15.0, 11.0 / 15.0, 13.0 / 15.0, 15.0 / 15.0, 15.0 / 15.0, 13.0 / 15.0, 11.0 / 15.0, 9.0 / 15.0, 7.0 / 15.0, 5.0 / 15.0, 3.0 / 15.0, 1.0 / 15.0, -1.0 / 15.0, -3.0 / 15.0, -5.0 / 15.0, -7.0 / 15.0, -9.0 / 15.0, -11.0 / 15.0, -13.0 / 15.0, -15.0 / 15.0, -15.0 / 15.0, -13.0 / 15.0, -11.0 / 15.0, -9.0 / 15.0, -7.0 / 15.0, -5.0 / 15.0, -3.0 / 15.0, -1.0 / 15.0]) },
@@ -708,8 +709,8 @@ var beepbox = (function (exports) {
         { name: "resonance", voices: 2, spread: 0.0025, offset: 0.1, expression: 0.8, sign: -1.5 },
         { name: "FART", voices: 2, spread: 13, offset: -5, expression: 1.0, sign: -3 },
     ]);
-    Config.effectNames = ["reverb", "chorus", "panning", "distortion", "bitcrusher", "note filter", "echo", "pitch shift", "detune", "vibrato", "transition type", "chord type", "ring modulation", "phaser", "note range", "invert wave"];
-    Config.effectOrder = [2, 10, 11, 7, 8, 9, 5, 3, 4, 1, 6, 0, 12, 13, 14, 15];
+    Config.effectNames = ["reverb", "chorus", "panning", "distortion", "bitcrusher", "note filter", "echo", "pitch shift", "detune", "vibrato", "transition type", "chord type", "ring modulation", "phaser", "note range", "invert wave", "granular"];
+    Config.effectOrder = [2, 10, 11, 7, 8, 9, 5, 3, 4, 1, 6, 0, 12, 13, 14, 15, 16];
     Config.noteSizeMax = 6;
     Config.volumeRange = 50;
     Config.volumeLogScale = 0.1428;
@@ -717,16 +718,23 @@ var beepbox = (function (exports) {
     Config.panMax = Config.panCenter * 2;
     Config.panDelaySecondsMax = 0.001;
     Config.chorusRange = 8;
-    Config.ringModRange = 8;
-    Config.ringModHzRange = 64;
-    Config.rmHzOffsetCenter = 200;
-    Config.rmHzOffsetMax = 400;
-    Config.rmHzOffsetMin = 0;
     Config.chorusPeriodSeconds = 2.0;
     Config.chorusDelayRange = 0.0034;
     Config.chorusDelayOffsets = [[1.51, 2.10, 3.35], [1.47, 2.15, 3.25]];
     Config.chorusPhaseOffsets = [[0.0, 2.1, 4.2], [3.2, 5.3, 1.0]];
     Config.chorusMaxDelay = Config.chorusDelayRange * (1.0 + Config.chorusDelayOffsets[0].concat(Config.chorusDelayOffsets[1]).reduce((x, y) => Math.max(x, y)));
+    Config.ringModRange = 8;
+    Config.ringModHzRange = 64;
+    Config.rmHzOffsetCenter = 200;
+    Config.rmHzOffsetMax = 400;
+    Config.rmHzOffsetMin = 0;
+    Config.granularRange = 10;
+    Config.grainSizeMin = 40;
+    Config.grainSizeMax = 2000;
+    Config.grainSizeStep = 40;
+    Config.grainRangeMax = 1600;
+    Config.grainAmountsMax = 10;
+    Config.granularEnvelopeType = 0;
     Config.chords = toNameMap([
         { name: "simultaneous", customInterval: false, arpeggiates: false, strumParts: 0, singleTone: false },
         { name: "strum", customInterval: false, arpeggiates: false, strumParts: 1, singleTone: false },
@@ -1111,14 +1119,18 @@ var beepbox = (function (exports) {
         { name: "phaserStages", computeIndex: 44, displayName: "phaser stages", interleave: false, isFilter: false, maxCount: 1, effect: 13, compatibleInstruments: null },
         { name: "ringModulation", computeIndex: 45, displayName: "ring mod", interleave: false, isFilter: false, maxCount: 1, effect: 12, compatibleInstruments: null },
         { name: "ringModulationHz", computeIndex: 46, displayName: "ring mod hz", interleave: false, isFilter: false, maxCount: 1, effect: 12, compatibleInstruments: null },
-        { name: "distortion", computeIndex: 48, displayName: "distortion", interleave: false, isFilter: false, maxCount: 1, effect: 3, compatibleInstruments: null },
-        { name: "bitcrusherQuantization", computeIndex: 49, displayName: "bitcrush", interleave: false, isFilter: false, maxCount: 1, effect: 4, compatibleInstruments: null },
-        { name: "bitcrusherFrequency", computeIndex: 50, displayName: "freq crush", interleave: false, isFilter: false, maxCount: 1, effect: 4, compatibleInstruments: null },
-        { name: "chorus", computeIndex: 51, displayName: "chorus", interleave: false, isFilter: false, maxCount: 1, effect: 1, compatibleInstruments: null },
-        { name: "echoSustain", computeIndex: 52, displayName: "echo sustain", interleave: false, isFilter: false, maxCount: 1, effect: 6, compatibleInstruments: null },
-        { name: "reverb", computeIndex: 53, displayName: "reverb", interleave: false, isFilter: false, maxCount: 1, effect: 0, compatibleInstruments: null },
-        { name: "panning", computeIndex: 54, displayName: "panning", interleave: false, isFilter: false, maxCount: 1, effect: 2, compatibleInstruments: null },
-        { name: "arpeggioSpeed", computeIndex: 55, displayName: "arpeggio speed", interleave: false, isFilter: false, maxCount: 1, effect: 11, compatibleInstruments: null },
+        { name: "distortion", computeIndex: 52, displayName: "distortion", interleave: false, isFilter: false, maxCount: 1, effect: 3, compatibleInstruments: null },
+        { name: "bitcrusherQuantization", computeIndex: 53, displayName: "bitcrush", interleave: false, isFilter: false, maxCount: 1, effect: 4, compatibleInstruments: null },
+        { name: "bitcrusherFrequency", computeIndex: 54, displayName: "freq crush", interleave: false, isFilter: false, maxCount: 1, effect: 4, compatibleInstruments: null },
+        { name: "chorus", computeIndex: 55, displayName: "chorus", interleave: false, isFilter: false, maxCount: 1, effect: 1, compatibleInstruments: null },
+        { name: "echoSustain", computeIndex: 56, displayName: "echo sustain", interleave: false, isFilter: false, maxCount: 1, effect: 6, compatibleInstruments: null },
+        { name: "reverb", computeIndex: 57, displayName: "reverb", interleave: false, isFilter: false, maxCount: 1, effect: 0, compatibleInstruments: null },
+        { name: "panning", computeIndex: 58, displayName: "panning", interleave: false, isFilter: false, maxCount: 1, effect: 2, compatibleInstruments: null },
+        { name: "arpeggioSpeed", computeIndex: 59, displayName: "arpeggio speed", interleave: false, isFilter: false, maxCount: 1, effect: 11, compatibleInstruments: null },
+        { name: "granular", computeIndex: 48, displayName: "granular", interleave: false, isFilter: false, maxCount: 1, effect: 16, compatibleInstruments: null },
+        { name: "grainFreq", computeIndex: 49, displayName: "grain freq", interleave: false, isFilter: false, maxCount: 1, effect: 16, compatibleInstruments: null },
+        { name: "grainSize", computeIndex: 50, displayName: "grain size", interleave: false, isFilter: false, maxCount: 1, effect: 16, compatibleInstruments: null },
+        { name: "grainRange", computeIndex: 51, displayName: "grain range", interleave: false, isFilter: false, maxCount: 1, effect: 16, compatibleInstruments: null },
     ]);
     Config.operatorWaves = toNameMap([
         { name: "sine", samples: Config.sineWave },
@@ -1146,32 +1158,32 @@ var beepbox = (function (exports) {
     Config.modulators = toNameMap([
         { name: "none",
             pianoName: "None",
-            maxRawVol: 6, newNoteVol: 6, forSong: true, convertRealFactor: 0, associatedEffect: 16,
+            maxRawVol: 6, newNoteVol: 6, forSong: true, convertRealFactor: 0, associatedEffect: 17,
             promptName: "No Mod Setting",
             promptDesc: ["No setting has been chosen yet, so this modulator will have no effect. Try choosing a setting with the dropdown, then click this '?' again for more info.", "[$LO - $HI]"] },
         { name: "song volume",
             pianoName: "Volume",
-            maxRawVol: 100, newNoteVol: 100, forSong: true, convertRealFactor: 0, associatedEffect: 16,
+            maxRawVol: 100, newNoteVol: 100, forSong: true, convertRealFactor: 0, associatedEffect: 17,
             promptName: "Song Volume",
             promptDesc: ["This setting affects the overall volume of the song, just like the main volume slider.", "At $HI, the volume will be unchanged from default, and it will get gradually quieter down to $LO.", "[MULTIPLICATIVE] [$LO - $HI] [%]"] },
         { name: "tempo",
             pianoName: "Tempo",
-            maxRawVol: Config.tempoMax - Config.tempoMin, newNoteVol: Math.ceil((Config.tempoMax - Config.tempoMin) / 2), forSong: true, convertRealFactor: Config.tempoMin, associatedEffect: 16,
+            maxRawVol: Config.tempoMax - Config.tempoMin, newNoteVol: Math.ceil((Config.tempoMax - Config.tempoMin) / 2), forSong: true, convertRealFactor: Config.tempoMin, associatedEffect: 17,
             promptName: "Song Tempo",
             promptDesc: ["This setting controls the speed your song plays at, just like the tempo slider.", "When you first make a note for this setting, it will default to your current tempo. Raising it speeds up the song, up to $HI BPM, and lowering it slows it down, to a minimum of $LO BPM.", "Note that you can make a 'swing' effect by rapidly changing between two tempo values.", "[OVERWRITING] [$LO - $HI] [BPM]"] },
         { name: "song reverb",
             pianoName: "Reverb",
-            maxRawVol: Config.reverbRange * 2, newNoteVol: Config.reverbRange, forSong: true, convertRealFactor: -Config.reverbRange, associatedEffect: 16,
+            maxRawVol: Config.reverbRange * 2, newNoteVol: Config.reverbRange, forSong: true, convertRealFactor: -Config.reverbRange, associatedEffect: 17,
             promptName: "Song Reverb",
             promptDesc: ["This setting affects the overall reverb of your song. It works by multiplying existing reverb for instruments, so those with no reverb set will be unaffected.", "At $MID, all instruments' reverb will be unchanged from default. This increases up to double the reverb value at $HI, or down to no reverb at $LO.", "[MULTIPLICATIVE] [$LO - $HI]"] },
         { name: "next bar",
             pianoName: "Next Bar",
-            maxRawVol: 1, newNoteVol: 1, forSong: true, convertRealFactor: 0, associatedEffect: 16,
+            maxRawVol: 1, newNoteVol: 1, forSong: true, convertRealFactor: 0, associatedEffect: 17,
             promptName: "Go To Next Bar",
             promptDesc: ["This setting functions a little different from most. Wherever a note is placed, the song will jump immediately to the next bar when it is encountered.", "This jump happens at the very start of the note, so the length of a next-bar note is irrelevant. Also, the note can be value 0 or 1, but the value is also irrelevant - wherever you place a note, the song will jump.", "You can make mixed-meter songs or intro sections by cutting off unneeded beats with a next-bar modulator.", "[$LO - $HI]"] },
         { name: "note volume",
             pianoName: "Note Vol.",
-            maxRawVol: Config.volumeRange, newNoteVol: Math.ceil(Config.volumeRange / 2), forSong: false, convertRealFactor: Math.ceil(-Config.volumeRange / 2.0), associatedEffect: 16,
+            maxRawVol: Config.volumeRange, newNoteVol: Math.ceil(Config.volumeRange / 2), forSong: false, convertRealFactor: Math.ceil(-Config.volumeRange / 2.0), associatedEffect: 17,
             promptName: "Note Volume",
             promptDesc: ["This setting affects the volume of your instrument as if its note size had been scaled.", "At $MID, an instrument's volume will be unchanged from default. This means you can still use the volume sliders to mix the base volume of instruments. The volume gradually increases up to $HI, or decreases down to mute at $LO.", "This setting was the default for volume modulation in JummBox for a long time. Due to some new effects like distortion and bitcrush, note volume doesn't always allow fine volume control. Also, this modulator affects the value of FM modulator waves instead of just carriers. This can distort the sound which may be useful, but also may be undesirable. In those cases, use the 'mix volume' modulator instead, which will always just scale the volume with no added effects.", "For display purposes, this mod will show up on the instrument volume slider, as long as there is not also an active 'mix volume' modulator anyhow. However, as mentioned, it works more like changing note volume.", "[MULTIPLICATIVE] [$LO - $HI]"] },
         { name: "pan",
@@ -1191,32 +1203,32 @@ var beepbox = (function (exports) {
             promptDesc: ["This setting controls the amount of distortion for your instrument, just like the distortion slider.", "At $LO, your instrument will have no distortion. At $HI, it will be at maximum.", "[OVERWRITING] [$LO - $HI]"] },
         { name: "fm slider 1",
             pianoName: "FM 1",
-            maxRawVol: 15, newNoteVol: 15, forSong: false, convertRealFactor: 0, associatedEffect: 16,
+            maxRawVol: 15, newNoteVol: 15, forSong: false, convertRealFactor: 0, associatedEffect: 17,
             promptName: "FM Slider 1",
             promptDesc: ["This setting affects the strength of the first FM slider, just like the corresponding slider on your instrument.", "It works in a multiplicative way, so at $HI your slider will sound the same is its default value, and at $LO it will sound like it has been moved all the way to the left.", "For the full range of control with this mod, move your underlying slider all the way to the right.", "[MULTIPLICATIVE] [$LO - $HI] [%]"] },
         { name: "fm slider 2",
             pianoName: "FM 2",
-            maxRawVol: 15, newNoteVol: 15, forSong: false, convertRealFactor: 0, associatedEffect: 16,
+            maxRawVol: 15, newNoteVol: 15, forSong: false, convertRealFactor: 0, associatedEffect: 17,
             promptName: "FM Slider 2",
             promptDesc: ["This setting affects the strength of the second FM slider, just like the corresponding slider on your instrument.", "It works in a multiplicative way, so at $HI your slider will sound the same is its default value, and at $LO it will sound like it has been moved all the way to the left.", "For the full range of control with this mod, move your underlying slider all the way to the right.", "[MULTIPLICATIVE] [$LO - $HI] [%]"] },
         { name: "fm slider 3",
             pianoName: "FM 3",
-            maxRawVol: 15, newNoteVol: 15, forSong: false, convertRealFactor: 0, associatedEffect: 16,
+            maxRawVol: 15, newNoteVol: 15, forSong: false, convertRealFactor: 0, associatedEffect: 17,
             promptName: "FM Slider 3",
             promptDesc: ["This setting affects the strength of the third FM slider, just like the corresponding slider on your instrument.", "It works in a multiplicative way, so at $HI your slider will sound the same is its default value, and at $LO it will sound like it has been moved all the way to the left.", "For the full range of control with this mod, move your underlying slider all the way to the right.", "[MULTIPLICATIVE] [$LO - $HI] [%]"] },
         { name: "fm slider 4",
             pianoName: "FM 4",
-            maxRawVol: 15, newNoteVol: 15, forSong: false, convertRealFactor: 0, associatedEffect: 16,
+            maxRawVol: 15, newNoteVol: 15, forSong: false, convertRealFactor: 0, associatedEffect: 17,
             promptName: "FM Slider 4",
             promptDesc: ["This setting affects the strength of the fourth FM slider, just like the corresponding slider on your instrument.", "It works in a multiplicative way, so at $HI your slider will sound the same is its default value, and at $LO it will sound like it has been moved all the way to the left.", "For the full range of control with this mod, move your underlying slider all the way to the right.", "[MULTIPLICATIVE] [$LO - $HI] [%]"] },
         { name: "fm feedback",
             pianoName: "FM Feedback",
-            maxRawVol: 15, newNoteVol: 15, forSong: false, convertRealFactor: 0, associatedEffect: 16,
+            maxRawVol: 15, newNoteVol: 15, forSong: false, convertRealFactor: 0, associatedEffect: 17,
             promptName: "FM Feedback",
             promptDesc: ["This setting affects the strength of the FM feedback slider, just like the corresponding slider on your instrument.", "It works in a multiplicative way, so at $HI your slider will sound the same is its default value, and at $LO it will sound like it has been moved all the way to the left.", "For the full range of control with this mod, move your underlying slider all the way to the right.", "[MULTIPLICATIVE] [$LO - $HI] [%]"] },
         { name: "pulse width",
             pianoName: "Pulse Width",
-            maxRawVol: Config.pulseWidthRange, newNoteVol: Config.pulseWidthRange, forSong: false, convertRealFactor: 0, associatedEffect: 16,
+            maxRawVol: Config.pulseWidthRange, newNoteVol: Config.pulseWidthRange, forSong: false, convertRealFactor: 0, associatedEffect: 17,
             promptName: "Pulse Width",
             promptDesc: ["This setting controls the width of this instrument's pulse wave, just like the pulse width slider.", "At $HI, your instrument will sound like a pure square wave (on 50% of the time). It will gradually sound narrower down to $LO, where it will be inaudible (as it is on 0% of the time).", "Changing pulse width randomly between a few values is a common strategy in chiptune music to lend some personality to a lead instrument.", "[OVERWRITING] [$LO - $HI] [%Duty]"] },
         { name: "detune",
@@ -1231,7 +1243,7 @@ var beepbox = (function (exports) {
             promptDesc: ["This setting controls the amount that your pitch moves up and down by during vibrato, just like the vibrato depth slider.", "At $LO, your instrument will have no vibrato depth so its vibrato would be inaudible. This increases up to $HI, where an extreme pitch change will be noticeable.", "[OVERWRITING] [$LO - $HI] [pitch ÷25]"] },
         { name: "song detune",
             pianoName: "Detune",
-            maxRawVol: Config.songDetuneMax - Config.songDetuneMin, newNoteVol: Math.ceil((Config.songDetuneMax - Config.songDetuneMin) / 2), forSong: true, convertRealFactor: -250, associatedEffect: 16,
+            maxRawVol: Config.songDetuneMax - Config.songDetuneMin, newNoteVol: Math.ceil((Config.songDetuneMax - Config.songDetuneMin) / 2), forSong: true, convertRealFactor: -250, associatedEffect: 17,
             promptName: "Song Detune",
             promptDesc: ["This setting controls the overall detune of the entire song. There is no associated slider.", "At $MID, your song will have no extra detune applied and sound unchanged from default. Each tick corresponds to four cents, or four hundredths of a pitch. Thus, each change of 25 ticks corresponds to one half-step of detune, up to 10 half-steps up at $HI, or 10 half-steps down at $LO.", "[ADDITIVE] [$LO - $HI] [cents x4]"] },
         { name: "vibrato speed",
@@ -1262,7 +1274,7 @@ var beepbox = (function (exports) {
             promptDesc: ["This setting functions a little different from most. Wherever a note is placed, the arpeggio of this instrument will reset at the very start of that note. This is most noticeable with lower arpeggio speeds. The lengths and values of notes for this setting don't matter, just the note start times.", "This mod can be used to sync up your apreggios so that they always sound the same, even if you are using an odd-ratio arpeggio speed or modulating arpeggio speed.", "[$LO - $HI]"] },
         { name: "eq filter",
             pianoName: "EQFlt",
-            maxRawVol: 10, newNoteVol: 0, forSong: false, convertRealFactor: 0, associatedEffect: 16,
+            maxRawVol: 10, newNoteVol: 0, forSong: false, convertRealFactor: 0, associatedEffect: 17,
             promptName: "EQ Filter",
             promptDesc: ["This setting controls a few separate things for your instrument's EQ filter.", "When the option 'morph' is selected, your modulator values will indicate a sub-filter index of your EQ filter to 'morph' to over time. For example, a change from 0 to 1 means your main filter (default) will morph to sub-filter 1 over the specified duration. You can shape the main filter and sub-filters in the large filter editor ('+' button). If your two filters' number, type, and order of filter dots all match up, the morph will happen smoothly and you'll be able to hear them changing. If they do not match up, the filters will simply jump between each other.", "Note that filters will morph based on endpoints in the pattern editor. So, if you specify a morph from sub-filter 1 to 4 but do not specifically drag in new endpoints for 2 and 3, it will morph directly between 1 and 4 without going through the others.", "If you target Dot X or Dot Y, you can finely tune the coordinates of a single dot for your filter. The number of available dots to choose is dependent on your main filter's dot count.", "[OVERWRITING] [$LO - $HI]"] },
         { name: "note filter",
@@ -1287,7 +1299,7 @@ var beepbox = (function (exports) {
             promptDesc: ["This setting controls the echo sustain (echo loudness) of your instrument, just like the echo slider.", "At $LO, your instrument will have no echo sustain and echo will not be audible. Echo sustain increases and the echo effect gets more noticeable up to the max value, $HI.", "[OVERWRITING] [$LO - $HI]"] },
         { name: "echo delay",
             pianoName: "Echo Delay",
-            maxRawVol: Config.echoDelayRange, newNoteVol: 0, forSong: false, convertRealFactor: 0, associatedEffect: 16,
+            maxRawVol: Config.echoDelayRange, newNoteVol: 0, forSong: false, convertRealFactor: 0, associatedEffect: 17,
             promptName: "Instrument Echo Delay",
             promptDesc: ["This setting controls the echo delay of your instrument, just like the echo delay slider.", "At $LO, your instrument will have very little echo delay, and this increases up to 2 beats of delay at $HI.", "[OVERWRITING] [$LO - $HI] [~beats ÷12]"]
         },
@@ -1298,12 +1310,12 @@ var beepbox = (function (exports) {
             promptDesc: ["This setting controls the chorus strength of your instrument, just like the chorus slider.", "At $LO, the chorus effect will be disabled. The strength of the chorus effect increases up to the max value, $HI.", "[OVERWRITING] [$LO - $HI]"] },
         { name: "eq filt cut",
             pianoName: "EQFlt Cut",
-            maxRawVol: Config.filterSimpleCutRange - 1, newNoteVol: Config.filterSimpleCutRange - 1, forSong: false, convertRealFactor: 0, associatedEffect: 16,
+            maxRawVol: Config.filterSimpleCutRange - 1, newNoteVol: Config.filterSimpleCutRange - 1, forSong: false, convertRealFactor: 0, associatedEffect: 17,
             promptName: "EQ Filter Cutoff Frequency",
             promptDesc: ["This setting controls the filter cut position of your instrument, just like the filter cut slider.", "This setting is roughly analagous to the horizontal position of a single low-pass dot on the advanced filter editor. At lower values, a wider range of frequencies is cut off.", "[OVERWRITING] [$LO - $HI]"] },
         { name: "eq filt peak",
             pianoName: "EQFlt Peak",
-            maxRawVol: Config.filterSimplePeakRange - 1, newNoteVol: 0, forSong: false, convertRealFactor: 0, associatedEffect: 16,
+            maxRawVol: Config.filterSimplePeakRange - 1, newNoteVol: 0, forSong: false, convertRealFactor: 0, associatedEffect: 17,
             promptName: "EQ Filter Peak Gain",
             promptDesc: ["This setting controls the filter peak position of your instrument, just like the filter peak slider.", "This setting is roughly analagous to the vertical position of a single low-pass dot on the advanced filter editor. At lower values, the cutoff frequency will not be emphasized, and at higher values you will hear emphasis on the cutoff frequency.", "[OVERWRITING] [$LO - $HI]"] },
         { name: "note filt cut",
@@ -1323,58 +1335,58 @@ var beepbox = (function (exports) {
             promptDesc: ["This setting controls the pitch offset of your instrument, just like the pitch shift slider.", "At $MID your instrument will have no pitch shift. This increases as you decrease toward $LO pitches (half-steps) at the low end, or increases towards +$HI pitches at the high end.", "[OVERWRITING] [$LO - $HI] [pitch]"] },
         { name: "sustain",
             pianoName: "Sustain",
-            maxRawVol: Config.stringSustainRange - 1, newNoteVol: 0, forSong: false, convertRealFactor: 0, associatedEffect: 16,
+            maxRawVol: Config.stringSustainRange - 1, newNoteVol: 0, forSong: false, convertRealFactor: 0, associatedEffect: 17,
             promptName: "Picked String Sustain",
             promptDesc: ["This setting controls the sustain of your picked string instrument, just like the sustain slider.", "At $LO, your instrument will have minimum sustain and sound 'plucky'. This increases to a more held sound as your modulator approaches the maximum, $HI.", "[OVERWRITING] [$LO - $HI]"] },
         { name: "mix volume",
             pianoName: "Mix Vol.",
-            maxRawVol: Config.volumeRange, newNoteVol: Math.ceil(Config.volumeRange / 2), forSong: false, convertRealFactor: Math.ceil(-Config.volumeRange / 2.0), associatedEffect: 16,
+            maxRawVol: Config.volumeRange, newNoteVol: Math.ceil(Config.volumeRange / 2), forSong: false, convertRealFactor: Math.ceil(-Config.volumeRange / 2.0), associatedEffect: 17,
             promptName: "Mix Volume",
             promptDesc: ["This setting affects the volume of your instrument as if its volume slider had been moved.", "At $MID, an instrument's volume will be unchanged from default. This means you can still use the volume sliders to mix the base volume of instruments, since this setting and the default value work multiplicatively. The volume gradually increases up to $HI, or decreases down to mute at $LO.", "Unlike the 'note volume' setting, mix volume is very straightforward and simply affects the resultant instrument volume after all effects are applied.", "[MULTIPLICATIVE] [$LO - $HI]"] },
         { name: "fm slider 5",
             pianoName: "FM 5",
-            maxRawVol: 15, newNoteVol: 15, forSong: false, convertRealFactor: 0, associatedEffect: 16,
+            maxRawVol: 15, newNoteVol: 15, forSong: false, convertRealFactor: 0, associatedEffect: 17,
             promptName: "FM Slider 5",
             promptDesc: ["This setting affects the strength of the fifth FM slider, just like the corresponding slider on your instrument.", "It works in a multiplicative way, so at $HI your slider will sound the same is its default value, and at $LO it will sound like it has been moved all the way to the left.", "For the full range of control with this mod, move your underlying slider all the way to the right.", "[MULTIPLICATIVE] [$LO - $HI] [%]"] },
         { name: "fm slider 6",
             pianoName: "FM 6",
-            maxRawVol: 15, newNoteVol: 15, forSong: false, convertRealFactor: 0, associatedEffect: 16,
+            maxRawVol: 15, newNoteVol: 15, forSong: false, convertRealFactor: 0, associatedEffect: 17,
             promptName: "FM Slider 6",
             promptDesc: ["This setting affects the strength of the sixth FM slider, just like the corresponding slider on your instrument.", "It works in a multiplicative way, so at $HI your slider will sound the same is its default value, and at $LO it will sound like it has been moved all the way to the left.", "For the full range of control with this mod, move your underlying slider all the way to the right.", "[MULTIPLICATIVE] [$LO - $HI] [%]"] },
         { name: "decimal offset",
             pianoName: "Decimal Offset",
-            maxRawVol: 99, newNoteVol: 0, forSong: false, convertRealFactor: 0, invertSliderIndicator: true, associatedEffect: 16,
+            maxRawVol: 99, newNoteVol: 0, forSong: false, convertRealFactor: 0, invertSliderIndicator: true, associatedEffect: 17,
             promptName: "Decimal Offset",
             promptDesc: ["This setting controls the decimal offset that is subtracted from the pulse width; use this for creating values like 12.5 or 6.25.", "[$LO - $HI]"] },
         { name: "envelope speed",
             pianoName: "EnvelopeSpd",
-            maxRawVol: 50, newNoteVol: 12, forSong: false, convertRealFactor: 0, associatedEffect: 16,
+            maxRawVol: 50, newNoteVol: 12, forSong: false, convertRealFactor: 0, associatedEffect: 17,
             promptName: "Envelope Speed",
             promptDesc: ["This setting controls how fast all of the envelopes for the instrument play.", "At $LO, your instrument's envelopes will be frozen, and at values near there they will change very slowly. At 12, the envelopes will work as usual, performing at normal speed. This increases up to $HI, where the envelopes will change very quickly. The speeds are given below:",
                 "[0-4]: x0, x1/16, x⅛, x⅕, x¼,", "[5-9]: x⅓, x⅖, x½, x⅔, x¾,", "[10-14]: x⅘, x0.9, x1, x1.1, x1.2,", "[15-19]: x1.3, x1.4, x1.5, x1.6, x1.7,", "[20-24]: x1.8, x1.9, x2, x2.1, x2.2,", "[25-29]: x2.3, x2.4, x2.5, x2.6, x2.7,", "[30-34]: x2.8, x2.9, x3, x3.1, x3.2,", "[35-39]: x3.3, x3.4, x3.5, x3.6, x3.7,", "[40-44]: x3.8, x3.9, x4, x4.15, x4.3,", "[45-50]: x4.5, x4.8, x5, x5.5, x6, x8", "[OVERWRITING] [$LO - $HI]"] },
         { name: "dynamism",
             pianoName: "Dynamism",
-            maxRawVol: Config.supersawDynamismMax, newNoteVol: 0, forSong: false, convertRealFactor: 0, associatedEffect: 16,
+            maxRawVol: Config.supersawDynamismMax, newNoteVol: 0, forSong: false, convertRealFactor: 0, associatedEffect: 17,
             promptName: "Supersaw Dynamism",
             promptDesc: ["This setting controls the supersaw dynamism of your instrument, just like the dynamism slider.", "At $LO, your instrument will have only a single pulse contributing. Increasing this will raise the contribution of other waves which is similar to a chorus effect. The effect gets more noticeable up to the max value, $HI.", "[OVERWRITING] [$LO - $HI]"] },
         { name: "spread",
             pianoName: "Spread",
-            maxRawVol: Config.supersawSpreadMax, newNoteVol: 0, forSong: false, convertRealFactor: 0, associatedEffect: 16,
+            maxRawVol: Config.supersawSpreadMax, newNoteVol: 0, forSong: false, convertRealFactor: 0, associatedEffect: 17,
             promptName: "Supersaw Spread",
             promptDesc: ["This setting controls the supersaw spread of your instrument, just like the spread slider.", "At $LO, all the pulses in your supersaw will be at the same frequency. Increasing this value raises the frequency spread of the contributing waves, up to a dissonant spread at the max value, $HI.", "[OVERWRITING] [$LO - $HI]"] },
         { name: "saw shape",
             pianoName: "Saw Shape",
-            maxRawVol: Config.supersawShapeMax, newNoteVol: 0, forSong: false, convertRealFactor: 0, associatedEffect: 16,
+            maxRawVol: Config.supersawShapeMax, newNoteVol: 0, forSong: false, convertRealFactor: 0, associatedEffect: 17,
             promptName: "Supersaw Shape",
             promptDesc: ["This setting controls the supersaw shape of your instrument, just like the Saw↔Pulse slider.", "As the slider's name implies, this effect will give you a sawtooth wave at $LO, and a full pulse width wave at $HI. Values in between will be a blend of the two.", "[OVERWRITING] [$LO - $HI] [%]"] },
         { name: "song bitcrush",
             pianoName: "Song Bit crush",
-            maxRawVol: Config.bitcrusherQuantizationRange * 2, newNoteVol: Config.bitcrusherQuantizationRange, forSong: true, convertRealFactor: -Config.bitcrusherQuantizationRange, associatedEffect: 16,
+            maxRawVol: Config.bitcrusherQuantizationRange * 2, newNoteVol: Config.bitcrusherQuantizationRange, forSong: true, convertRealFactor: -Config.bitcrusherQuantizationRange, associatedEffect: 17,
             promptName: "Song Bit crush",
             promptDesc: ["This setting affects the overall bitcrush of your song. It works by multiplying existing bitcrush for instruments, so those with no bitcrush set will be unaffected.", "At $MID, all instruments' bitcrush will be unchanged from default. This increases up to double the set bitcrush value at $HI, or down to no bitcrush at $LO.", "[MULTIPLICATIVE] [$LO - $HI]"] },
         { name: "song freqcrush",
             pianoName: "Song freqcrush",
-            maxRawVol: Config.bitcrusherFreqRange * 2, newNoteVol: Config.bitcrusherFreqRange, forSong: true, convertRealFactor: -Config.bitcrusherFreqRange, associatedEffect: 16,
+            maxRawVol: Config.bitcrusherFreqRange * 2, newNoteVol: Config.bitcrusherFreqRange, forSong: true, convertRealFactor: -Config.bitcrusherFreqRange, associatedEffect: 17,
             promptName: "Song Freq crush",
             promptDesc: ["This setting affects the overall frequency crush of your song. It works by multiplying existing freq crush for instruments, so those with no bitcrush or freq crush set will be unaffected.", "At $MID, all instruments' bitcrush will be unchanged from default. This increases up to double the set bitcrush value at $HI, or down to no bitcrush at $LO.", "[MULTIPLICATIVE] [$LO - $HI]"] },
         { name: "song panning",
@@ -1384,27 +1396,27 @@ var beepbox = (function (exports) {
             promptDesc: ["This setting affects the overall panning of your song. It works by adding to existing pan for instruments, so those with no panning set will be unaffected.", "At $MID, nothing will be added to the songs panning. At $HI, all instruments will have 100+ panning added, which would max out the panning. At $LO, -100+ panning added to it, which would make the panning as low as possible.", "[ADDITIVE] [$LO - $HI]"] },
         { name: "song chorus",
             pianoName: "Song Chorus",
-            maxRawVol: Config.chorusRange * 2, newNoteVol: Config.chorusRange, forSong: true, convertRealFactor: -Config.chorusRange, associatedEffect: 16,
+            maxRawVol: Config.chorusRange * 2, newNoteVol: Config.chorusRange, forSong: true, convertRealFactor: -Config.chorusRange, associatedEffect: 17,
             promptName: "Song Chorus",
             promptDesc: ["This setting affects the overall chorus of your song. It works by multiplying existing chorus for instruments, so those with no chorus set will be unaffected.", "At $MID, all instruments' chorus will be unchanged from default. This increases up to double the set chorus value at $HI, or down to no chorus at $LO.", "[MULTIPLICATIVE] [$LO - $HI]"] },
         { name: "song distortion",
             pianoName: "Song Distortion",
-            maxRawVol: Config.distortionRange * 2, newNoteVol: Config.distortionRange, forSong: true, convertRealFactor: -Config.distortionRange, associatedEffect: 16,
+            maxRawVol: Config.distortionRange * 2, newNoteVol: Config.distortionRange, forSong: true, convertRealFactor: -Config.distortionRange, associatedEffect: 17,
             promptName: "Song Distortion",
             promptDesc: ["This setting affects the overall distortion of your song. It works by multiplying existing distortion for instruments, so those with no distortion set will be unaffected.", "At $MID, all instruments' distortion will be unchanged from default. This increases up to double the set distortion value at $HI, or down to no distortion at $LO.", "[MULTIPLICATIVE] [$LO - $HI]"] },
         { name: "ring modulation",
             pianoName: "Ring Modulation",
-            maxRawVol: Config.ringModRange, newNoteVol: 0, forSong: false, convertRealFactor: 0, associatedEffect: 16,
+            maxRawVol: Config.ringModRange, newNoteVol: 0, forSong: false, convertRealFactor: 0, associatedEffect: 17,
             promptName: "Ring Modulation",
             promptDesc: ["This setting controls the Ring Modulation effect in your instrument.", "[OVERWRITING] [$LO - $HI]"] },
         { name: "song ring modulation",
             pianoName: "Songwide Ring Modulation",
-            maxRawVol: Config.ringModRange * 2, newNoteVol: Config.ringModRange, forSong: true, convertRealFactor: -Config.ringModRange, associatedEffect: 16,
+            maxRawVol: Config.ringModRange * 2, newNoteVol: Config.ringModRange, forSong: true, convertRealFactor: -Config.ringModRange, associatedEffect: 17,
             promptName: "Songwide Ring Modulation",
             promptDesc: ["This setting multiplies the Ring Modulation effect across all instruments.", "[MULTIPLICATIVE] [$LO - $HI]"] },
         { name: "ring mod hertz",
             pianoName: "Ring Modulation (Hertz)",
-            maxRawVol: Config.ringModHzRange, newNoteVol: 0, forSong: false, convertRealFactor: 0, associatedEffect: 16,
+            maxRawVol: Config.ringModHzRange, newNoteVol: 0, forSong: false, convertRealFactor: 0, associatedEffect: 17,
             promptName: "Ring Modulation (Hertz)",
             promptDesc: ["This setting controls the Hertz (Hz) used in the Ring Modulation effect in your instrument.", "[OVERWRITING] [$LO - $HI]"] },
         { name: "phaser",
@@ -1434,7 +1446,7 @@ var beepbox = (function (exports) {
             promptDesc: ["This setting controls the pitch offset of all instruments regardless of whether or not the instrument has the effect itself, just like the pitch shift slider.", "At $MID your instrument will have no pitch shift. This increases as you decrease toward $LO pitches (half-steps) at the low end, or increases towards +$HI pitches at the high end.", "[ADDITIVE] [$LO - $HI] [pitch]"] },
         { name: "individual envelope speed",
             pianoName: "IndvEnvSpd",
-            maxRawVol: 63, newNoteVol: 23, forSong: false, convertRealFactor: 0, associatedEffect: 16,
+            maxRawVol: 63, newNoteVol: 23, forSong: false, convertRealFactor: 0, associatedEffect: 17,
             promptName: "Individual Envelope Speed",
             promptDesc: ["This setting controls how fast the specified envelope of the instrument will play.", "At $LO, your the envelope will be frozen, and at values near there they will change very slowly. At 23, the envelope will work as usual, performing at normal speed. This increases up to $HI, where the envelope will change very quickly. The speeds are given below:", "[0-4]: x0, x0.01, x0.02, x0.03, x0.04,", "[5-9]: x0.05, x0.06, x0.07, x0.08, x0.09,", "[10-14]: x0.1, x0.2, x0.25, x0.3, x0.33,", "[15-19]: x0.4, x0.5, x0.6, x0.6667, x0.7,", "[20-24]: x0.75, x0.8, x0.9, x1, x1.25,", "[25-29]: x1.3333, x1.5, x1.6667, x1.75, x2,", "[30-34]: x2.25, x2.5, x2.75, x3, x3.5,", "[35-39]: x4, x4.5, x5, x5.5, x6,", "[40-44]: x6.5, x7, x7.5, x8, x8.5,", "[45-49]: x9, x9.5, x10, x11, x12", "[50-54]: x13, x14, x15, x16, x17", "[55-59]: x18, x19, x20, x24, x32", "[60-63]: x40, x64, x128, x256", "[OVERWRITING] [$LO - $HI]"] },
         { name: "invert wave",
@@ -1442,6 +1454,25 @@ var beepbox = (function (exports) {
             maxRawVol: 1, newNoteVol: 1, forSong: false, convertRealFactor: 0, associatedEffect: 15,
             promptName: "Invert Wave",
             promptDesc: ["Allows you to toggle the Invert Wave effect on instruments. Value must be exactly 1 for this to take effect.", "[$LO - $HI]"] },
+        { name: "granular",
+            pianoName: "Granular",
+            maxRawVol: Config.granularRange, newNoteVol: 0, forSong: false, convertRealFactor: 0, associatedEffect: 16,
+            promptName: "Granular",
+            promptDesc: ["This setting controls the granular effect in your instrument.", "[OVERWRITING] [$LO - $HI]"] },
+        { name: "grain freq",
+            pianoName: "Grain #",
+            maxRawVol: Config.grainAmountsMax, newNoteVol: 8, forSong: false, convertRealFactor: 0, associatedEffect: 16,
+            promptName: "Grain Count",
+            promptDesc: ["This setting controls the density of grains for the granular effect on your instrument.", "[OVERWRITING] [$LO - $HI]"] },
+        { name: "grain size",
+            pianoName: "Grain Size",
+            maxRawVol: Config.grainSizeMax / Config.grainSizeStep, newNoteVol: Config.grainSizeMin / Config.grainSizeStep, forSong: false, convertRealFactor: 0, associatedEffect: 16,
+            promptName: "Grain Size", promptDesc: ["This setting controls the grain size of the granular effect in your instrument.", "The number shown in the mod channel is multiplied by " + Config.grainSizeStep + " to get the actual grain size.", "[OVERWRITING] [$LO - $HI]"] },
+        { name: "grain range",
+            pianoName: "Grain Range",
+            maxRawVol: Config.grainRangeMax / Config.grainSizeStep, newNoteVol: 0, forSong: false, convertRealFactor: 0, associatedEffect: 16,
+            promptName: "Grain Range",
+            promptDesc: ["This setting controls the range of values for your grain size of the granular effect in your instrument, from no variation to a lot", "The number shown in the mod channel is multiplied by " + Config.grainSizeStep + " to get the actual grain size.", "[OVERWRITING] [$LO - $HI]"] },
     ]);
     function centerWave(wave) {
         let sum = 0.0;
@@ -1774,6 +1805,9 @@ var beepbox = (function (exports) {
     function effectsIncludeInvertWave(effects) {
         return (effects & (1 << 15)) != 0;
     }
+    function effectsIncludeGranular(effects) {
+        return (effects & (1 << 16)) != 0;
+    }
     function rawChipToIntegrated(raw) {
         const newArray = new Array(raw.length);
         const dictionary = {};
@@ -1828,7 +1862,7 @@ var beepbox = (function (exports) {
             return (_a = EditorConfig.presetCategories[0].presets.dictionary) === null || _a === void 0 ? void 0 : _a[TypePresets === null || TypePresets === void 0 ? void 0 : TypePresets[instrument]];
         }
     }
-    EditorConfig.version = "1.6.1";
+    EditorConfig.version = "1.7";
     EditorConfig.versionDisplayName = "AbyssBox " + EditorConfig.version;
     EditorConfig.releaseNotesURL = "./patch_notes.html";
     EditorConfig.isOnMac = /^Mac/i.test(navigator.platform) || /Mac OS X/i.test(navigator.userAgent) || /^(iPhone|iPad|iPod)/i.test(navigator.platform) || /(iPhone|iPad|iPod)/i.test(navigator.userAgent);
@@ -15496,17 +15530,43 @@ var beepbox = (function (exports) {
 	`,
         "ultrabox dark": `
 		:root {
-		/*--mod-title: #CCCCCC;*/
+		--page-margin: black;
+		--editor-background: black;
+		--secondary-text: #999;
+		--inverted-text: black;
+		--text-selection: rgba(119,68,255,0.99);
+		--box-selection-fill: rgba(255,255,255,0.2);
+		--ui-widget-background: #444;
+		--ui-widget-focus: #777;
+		--pitch-background: #444;
+		--tonic: #864;
+		--fifth-note: #468;
+		--third-note: #486;
+		--use-color-formula: false;
+		--track-editor-bg-pitch: #444;
+		--track-editor-bg-pitch-dim: #333;
+		--track-editor-bg-noise: #444;
+		--track-editor-bg-noise-dim: #333;
+		--track-editor-bg-mod: #234;
+		--track-editor-bg-mod-dim: #123;
+		--multiplicative-mod-slider: #456;
+		--overwriting-mod-slider: #654;
+		--indicator-primary: #74f;
+		--indicator-secondary: #444;
+		--select2-opt-group: #585858;
+		--input-box-outline: #333;
+		--mute-button-normal: #ffa033;
+		--mute-button-mod: #9a6bff;
+        --mod-title: #CCCCCC;
 		--loop-accent: #CCCCCC;
 		--playhead: #CCCCCC;
-		/*--primary-text: #CCCCCC;
-		--hover-preview: #CCCCCC;*/
+		--primary-text: #CCCCCC;
+		--hover-preview: #CCCCCC;
 		--link-accent: #FF8EC5;
 		--indicator-primary: #FF8EC5;
-		/*--indicator-primary: #CCCCCC;*/
-		/*--indicator-secondary: #E856B2;*/
+		--indicator-secondary: #E856B2;
 		--white-piano-key: #CCCCCC;
-		/*--black-piano-key: #444;*/
+		--black-piano-key: #444;
 		--text-selection: #932253;
 		--oscilloscope-line-L: #CCCCCC;
 		--oscilloscope-line-R: #932253;
@@ -15543,6 +15603,47 @@ var beepbox = (function (exports) {
 		--pitch8-primary-channel:   #FF60A5;
 		--pitch8-secondary-note:    #8E1C4E;
 		--pitch8-primary-note:      #FF8EC5;
+        --noise1-secondary-channel: #6F6F6F;
+		--noise1-primary-channel:   #AAAAAA;
+		--noise1-secondary-note:    #A7A7A7;
+		--noise1-primary-note:      #E0E0E0;
+		--noise2-secondary-channel: #996633;
+		--noise2-primary-channel:   #DDAA77;
+		--noise2-secondary-note:    #CC9966;
+		--noise2-primary-note:      #F0D0BB;
+		--noise3-secondary-channel: #4A6D8F;
+		--noise3-primary-channel:   #77AADD;
+		--noise3-secondary-note:    #6F9FCF;
+		--noise3-primary-note:      #BBD7FF;
+		--noise4-secondary-channel: #7A4F9A;
+		--noise4-primary-channel:   #AF82D2;
+		--noise4-secondary-note:    #9E71C1;
+		--noise4-primary-note:      #D4C1EA;
+		--noise5-secondary-channel: #607837;
+		--noise5-primary-channel:   #A2BB77;
+		--noise5-secondary-note:    #91AA66;
+		--noise5-primary-note:      #C5E2B2;
+        --mod1-secondary-channel:   #339955;
+		--mod1-primary-channel:     #77fc55;
+		--mod1-secondary-note:      #77ff8a;
+		--mod1-primary-note:        #cdffee;
+		--mod2-secondary-channel:   #993355;
+		--mod2-primary-channel:     #f04960;
+		--mod2-secondary-note:      #f057a0;
+		--mod2-primary-note:        #ffb8de;
+		--mod3-secondary-channel:   #553399;
+		--mod3-primary-channel:     #8855fc;
+		--mod3-secondary-note:      #aa64ff;
+		--mod3-primary-note:	    #f8ddff;
+		--mod4-secondary-channel:   #a86436;
+		--mod4-primary-channel:     #c8a825;
+		--mod4-secondary-note:      #e8ba46;
+		--mod4-primary-note:        #fff6d3;
+		--mod-label-primary:        #999;
+		--mod-label-secondary-text: #333;
+		--mod-label-primary-text:   black;
+		--disabled-note-primary:    #999;
+		--disabled-note-secondary:  #666;
 		}`,
         "modbox classic": `
 			:root {
@@ -21917,6 +22018,263 @@ var beepbox = (function (exports) {
 					
 				}
 			`,
+        "lemmbox dark": `
+					:root {
+					--page-margin: #020009;
+					--editor-background: #020009;
+					--hover-preview: white;
+					--playhead: white;
+					--primary-text: white;
+					--secondary-text: white;
+					--inverted-text: black;
+					--text-selection: #c2a855;
+					--box-selection-fill: rgba(255, 255, 255, 0.2);
+					--loop-accent: #fff570;
+					--link-accent: #fff570;
+					--ui-widget-background: #191721;
+					--ui-widget-focus: #2d293b;
+					--pitch-background: #443d4a;
+					--tonic: #c2a855;
+					--fifth-note: #a0cd7c;
+					--third-note: #486;
+					--white-piano-key: #bbb;
+					--black-piano-key: #444;
+					--white-piano-key-text: #131200;
+					--black-piano-key-text: #fff;
+					--use-color-formula: false;
+					--pitch-channel-limit: 10;
+					--track-editor-bg-pitch: #444;
+					--track-editor-bg-pitch-dim: #333;
+					--track-editor-bg-noise: #444;
+					--track-editor-bg-noise-dim: #333;
+					--track-editor-bg-mod: #234;
+					--track-editor-bg-mod-dim: #123;
+					--multiplicative-mod-slider: #456;
+					--overwriting-mod-slider: #654;
+					--indicator-primary: #6a38ff;
+					--indicator-secondary: #444;
+					--select2-opt-group: #585858;
+					--input-box-outline: #403b4f;
+					--mute-button-normal: #ffa033;
+					--mute-button-mod: #8066cc;
+
+					--pitch1-secondary-channel: #e64951;
+					--pitch1-primary-channel: #f0565e;
+					--pitch1-secondary-note: #f34149;
+					--pitch1-primary-note: #f99ca9;
+
+					--pitch2-secondary-channel: #de6f2f;
+					--pitch2-primary-channel: #f18e55;
+					--pitch2-secondary-note: #ef7d3b;
+					--pitch2-primary-note: #f6ad92;
+
+					--pitch3-secondary-channel: #e1d30e;
+					--pitch3-primary-channel: #faec29;
+					--pitch3-secondary-note: #d9cd23;
+					--pitch3-primary-note: #fff570;
+
+					--pitch4-secondary-channel: #78c25a;
+					--pitch4-primary-channel: #85d947;
+					--pitch4-secondary-note: #8de02d;
+					--pitch4-primary-note: #bdff70;
+
+					--pitch5-secondary-channel: #2190eb;
+					--pitch5-primary-channel: #45a5f5;
+					--pitch5-secondary-note: #399bea;
+					--pitch5-primary-note: #70bfff;
+
+					--pitch6-secondary-channel: #7e3af2;
+					--pitch6-primary-channel: #8b4df7;
+					--pitch6-secondary-note: #752fed;
+					--pitch6-primary-note: #965cfa;
+
+					--pitch7-secondary-channel: #7e05f7;
+					--pitch7-primary-channel: #922df7;
+					--pitch7-secondary-note: #7c29cf;
+					--pitch7-primary-note: #9443e6;
+
+					--pitch8-secondary-channel: #94249e;
+					--pitch8-primary-channel: #cf2cde;
+					--pitch8-secondary-note: #b326bf;
+					--pitch8-primary-note: #c53fd1;
+
+					--pitch9-secondary-channel: #c42f6b;
+					--pitch9-primary-channel: #fc5d9d;
+					--pitch9-secondary-note: #cf3b77;   
+					--pitch9-primary-note: #e36f9e;
+
+					--pitch10-secondary-channel: #d53c5e;
+					--pitch10-primary-channel: #f65a7e;
+					--pitch10-secondary-note: #e13e60;
+					--pitch10-primary-note: #ed8090;
+
+					--noise1-secondary-channel: #6F6F6F;
+					--noise1-primary-channel: #AAAAAA;
+					--noise1-secondary-note: #A7A7A7;
+					--noise1-primary-note: #E0E0E0;
+
+					--noise2-secondary-channel: #996633;
+					--noise2-primary-channel: #DDAA77;
+					--noise2-secondary-note: #CC9966;
+					--noise2-primary-note: #F0D0BB;
+
+					--noise3-secondary-channel: #4A6D8F;
+					--noise3-primary-channel: #77AADD;
+					--noise3-secondary-note: #6F9FCF;
+					--noise3-primary-note: #BBD7FF;
+
+					--noise4-secondary-channel: #7A4F9A;
+					--noise4-primary-channel: #AF82D2;
+					--noise4-secondary-note: #9E71C1;
+					--noise4-primary-note: #D4C1EA;
+
+					--noise5-secondary-channel: #607837;
+					--noise5-primary-channel: #A2BB77;
+					--noise5-secondary-note: #91AA66;
+					--noise5-primary-note: #C5E2B2;
+
+					--mod1-secondary-channel: #339955;
+					--mod1-primary-channel: #77fc55;
+					--mod1-secondary-note: #77ff8a;
+					--mod1-primary-note: #cdffee;
+
+					--mod2-secondary-channel: #993355;
+					--mod2-primary-channel: #f04960;
+					--mod2-secondary-note: #f057a0;
+					--mod2-primary-note: #ffb8de;
+
+					--mod3-secondary-channel: #553399;
+					--mod3-primary-channel: #8855fc;
+					--mod3-secondary-note: #aa64ff;
+					--mod3-primary-note: #f8ddff;
+
+					--mod4-secondary-channel: #a86436;
+					--mod4-primary-channel: #c8a825;
+					--mod4-secondary-note: #e8ba46;
+					--mod4-primary-note: #fff6d3;
+
+					--mod-label-primary: #999;
+					--mod-label-secondary-text: #333;
+					--mod-label-primary-text: black;
+					--disabled-note-primary: #999;
+					--disabled-note-secondary: #666;
+					
+					--pitch1-background: #777;
+				}
+				`,
+        "slarmoosbox": `
+		:root {
+			--page-margin: #14051a;
+			--editor-background: #14051a;
+			--playhead: rgba(255, 255, 255, 0.9);
+			--primary-text: #71eee5;
+			--secondary-text: #3abbb2;
+			--inverted-text: #13695e;
+			--box-selection-fill: #36c71c;
+			--loop-accent: #36c71c;
+			--link-accent: white;
+			--ui-widget-background: #183d05;
+			--ui-widget-focus: #247d0d;
+			--pitch-background: #2e0e51;
+			--tonic: #247d0d;
+			--fifth-note: #3abbb2;
+			--white-piano-key: #ffffff;
+			--black-piano-key: #061705;
+			--white-piano-key-text: #061705;
+			--use-color-formula: true;
+			--track-editor-bg-pitch: #09382b;
+			--track-editor-bg-pitch-dim: #14051a;
+			--track-editor-bg-noise: #40400b;
+			--track-editor-bg-noise-dim: #14051a;
+			--track-editor-bg-mod: #0a2c08;
+			--track-editor-bg-mod-dim: #14051a;
+			--multiplicative-mod-slider: #3abb22;
+			--overwriting-mod-slider: #71eee5;
+			--indicator-primary: #a773e5;
+			--indicator-secondary: #4c1c89;
+			--select2-opt-group: #183d05;
+			--input-box-outline: #18040a;
+			--mute-button-normal: #36c71c;
+			--mute-button-mod: #a773e5;
+			--mod-label-primary: #a773e5;
+			--mod-label-secondary-text: #6b29bf;
+			--mod-label-primary-text: #14051a;
+			--mod-title: #247d1d;
+			--pitch-secondary-channel-hue: 100;
+			--pitch-secondary-channel-hue-scale: 6.1;
+			--pitch-secondary-channel-sat: 100.0;
+			--pitch-secondary-channel-sat-scale: 0.15;
+			--pitch-secondary-channel-lum: 60.0;
+			--pitch-secondary-channel-lum-scale: 0.05;
+			--pitch-primary-channel-hue: 100;
+			--pitch-primary-channel-hue-scale: 6.1;
+			--pitch-primary-channel-sat: 100;
+			--pitch-primary-channel-sat-scale: 0.15;
+			--pitch-primary-channel-lum: 75.0;
+			--pitch-primary-channel-lum-scale: 0.05;
+			--pitch-secondary-note-hue: 100;
+			--pitch-secondary-note-hue-scale: 6.1;
+			--pitch-secondary-note-sat: 95.0;
+			--pitch-secondary-note-sat-scale: 0.15;
+			--pitch-secondary-note-lum: 40;
+			--pitch-secondary-note-lum-scale: 0.05;
+			--pitch-primary-note-hue: 100;
+			--pitch-primary-note-hue-scale: 6.1;
+			--pitch-primary-note-sat: 100;
+			--pitch-primary-note-sat-scale: 0.15;
+			--pitch-primary-note-lum: 85.6;
+			--pitch-primary-note-lum-scale: 0.025;
+			--noise-secondary-channel-hue: 65;
+			--noise-secondary-channel-hue-scale: 2;
+			--noise-secondary-channel-sat: 55;
+			--noise-secondary-channel-sat-scale: 0;
+			--noise-secondary-channel-lum: 42;
+			--noise-secondary-channel-lum-scale: 0;
+			--noise-primary-channel-hue: 65;
+			--noise-primary-channel-hue-scale: 2;
+			--noise-primary-channel-sat: 66;
+			--noise-primary-channel-sat-scale: 0;
+			--noise-primary-channel-lum: 63.5;
+			--noise-primary-channel-lum-scale: 0;
+			--noise-secondary-note-hue: 65;
+			--noise-secondary-note-hue-scale: 2;
+			--noise-secondary-note-sat: 66;
+			--noise-secondary-note-sat-scale: 0;
+			--noise-secondary-note-lum: 55;
+			--noise-secondary-note-lum-scale: 0;
+			--noise-primary-note-hue: 65;
+			--noise-primary-note-hue-scale: 2;
+			--noise-primary-note-sat: 70;
+			--noise-primary-note-sat-scale: 0;
+			--noise-primary-note-lum: 74;
+			--noise-primary-note-lum-scale: 0;
+			--mod-secondary-channel-hue: 192;
+			--mod-secondary-channel-hue-scale: 1.5;
+			--mod-secondary-channel-sat: 88;
+			--mod-secondary-channel-sat-scale: 0;
+			--mod-secondary-channel-lum: 50;
+			--mod-secondary-channel-lum-scale: 0;
+			--mod-primary-channel-hue: 192;
+			--mod-primary-channel-hue-scale: 1.5;
+			--mod-primary-channel-sat: 96;
+			--mod-primary-channel-sat-scale: 0;
+			--mod-primary-channel-lum: 80;
+			--mod-primary-channel-lum-scale: 0;
+			--mod-secondary-note-hue: 192;
+			--mod-secondary-note-hue-scale: 1.5;
+			--mod-secondary-note-sat: 92;
+			--mod-secondary-note-sat-scale: 0;
+			--mod-secondary-note-lum: 45;
+			--mod-secondary-note-lum-scale: 0;
+			--mod-primary-note-hue: 192;
+			--mod-primary-note-hue-scale: 1.5;
+			--mod-primary-note-sat: 96;
+			--mod-primary-note-sat-scale: 0;
+			--mod-primary-note-lum: 85;
+			--mod-primary-note-lum-scale: 0;
+			--oscilloscope-line-R: white;
+			--oscilloscope-line-L: var(--secondary-text);
+		}`,
         "wackybox": `
 			:root {
 				--page-margin: black;
@@ -27642,6 +28000,50 @@ li.select2-results__option[role=group] > strong:hover {
             return wave;
         }
     }
+    class Grain {
+        constructor() {
+            this.delayLinePosition = 0;
+            this.ageInSamples = 0;
+            this.maxAgeInSamples = 0;
+            this.delay = 0;
+            this.parabolicEnvelopeAmplitude = 0;
+            this.parabolicEnvelopeSlope = 0;
+            this.parabolicEnvelopeCurve = 0;
+            this.rcbEnvelopeAmplitude = 0;
+            this.rcbEnvelopeAttackIndex = 0;
+            this.rcbEnvelopeReleaseIndex = 0;
+            this.rcbEnvelopeSustain = 0;
+        }
+        initializeParabolicEnvelope(durationInSamples, amplitude) {
+            this.parabolicEnvelopeAmplitude = 0;
+            if (durationInSamples == 0)
+                durationInSamples++;
+            const invDuration = 1.0 / durationInSamples;
+            const invDurationSquared = invDuration * invDuration;
+            this.parabolicEnvelopeSlope = 4.0 * amplitude * (invDuration - invDurationSquared);
+            this.parabolicEnvelopeCurve = -8.0 * amplitude * invDurationSquared;
+        }
+        updateParabolicEnvelope() {
+            this.parabolicEnvelopeAmplitude += this.parabolicEnvelopeSlope;
+            this.parabolicEnvelopeSlope += this.parabolicEnvelopeCurve;
+        }
+        initializeRCBEnvelope(durationInSamples, amplitude) {
+            this.rcbEnvelopeAttackIndex = Math.floor(durationInSamples / 6);
+            this.rcbEnvelopeSustain = amplitude;
+            this.rcbEnvelopeReleaseIndex = Math.floor(durationInSamples * 5 / 6);
+        }
+        updateRCBEnvelope() {
+            if (this.ageInSamples < this.rcbEnvelopeAttackIndex) {
+                this.rcbEnvelopeAmplitude = (1.0 + Math.cos(Math.PI + (Math.PI * (this.ageInSamples / this.rcbEnvelopeAttackIndex) * (this.rcbEnvelopeSustain / 2.0))));
+            }
+            else if (this.ageInSamples > this.rcbEnvelopeReleaseIndex) {
+                this.rcbEnvelopeAmplitude = (1.0 + Math.cos(Math.PI * ((this.ageInSamples - this.rcbEnvelopeReleaseIndex) / this.rcbEnvelopeAttackIndex)) * (this.rcbEnvelopeSustain / 2.0));
+            }
+        }
+        addDelay(delay) {
+            this.delay = delay;
+        }
+    }
     class FilterControlPoint {
         constructor() {
             this.freq = 0;
@@ -28034,6 +28436,10 @@ li.select2-results__option[role=group] > strong:hover {
             this.rmHzOffset = 200;
             this.bitcrusherFreq = 0;
             this.bitcrusherQuantization = 0;
+            this.granular = 4;
+            this.grainSize = (Config.grainSizeMax - Config.grainSizeMin) / Config.grainSizeStep;
+            this.grainAmounts = Config.grainAmountsMax;
+            this.grainRange = 40;
             this.chorus = 0;
             this.reverb = 0;
             this.echoSustain = 0;
@@ -28126,6 +28532,10 @@ li.select2-results__option[role=group] > strong:hover {
             this.rmPulseWidth = 0;
             this.rmWaveformIndex = 0;
             this.rmHzOffset = 200;
+            this.granular = 4;
+            this.grainSize = (Config.grainSizeMax - Config.grainSizeMin) / Config.grainSizeStep;
+            this.grainAmounts = Config.grainAmountsMax;
+            this.grainRange = 40;
             this.phaserFreq = 0;
             this.phaserFeedback = 0;
             this.phaserStages = 2;
@@ -28427,6 +28837,12 @@ li.select2-results__option[role=group] > strong:hover {
                         instrumentObject["noteSubFilters" + i] = this.noteSubFilters[i].toJsonObject();
                 }
             }
+            if (effectsIncludeGranular(this.effects)) {
+                instrumentObject["granular"] = this.granular;
+                instrumentObject["grainSize"] = this.grainSize;
+                instrumentObject["grainAmounts"] = this.grainAmounts;
+                instrumentObject["grainRange"] = this.grainRange;
+            }
             if (effectsIncludeDistortion(this.effects)) {
                 instrumentObject["distortion"] = Math.round(100 * this.distortion / (Config.distortionRange - 1));
                 instrumentObject["aliases"] = this.aliases;
@@ -28654,7 +29070,7 @@ li.select2-results__option[role=group] > strong:hover {
                 for (let i = 0; i < instrumentObject["effects"].length; i++) {
                     effects = effects | (1 << Config.effectNames.indexOf(instrumentObject["effects"][i]));
                 }
-                this.effects = (effects & ((1 << 16) - 1));
+                this.effects = (effects & ((1 << 17) - 1));
             }
             else {
                 const legacyEffectsNames = ["none", "reverb", "chorus", "chorus & reverb"];
@@ -28825,6 +29241,18 @@ li.select2-results__option[role=group] > strong:hover {
             }
             else if (instrumentObject["detuneCents"] == undefined) {
                 this.detune = Config.detuneCenter;
+            }
+            if (instrumentObject["granular"] != undefined) {
+                this.granular = instrumentObject["granular"];
+            }
+            if (instrumentObject["grainSize"] != undefined) {
+                this.grainSize = instrumentObject["grainSize"];
+            }
+            if (instrumentObject["grainAmounts"] != undefined) {
+                this.grainAmounts = instrumentObject["grainAmounts"];
+            }
+            if (instrumentObject["grainRange"] != undefined) {
+                this.grainRange = clamp(0, Config.grainRangeMax / Config.grainSizeStep + 1, instrumentObject["grainRange"]);
             }
             if (instrumentObject["distortion"] != undefined) {
                 this.distortion = clamp(0, Config.distortionRange, Math.round((Config.distortionRange - 1) * (instrumentObject["distortion"] | 0) / 100));
@@ -29779,6 +30207,12 @@ li.select2-results__option[role=group] > strong:hover {
                     }
                     if (effectsIncludeReverb(instrument.effects)) {
                         buffer.push(base64IntToCharCode[instrument.reverb]);
+                    }
+                    if (effectsIncludeGranular(instrument.effects)) {
+                        buffer.push(base64IntToCharCode[instrument.granular]);
+                        buffer.push(base64IntToCharCode[instrument.grainSize]);
+                        buffer.push(base64IntToCharCode[instrument.grainAmounts]);
+                        buffer.push(base64IntToCharCode[instrument.grainRange]);
                     }
                     if (effectsIncludeNoteRange(instrument.effects)) {
                         buffer.push(base64IntToCharCode[instrument.upperNoteLimit >> 6], base64IntToCharCode[instrument.upperNoteLimit & 0x3f]);
@@ -31216,7 +31650,7 @@ li.select2-results__option[role=group] > strong:hover {
                         {
                             const instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                             if ((beforeNine && fromBeepBox) || ((fromJummBox && beforeFive) || (beforeFour && fromGoldBox))) {
-                                instrument.effects = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] & ((1 << 16) - 1));
+                                instrument.effects = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] & ((1 << 17) - 1));
                                 if (legacyGlobalReverb == 0 && !((fromJummBox && beforeFive) || (beforeFour && fromGoldBox))) {
                                     instrument.effects &= ~(1 << 0);
                                 }
@@ -31404,12 +31838,18 @@ li.select2-results__option[role=group] > strong:hover {
                                         instrument.reverb = clamp(0, Config.reverbRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                                     }
                                 }
+                                if (effectsIncludeGranular(instrument.effects)) {
+                                    instrument.granular = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                                    instrument.grainSize = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                                    instrument.grainAmounts = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                                    instrument.grainRange = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                                }
                                 if (effectsIncludeNoteRange(instrument.effects)) {
                                     instrument.upperNoteLimit = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) + base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                                     instrument.lowerNoteLimit = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) + base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                                 }
                             }
-                            instrument.effects &= (1 << 16) - 1;
+                            instrument.effects &= (1 << 17) - 1;
                         }
                         break;
                     case 118:
@@ -31940,7 +32380,7 @@ li.select2-results__option[role=group] > strong:hover {
                                                     songReverbIndex = mod;
                                                 }
                                             }
-                                            if (jumfive && Config.modulators[instrument.modulators[mod]].associatedEffect != 16) {
+                                            if (jumfive && Config.modulators[instrument.modulators[mod]].associatedEffect != 17) {
                                                 this.channels[instrument.modChannels[mod]].instruments[instrument.modInstruments[mod]].effects |= 1 << Config.modulators[instrument.modulators[mod]].associatedEffect;
                                             }
                                         }
@@ -33379,7 +33819,7 @@ li.select2-results__option[role=group] > strong:hover {
             this._modifiedEnvelopeIndices = [];
             this._modifiedEnvelopeCount = 0;
             this.lowpassCutoffDecayVolumeCompensation = 1.0;
-            const length = 56;
+            const length = 60;
             for (let i = 0; i < length; i++) {
                 this.envelopeStarts[i] = 1.0;
                 this.envelopeEnds[i] = 1.0;
@@ -33770,6 +34210,14 @@ li.select2-results__option[role=group] > strong:hover {
             this.mixVolumeDelta = 0.0;
             this.delayInputMult = 0.0;
             this.delayInputMultDelta = 0.0;
+            this.granularMix = 1.0;
+            this.granularMixDelta = 0.0;
+            this.granularDelayLine = null;
+            this.granularDelayLineIndex = 0;
+            this.granularMaximumDelayTimeInSeconds = 1;
+            this.usesRandomGrainLocation = true;
+            this.granularDelayLineDirty = false;
+            this.computeGrains = true;
             this.distortion = 0.0;
             this.distortionDelta = 0.0;
             this.distortionDrive = 0.0;
@@ -33870,6 +34318,12 @@ li.select2-results__option[role=group] > strong:hover {
             for (let i = 0; i < Config.drumCount; i++) {
                 this.drumsetSpectrumWaves[i] = new SpectrumWaveState();
             }
+            this.granularGrains = [];
+            this.granularMaximumGrains = 256;
+            for (let i = 0; i < this.granularMaximumGrains; i++) {
+                this.granularGrains.push(new Grain());
+            }
+            this.granularGrainsLength = 0;
         }
         allocateNecessaryBuffers(synth, instrument, samplesPerTick) {
             if (effectsIncludePanning(instrument.effects)) {
@@ -33915,6 +34369,25 @@ li.select2-results__option[role=group] > strong:hover {
                 if (this.phaserSamples == null) {
                     this.phaserSamples = new Float32Array(Config.phaserMaxStages);
                     this.phaserPrevInputs = new Float32Array(Config.phaserMaxStages);
+                }
+            }
+            if (effectsIncludeGranular(instrument.effects)) {
+                const granularDelayLineSizeInMilliseconds = 2500;
+                const granularDelayLineSizeInSeconds = granularDelayLineSizeInMilliseconds / 1000;
+                this.granularMaximumDelayTimeInSeconds = granularDelayLineSizeInSeconds;
+                const granularDelayLineSizeInSamples = Synth.fittingPowerOfTwo(Math.floor(granularDelayLineSizeInSeconds * synth.samplesPerSecond));
+                if (this.granularDelayLine == null || this.granularDelayLine.length != granularDelayLineSizeInSamples) {
+                    this.granularDelayLine = new Float32Array(granularDelayLineSizeInSamples);
+                    this.granularDelayLineIndex = 0;
+                }
+                const oldGrainsLength = this.granularGrains.length;
+                if (this.granularMaximumGrains > oldGrainsLength) {
+                    for (let i = oldGrainsLength; i < this.granularMaximumGrains + 1; i++) {
+                        this.granularGrains.push(new Grain());
+                    }
+                }
+                if (this.granularMaximumGrains < this.granularGrainsLength) {
+                    this.granularGrainsLength = Math.round(this.granularMaximumGrains);
                 }
             }
         }
@@ -33988,6 +34461,10 @@ li.select2-results__option[role=group] > strong:hover {
                 for (let i = 0; i < this.reverbDelayLine.length; i++)
                     this.reverbDelayLine[i] = 0.0;
             }
+            if (this.granularDelayLineDirty) {
+                for (let i = 0; i < this.granularDelayLine.length; i++)
+                    this.granularDelayLine[i] = 0.0;
+            }
             this.chorusPhase = 0.0;
             this.ringModPhase = 0.0;
         }
@@ -34037,11 +34514,70 @@ li.select2-results__option[role=group] > strong:hover {
             const usesReverb = effectsIncludeReverb(this.effects);
             const usesRingModulation = effectsIncludeRM(this.effects);
             const usesPhaser = effectsIncludePhaser(this.effects);
+            const usesGranular = effectsIncludeGranular(this.effects);
+            let granularChance = 0;
+            if (usesGranular) {
+                granularChance = (instrument.grainAmounts + 1);
+                this.granularMaximumGrains = instrument.grainAmounts;
+                if (synth.isModActive(Config.modulators.dictionary["grain freq"].index, channelIndex, instrumentIndex)) {
+                    this.granularMaximumGrains = synth.getModValue(Config.modulators.dictionary["grain freq"].index, channelIndex, instrumentIndex, false);
+                    granularChance = (synth.getModValue(Config.modulators.dictionary["grain freq"].index, channelIndex, instrumentIndex, false) + 1);
+                }
+                this.granularMaximumGrains = Math.floor(Math.pow(2, this.granularMaximumGrains * envelopeStarts[49]));
+                granularChance = granularChance * envelopeStarts[49];
+            }
+            this.allocateNecessaryBuffers(synth, instrument, samplesPerTick);
+            if (usesGranular) {
+                this.granularMix = instrument.granular / Config.granularRange;
+                this.computeGrains = true;
+                let granularMixEnd = this.granularMix;
+                if (synth.isModActive(Config.modulators.dictionary["granular"].index, channelIndex, instrumentIndex)) {
+                    this.granularMix = synth.getModValue(Config.modulators.dictionary["granular"].index, channelIndex, instrumentIndex, false) / Config.granularRange;
+                    granularMixEnd = synth.getModValue(Config.modulators.dictionary["granular"].index, channelIndex, instrumentIndex, true) / Config.granularRange;
+                }
+                this.granularMix *= envelopeStarts[48];
+                granularMixEnd *= envelopeEnds[48];
+                this.granularMixDelta = (granularMixEnd - this.granularMix) / roundedSamplesPerTick;
+                for (let iterations = 0; iterations < Math.ceil(Math.random() * Math.random() * 10); iterations++) {
+                    if (this.granularGrainsLength < this.granularMaximumGrains && Math.random() <= granularChance) {
+                        let granularMinGrainSizeInMilliseconds = instrument.grainSize;
+                        if (synth.isModActive(Config.modulators.dictionary["grain size"].index, channelIndex, instrumentIndex)) {
+                            granularMinGrainSizeInMilliseconds = synth.getModValue(Config.modulators.dictionary["grain size"].index, channelIndex, instrumentIndex, false);
+                        }
+                        granularMinGrainSizeInMilliseconds *= envelopeStarts[50];
+                        let grainRange = instrument.grainRange;
+                        if (synth.isModActive(Config.modulators.dictionary["grain range"].index, channelIndex, instrumentIndex)) {
+                            grainRange = synth.getModValue(Config.modulators.dictionary["grain range"].index, channelIndex, instrumentIndex, false);
+                        }
+                        grainRange *= envelopeStarts[51];
+                        const granularMaxGrainSizeInMilliseconds = granularMinGrainSizeInMilliseconds + grainRange;
+                        const granularGrainSizeInMilliseconds = granularMinGrainSizeInMilliseconds + (granularMaxGrainSizeInMilliseconds - granularMinGrainSizeInMilliseconds) * Math.random();
+                        const granularGrainSizeInSeconds = granularGrainSizeInMilliseconds / 1000.0;
+                        const granularGrainSizeInSamples = Math.floor(granularGrainSizeInSeconds * samplesPerSecond);
+                        const granularDelayLineLength = this.granularDelayLine.length;
+                        const grainIndex = this.granularGrainsLength;
+                        this.granularGrainsLength++;
+                        const grain = this.granularGrains[grainIndex];
+                        grain.ageInSamples = 0;
+                        grain.maxAgeInSamples = granularGrainSizeInSamples;
+                        const minDelayTimeInSeconds = 0.02;
+                        const maxDelayTimeInSeconds = 2.4;
+                        grain.delayLinePosition = this.usesRandomGrainLocation ? (minDelayTimeInSeconds + (maxDelayTimeInSeconds - minDelayTimeInSeconds) * Math.random() * Math.random() * samplesPerSecond) % (granularDelayLineLength - 1) : minDelayTimeInSeconds;
+                        if (Config.granularEnvelopeType == 0) {
+                            grain.initializeParabolicEnvelope(grain.maxAgeInSamples, 1.0);
+                        }
+                        else if (Config.granularEnvelopeType == 1) {
+                            grain.initializeRCBEnvelope(grain.maxAgeInSamples, 1.0);
+                        }
+                        grain.addDelay(Math.random() * samplesPerTick * 4);
+                    }
+                }
+            }
             if (usesDistortion) {
                 let useDistortionStart = instrument.distortion;
                 let useDistortionEnd = instrument.distortion;
-                let useDistortionEnvelopeStart = envelopeStarts[48];
-                let useDistortionEnvelopeEnd = envelopeEnds[48];
+                let useDistortionEnvelopeStart = envelopeStarts[52];
+                let useDistortionEnvelopeEnd = envelopeEnds[52];
                 if (synth.isModActive(Config.modulators.dictionary["distortion"].index, channelIndex, instrumentIndex)) {
                     useDistortionStart = synth.getModValue(Config.modulators.dictionary["distortion"].index, channelIndex, instrumentIndex, false);
                     useDistortionEnd = synth.getModValue(Config.modulators.dictionary["distortion"].index, channelIndex, instrumentIndex, true);
@@ -34064,16 +34600,16 @@ li.select2-results__option[role=group] > strong:hover {
             if (usesBitcrusher) {
                 let freqSettingStart = instrument.bitcrusherFreq;
                 let freqSettingEnd = instrument.bitcrusherFreq;
-                let freqSettingEnvelopeStart = envelopeStarts[50];
-                let freqSettingEnvelopeEnd = envelopeEnds[50];
+                let freqSettingEnvelopeStart = envelopeStarts[54];
+                let freqSettingEnvelopeEnd = envelopeEnds[54];
                 if (synth.isModActive(Config.modulators.dictionary["freq crush"].index, channelIndex, instrumentIndex)) {
                     freqSettingStart = synth.getModValue(Config.modulators.dictionary["freq crush"].index, channelIndex, instrumentIndex, false);
                     freqSettingEnd = synth.getModValue(Config.modulators.dictionary["freq crush"].index, channelIndex, instrumentIndex, true);
                 }
                 let quantizationSettingStart = instrument.bitcrusherQuantization;
                 let quantizationSettingEnd = instrument.bitcrusherQuantization;
-                let quantizationSettingEnvelopeStart = envelopeStarts[49];
-                let quantizationSettingEnvelopeEnd = envelopeEnds[49];
+                let quantizationSettingEnvelopeStart = envelopeStarts[53];
+                let quantizationSettingEnvelopeEnd = envelopeEnds[53];
                 if (synth.isModActive(Config.modulators.dictionary["bit crush"].index, channelIndex, instrumentIndex)) {
                     quantizationSettingStart = synth.getModValue(Config.modulators.dictionary["bit crush"].index, channelIndex, instrumentIndex, false);
                     quantizationSettingEnd = synth.getModValue(Config.modulators.dictionary["bit crush"].index, channelIndex, instrumentIndex, true);
@@ -34184,8 +34720,8 @@ li.select2-results__option[role=group] > strong:hover {
             let delayInputMultStart = 1.0;
             let delayInputMultEnd = 1.0;
             if (usesPanning) {
-                const panEnvelopeStart = envelopeStarts[54] * 2.0 - 1.0;
-                const panEnvelopeEnd = envelopeEnds[54] * 2.0 - 1.0;
+                const panEnvelopeStart = envelopeStarts[58] * 2.0 - 1.0;
+                const panEnvelopeEnd = envelopeEnds[58] * 2.0 - 1.0;
                 let usePanStart = instrument.pan;
                 let usePanEnd = instrument.pan;
                 if (synth.isModActive(Config.modulators.dictionary["pan"].index, channelIndex, instrumentIndex)) {
@@ -34225,8 +34761,8 @@ li.select2-results__option[role=group] > strong:hover {
                 this.panningOffsetDeltaR = (delayEndR - delayStartR) / roundedSamplesPerTick;
             }
             if (usesChorus) {
-                const chorusEnvelopeStart = envelopeStarts[51];
-                const chorusEnvelopeEnd = envelopeEnds[51];
+                const chorusEnvelopeStart = envelopeStarts[55];
+                const chorusEnvelopeEnd = envelopeEnds[55];
                 let useChorusStart = instrument.chorus;
                 let useChorusEnd = instrument.chorus;
                 if (synth.isModActive(Config.modulators.dictionary["chorus"].index, channelIndex, instrumentIndex)) {
@@ -34286,8 +34822,8 @@ li.select2-results__option[role=group] > strong:hover {
             let maxEchoMult = 0.0;
             let averageEchoDelaySeconds = 0.0;
             if (usesEcho) {
-                const echoSustainEnvelopeStart = envelopeStarts[52];
-                const echoSustainEnvelopeEnd = envelopeEnds[52];
+                const echoSustainEnvelopeStart = envelopeStarts[56];
+                const echoSustainEnvelopeEnd = envelopeEnds[56];
                 let useEchoSustainStart = instrument.echoSustain;
                 let useEchoSustainEnd = instrument.echoSustain;
                 if (synth.isModActive(Config.modulators.dictionary["echo"].index, channelIndex, instrumentIndex)) {
@@ -34385,8 +34921,8 @@ li.select2-results__option[role=group] > strong:hover {
                 this.phaserStagesDelta = (phaserStagesEnd - phaserStagesStart) / roundedSamplesPerTick;
             }
             if (usesReverb) {
-                const reverbEnvelopeStart = envelopeStarts[53];
-                const reverbEnvelopeEnd = envelopeEnds[53];
+                const reverbEnvelopeStart = envelopeStarts[57];
+                const reverbEnvelopeEnd = envelopeEnds[57];
                 let useReverbStart = instrument.reverb;
                 let useReverbEnd = instrument.reverb;
                 if (synth.isModActive(Config.modulators.dictionary["reverb"].index, channelIndex, instrumentIndex)) {
@@ -34441,6 +34977,9 @@ li.select2-results__option[role=group] > strong:hover {
                     const reverbDuration = halfLife * halfLifeMult;
                     delayDuration += reverbDuration;
                 }
+                if (usesGranular) {
+                    this.computeGrains = false;
+                }
                 const secondsInTick = samplesPerTick / samplesPerSecond;
                 const progressInTick = secondsInTick / delayDuration;
                 const progressAtEndOfTick = this.attentuationProgress + progressInTick;
@@ -34464,6 +35003,8 @@ li.select2-results__option[role=group] > strong:hover {
                     totalDelaySamples += this.echoDelayLineL.length;
                 if (usesReverb)
                     totalDelaySamples += Config.reverbDelayBufferSize;
+                if (usesGranular)
+                    totalDelaySamples += this.granularMaximumDelayTimeInSeconds;
                 this.flushedSamples += roundedSamplesPerTick;
                 if (this.flushedSamples >= totalDelaySamples) {
                     this.deactivateAfterThisTick = true;
@@ -34776,7 +35317,7 @@ li.select2-results__option[role=group] > strong:hover {
                     if (tgtInstrument == null)
                         continue;
                     const str = Config.modulators[instrument.modulators[mod]].name;
-                    if (!((Config.modulators[instrument.modulators[mod]].associatedEffect != 16 && !(tgtInstrument.effects & (1 << Config.modulators[instrument.modulators[mod]].associatedEffect)))
+                    if (!((Config.modulators[instrument.modulators[mod]].associatedEffect != 17 && !(tgtInstrument.effects & (1 << Config.modulators[instrument.modulators[mod]].associatedEffect)))
                         || ((tgtInstrument.type != 1 && tgtInstrument.type != 11) && (str == "fm slider 1" || str == "fm slider 2" || str == "fm slider 3" || str == "fm slider 4" || str == "fm feedback"))
                         || tgtInstrument.type != 11 && (str == "fm slider 5" || str == "fm slider 6")
                         || ((tgtInstrument.type != 6 && tgtInstrument.type != 8) && (str == "pulse width" || str == "decimal offset"))
@@ -37967,6 +38508,7 @@ li.select2-results__option[role=group] > strong:hover {
             const usesRingModulation = effectsIncludeRM(instrumentState.effects);
             const usesPhaser = effectsIncludePhaser(instrumentState.effects);
             const usesInvertWave = effectsIncludeInvertWave(instrumentState.effects) && instrumentState.invertWave;
+            const usesGranular = effectsIncludeGranular(instrumentState.effects);
             let signature = 0;
             if (usesDistortion)
                 signature = signature | 1;
@@ -37997,10 +38539,13 @@ li.select2-results__option[role=group] > strong:hover {
             signature = signature << 1;
             if (usesInvertWave)
                 signature = signature | 1;
+            signature = signature << 1;
+            if (usesGranular)
+                signature = signature | 1;
             let effectsFunction = Synth.effectsFunctionCache[signature];
             if (effectsFunction == undefined) {
                 let effectsSource = "return (synth, outputDataL, outputDataR, bufferIndex, runLength, instrumentState) => {";
-                const usesDelays = usesChorus || usesReverb || usesEcho;
+                const usesDelays = usesChorus || usesReverb || usesEcho || usesGranular;
                 effectsSource += `
 				const tempMonoInstrumentSampleBuffer = synth.tempMonoInstrumentSampleBuffer;
 				
@@ -38015,6 +38560,22 @@ li.select2-results__option[role=group] > strong:hover {
                 if (usesInvertWave) {
                     effectsSource += `
                 let isInverted = +instrumentState.invertWave;
+                `;
+                }
+                if (usesGranular) {
+                    effectsSource += `
+                let granularWet = instrumentState.granularMix;
+                const granularMixDelta = instrumentState.granularMixDelta;
+                let granularDry = 1.0 - granularWet; 
+                const granularDelayLine = instrumentState.granularDelayLine;
+                const granularGrains = instrumentState.granularGrains;
+                let granularGrainCount = instrumentState.granularGrainsLength;
+                const granularDelayLineLength = granularDelayLine.length;
+                const granularDelayLineMask = granularDelayLineLength - 1;
+                let granularDelayLineIndex = instrumentState.granularDelayLineIndex;
+                const usesRandomGrainLocation = instrumentState.usesRandomGrainLocation;
+                const computeGrains = instrumentState.computeGrains;
+                instrumentState.granularDelayLineDirty = true;
                 `;
                 }
                 if (usesDistortion) {
@@ -38221,6 +38782,81 @@ li.select2-results__option[role=group] > strong:hover {
                 if (usesInvertWave) {
                     effectsSource += `
                     sample = sample*-1;
+                `;
+                }
+                if (usesGranular) {
+                    effectsSource += `
+                let granularOutput = 0;
+                for (let grainIndex = 0; grainIndex < granularGrainCount; grainIndex++) {
+                    const grain = granularGrains[grainIndex];
+                    if(computeGrains) {
+                        if(grain.delay > 0) {
+                            grain.delay--;
+                        } else {
+                            const grainDelayLinePosition = grain.delayLinePosition;
+                            const grainDelayLinePositionInt = grainDelayLinePosition | 0;
+                            // const grainDelayLinePositionT = grainDelayLinePosition - grainDelayLinePositionInt;
+                            let grainAgeInSamples = grain.ageInSamples;
+                            const grainMaxAgeInSamples = grain.maxAgeInSamples;
+                            // const grainSample0 = granularDelayLine[((granularDelayLineIndex + (granularDelayLineLength - grainDelayLinePositionInt))    ) & granularDelayLineMask];
+                            // const grainSample1 = granularDelayLine[((granularDelayLineIndex + (granularDelayLineLength - grainDelayLinePositionInt)) + 1) & granularDelayLineMask];
+                            // let grainSample = grainSample0 + (grainSample1 - grainSample0) * grainDelayLinePositionT; // Linear interpolation (@TODO: sounds quite bad?)
+                            let grainSample = granularDelayLine[((granularDelayLineIndex + (granularDelayLineLength - grainDelayLinePositionInt))    ) & granularDelayLineMask]; // No interpolation
+                            `;
+                    if (Config.granularEnvelopeType == 0) {
+                        effectsSource += `
+                                const grainEnvelope = grain.parabolicEnvelopeAmplitude;
+                                `;
+                    }
+                    else if (Config.granularEnvelopeType == 1) {
+                        effectsSource += `
+                                const grainEnvelope = grain.rcbEnvelopeAmplitude;
+                                `;
+                    }
+                    effectsSource += `
+                            grainSample *= grainEnvelope;
+                            granularOutput += grainSample;
+                            if (grainAgeInSamples > grainMaxAgeInSamples) {
+                                if (granularGrainCount > 0) {
+                                    // Faster equivalent of .pop, ignoring the order in the array.
+                                    const lastGrainIndex = granularGrainCount - 1;
+                                    const lastGrain = granularGrains[lastGrainIndex];
+                                    granularGrains[grainIndex] = lastGrain;
+                                    granularGrains[lastGrainIndex] = grain;
+                                    granularGrainCount--;
+                                    grainIndex--;
+                                    // ^ Dangerous, since this could end up causing an infinite loop,
+                                    // but should be okay in this case.
+                                }
+                            } else {
+                                grainAgeInSamples++;
+                            `;
+                    if (Config.granularEnvelopeType == 0) {
+                        effectsSource += `
+                                    grain.parabolicEnvelopeAmplitude += grain.parabolicEnvelopeSlope;
+                                    grain.parabolicEnvelopeSlope += grain.parabolicEnvelopeCurve;
+                                    `;
+                    }
+                    else if (Config.granularEnvelopeType == 1) {
+                        effectsSource += `
+                                    grain.updateRCBEnvelope();
+                                    `;
+                    }
+                    effectsSource += `
+                                grain.ageInSamples = grainAgeInSamples;
+                                // if(usesRandomGrainLocation) {
+                                //     grain.delayLine -= grainPitchShift;
+                                // }
+                            }
+                        }
+                    }
+                }
+                granularWet += granularMixDelta;
+                granularDry -= granularMixDelta;
+                granularOutput *= Config.granularOutputLoudnessCompensation;
+                granularDelayLine[granularDelayLineIndex] = sample;
+                granularDelayLineIndex = (granularDelayLineIndex + 1) & granularDelayLineMask;
+                sample = sample * granularDry + granularOutput * granularWet;
                 `;
                 }
                 if (usesDistortion) {
@@ -38470,6 +39106,13 @@ li.select2-results__option[role=group] > strong:hover {
                     effectsSource += `
 				
 				instrumentState.delayInputMult = delayInputMult;`;
+                }
+                if (usesGranular) {
+                    effectsSource += `
+                    instrumentState.granularMix = granularWet;
+                    instrumentState.granularGrainsLength = granularGrainCount;
+                    instrumentState.granularDelayLineIndex = granularDelayLineIndex;
+                `;
                 }
                 if (usesDistortion) {
                     effectsSource += `
@@ -41577,6 +42220,44 @@ li.select2-results__option[role=group] > strong:hover {
         constructor(doc, oldValue, newValue) {
             super(doc);
             this._instrument.rmHzOffset = newValue + Config.rmHzOffsetCenter;
+            doc.notifier.changed();
+            if (oldValue != newValue)
+                this._didSomething();
+        }
+    }
+    class ChangeGranular extends ChangeInstrumentSlider {
+        constructor(doc, oldValue, newValue) {
+            super(doc);
+            this._instrument.granular = newValue;
+            doc.notifier.changed();
+            doc.synth.unsetMod(Config.modulators.dictionary["granular"].index, doc.channel, doc.getCurrentInstrument());
+            if (oldValue != newValue)
+                this._didSomething();
+        }
+    }
+    class ChangeGrainSize extends ChangeInstrumentSlider {
+        constructor(doc, oldValue, newValue) {
+            super(doc);
+            this._instrument.grainSize = newValue;
+            doc.notifier.changed();
+            doc.synth.unsetMod(Config.modulators.dictionary["grain size"].index, doc.channel, doc.getCurrentInstrument());
+            if (oldValue != newValue)
+                this._didSomething();
+        }
+    }
+    class ChangeGrainAmounts extends ChangeInstrumentSlider {
+        constructor(doc, oldValue, newValue) {
+            super(doc);
+            this._instrument.grainAmounts = newValue;
+            doc.notifier.changed();
+            if (oldValue != newValue)
+                this._didSomething();
+        }
+    }
+    class ChangeGrainRange extends ChangeInstrumentSlider {
+        constructor(doc, oldValue, newValue) {
+            super(doc);
+            this._instrument.grainRange = newValue;
             doc.notifier.changed();
             if (oldValue != newValue)
                 this._didSomething();
@@ -48090,7 +48771,7 @@ button.playButton::before {
     class SetThemePrompt {
         constructor(_doc) {
             this._doc = _doc;
-            this._themeSelect = select$f({ style: "width: 100%;", id: "themeSelect" }, option$f({ value: "none" }, "None"), optgroup$2({ label: "AbyssBox Themes" }, option$f({ value: "AbyssBox Classic" }, "AbyssBox Classic"), option$f({ value: "AbyssBox Competitive" }, "AbyssBox Competitive"), option$f({ value: "AbyssBox Light" }, "AbyssBox Light"), option$f({ value: "AbyssBox 0.8" }, "AbyssBox 0.8"), option$f({ value: "AbyssBox Piano" }, "AbyssBox Piano [!]"), option$f({ value: "Half-Life" }, "Half-Life"), option$f({ value: "Half-Life: Source" }, "Half-Life: Source"), option$f({ value: "Doom 1993" }, "Doom 1993"), option$f({ value: "Undertale" }, "Undertale"), option$f({ value: "Yume Nikki" }, "Yume Nikki [!]"), option$f({ value: "Scratch" }, "Scratch"), option$f({ value: "Scratch Addons" }, "Scratch Addons"), option$f({ value: "Windows Xp" }, "Windows Xp"), option$f({ value: "Frutiger Aero" }, "Frutiger Aero"), option$f({ value: "Frutiger Aero Night" }, "Frutiger Aero Night"), option$f({ value: "Skeuomorphic" }, "Skeuomorphic/Early 2000's (LeoV)"), option$f({ value: "woodland" }, "Woodland"), option$f({ value: "corporate dark" }, "Corporate Dark"), option$f({ value: "corporate light" }, "Corporate Light"), option$f({ value: "Glyde" }, "Glyde"), option$f({ value: "starry studio" }, "Starry Studio"), option$f({ value: "Terminal 2.0 (AB)" }, "Terminal 2.0 (AB)"), option$f({ value: "Slushie" }, "Slushie"), option$f({ value: "Slushie Pixel" }, "Slushie 2"), option$f({ value: "BeepBox Pixel" }, "BeepBox Pixel"), option$f({ value: "forest 2" }, "Forest 2"), option$f({ value: "canyon 2" }, "Canyon 2"), option$f({ value: "Nebula 2" }, "Nebula 2"), option$f({ value: "Ghost House" }, "Ghost House"), option$f({ value: "Ghost House 2" }, "Ghost House 2")), optgroup$2({ label: "BeepBox Themes" }, option$f({ value: "dark classic" }, "BeepBox Dark"), option$f({ value: "light classic" }, "BeepBox Light"), option$f({ value: "dark competition" }, "BeepBox Competition Dark")), optgroup$2({ label: "JummBox Themes" }, option$f({ value: "jummbox classic" }, "JummBox Dark"), option$f({ value: "jummbox light" }, "JummBox Light"), option$f({ value: "forest" }, "Forest"), option$f({ value: "canyon" }, "Canyon"), option$f({ value: "midnight" }, "Midnight"), option$f({ value: "beachcombing" }, "Beachcombing"), option$f({ value: "violet verdant" }, "Violet Verdant"), option$f({ value: "sunset" }, "Sunset"), option$f({ value: "autumn" }, "Autumn"), option$f({ value: "fruit" }, "Shadowfruit"), option$f({ value: "toxic" }, "Toxic"), option$f({ value: "roe" }, "Roe"), option$f({ value: "moonlight" }, "Moonlight"), option$f({ value: "portal" }, "Portal"), option$f({ value: "fusion" }, "Fusion"), option$f({ value: "inverse" }, "Inverse"), option$f({ value: "nebula" }, "Nebula"), option$f({ value: "roe light" }, "Roe Light"), option$f({ value: "amoled dark" }, "High Contrast Dark"), option$f({ value: "energized" }, "Energized"), option$f({ value: "neapolitan" }, "Neapolitan"), option$f({ value: "mono" }, "Poly"), option$f({ value: "blutonium" }, "Blutonium")), optgroup$2({ label: "ModBox Themes" }, option$f({ value: "modbox classic" }, "Modbox"), option$f({ value: "modbox 2" }, "Modbox 2.0"), option$f({ value: "modbox artic" }, "Artic"), option$f({ value: "modbox cinnamon" }, "Cinnamon Roll [!]"), option$f({ value: "modbox ocean" }, "Ocean"), option$f({ value: "modbox rainbow" }, "Rainbow [!]"), option$f({ value: "modbox float" }, "Float [!]"), option$f({ value: "modbox windows" }, "Windows"), option$f({ value: "modbox grassland" }, "Grassland"), option$f({ value: "modbox dessert" }, "Dessert"), option$f({ value: "modbox kahoot" }, "Kahootiest"), option$f({ value: "modbox bitbeam" }, "Beam to the Bit [!]"), option$f({ value: "modbox egg" }, "Pretty Egg"), option$f({ value: "modbox pony" }, "Poniryoshka"), option$f({ value: "modbox gameboy" }, "Gameboy [!]"), option$f({ value: "modbox woodkid" }, "Woodkid [!]"), option$f({ value: "modbox midnight" }, "Midnight [!]"), option$f({ value: "modbox snedbox" }, "Snedbox"), option$f({ value: "modbox unnamed" }, "unnamed [!]"), option$f({ value: "modbox piano" }, "Piano [!]"), option$f({ value: "modbox halloween" }, "Halloween [!]"), option$f({ value: "modbox frozen" }, "FrozenOver❄️ [!]")), optgroup$2({ label: "ShitBox Themes" }, option$f({ value: "shitbox 1.0" }, "Shitbox 1.0"), option$f({ value: "shitbox 2.0" }, "Shitbox 2.0"), option$f({ value: "shitbox 3.0" }, "Shitbox 3.0/shitbox4"), option$f({ value: "shitbox ModBox 2.0" }, "Shitbox ModBox 2.0"), option$f({ value: "shitbox Realm" }, "Shitbox Realm [!]")), optgroup$2({ label: "Nepbox Themes" }, option$f({ value: "nepbox" }, "Nepbox"), option$f({ value: "nepbox laffey" }, "Laffey"), option$f({ value: "nepbox snedbox" }, "Snedbox (Nb) [!]"), option$f({ value: "nepbox piano" }, "Piano (Nb) [!]")), optgroup$2({ label: "Mod Default Themes" }, option$f({ value: "sandbox classic" }, "Sandbox"), option$f({ value: "harrybox" }, "Haileybox"), option$f({ value: "brucebox" }, "Brucebox"), option$f({ value: "nerdbox" }, "NerdBox"), option$f({ value: "zefbox" }, "Zefbox"), option$f({ value: "cardboardbox classic" }, "Cardboardbox"), option$f({ value: "blubox classic" }, "Blubox"), option$f({ value: "dogebox classic" }, "Dogebox"), option$f({ value: "dogebox dark" }, "Way too Dark (DB)/TOO DARK(BluB)"), option$f({ value: "wackybox" }, "Wackybox"), option$f({ value: "todbox dark mode" }, "Todbox Dark Mode"), option$f({ value: "mainbox 1.0" }, "Mainbox"), option$f({ value: "microbox" }, "MicroBox"), option$f({ value: "paandorasbox" }, "PaandorasBox"), option$f({ value: "foxbox" }, "FoxBox"), option$f({ value: "midbox" }, "Midbox"), option$f({ value: "gold light" }, "Gold Light"), option$f({ value: "dogebox2" }, "Dogebox2"), option$f({ value: "WeebBox" }, "WeebBox"), option$f({ value: "BoxBeep Dark" }, "BoxBeep Dark"), option$f({ value: "BoxBeep light" }, "BoxBeep Light"), option$f({ value: "birdbox dark" }, "BirdBox Dark"), option$f({ value: "birdbox light" }, "BirdBox Light")), optgroup$2({ label: "Miscellaneous Themes" }, option$f({ value: "azur lane" }, "Azur Lane"), option$f({ value: "AWeebyssBox" }, "AWeebyssBox"), option$f({ value: "Deuteranopia" }, "Deuteranopia"), option$f({ value: "Protanopia" }, "Protanopia"), option$f({ value: "Tritanopia" }, "Tritanopia"), option$f({ value: "2012 Video Tutorial" }, "2012 Video Tutorial"), option$f({ value: "I am on fire" }, "I am on fire")));
+            this._themeSelect = select$f({ style: "width: 100%;", id: "themeSelect" }, option$f({ value: "none" }, "None"), optgroup$2({ label: "AbyssBox Themes" }, option$f({ value: "AbyssBox Classic" }, "AbyssBox Classic"), option$f({ value: "AbyssBox Competitive" }, "AbyssBox Competitive"), option$f({ value: "AbyssBox Light" }, "AbyssBox Light"), option$f({ value: "AbyssBox 0.8" }, "AbyssBox 0.8"), option$f({ value: "AbyssBox Piano" }, "AbyssBox Piano [!]"), option$f({ value: "Half-Life" }, "Half-Life"), option$f({ value: "Half-Life: Source" }, "Half-Life: Source"), option$f({ value: "Doom 1993" }, "Doom 1993"), option$f({ value: "Undertale" }, "Undertale"), option$f({ value: "Yume Nikki" }, "Yume Nikki [!]"), option$f({ value: "Scratch" }, "Scratch"), option$f({ value: "Scratch Addons" }, "Scratch Addons"), option$f({ value: "Windows Xp" }, "Windows Xp"), option$f({ value: "Frutiger Aero" }, "Frutiger Aero"), option$f({ value: "Frutiger Aero Night" }, "Frutiger Aero Night"), option$f({ value: "Skeuomorphic" }, "Skeuomorphic/Early 2000's (LeoV)"), option$f({ value: "woodland" }, "Woodland"), option$f({ value: "corporate dark" }, "Corporate Dark"), option$f({ value: "corporate light" }, "Corporate Light"), option$f({ value: "Glyde" }, "Glyde"), option$f({ value: "starry studio" }, "Starry Studio"), option$f({ value: "Terminal 2.0 (AB)" }, "Terminal 2.0 (AB)"), option$f({ value: "Slushie" }, "Slushie"), option$f({ value: "Slushie Pixel" }, "Slushie 2"), option$f({ value: "BeepBox Pixel" }, "BeepBox Pixel"), option$f({ value: "forest 2" }, "Forest 2"), option$f({ value: "canyon 2" }, "Canyon 2"), option$f({ value: "Nebula 2" }, "Nebula 2"), option$f({ value: "Ghost House" }, "Ghost House"), option$f({ value: "Ghost House 2" }, "Ghost House 2")), optgroup$2({ label: "BeepBox Themes" }, option$f({ value: "dark classic" }, "BeepBox Dark"), option$f({ value: "light classic" }, "BeepBox Light"), option$f({ value: "dark competition" }, "BeepBox Competition Dark")), optgroup$2({ label: "JummBox Themes" }, option$f({ value: "jummbox classic" }, "JummBox Dark"), option$f({ value: "jummbox light" }, "JummBox Light"), option$f({ value: "forest" }, "Forest"), option$f({ value: "canyon" }, "Canyon"), option$f({ value: "midnight" }, "Midnight"), option$f({ value: "beachcombing" }, "Beachcombing"), option$f({ value: "violet verdant" }, "Violet Verdant"), option$f({ value: "sunset" }, "Sunset"), option$f({ value: "autumn" }, "Autumn"), option$f({ value: "fruit" }, "Shadowfruit"), option$f({ value: "toxic" }, "Toxic"), option$f({ value: "roe" }, "Roe"), option$f({ value: "moonlight" }, "Moonlight"), option$f({ value: "portal" }, "Portal"), option$f({ value: "fusion" }, "Fusion"), option$f({ value: "inverse" }, "Inverse"), option$f({ value: "nebula" }, "Nebula"), option$f({ value: "roe light" }, "Roe Light"), option$f({ value: "amoled dark" }, "High Contrast Dark"), option$f({ value: "energized" }, "Energized"), option$f({ value: "neapolitan" }, "Neapolitan"), option$f({ value: "mono" }, "Poly"), option$f({ value: "blutonium" }, "Blutonium")), optgroup$2({ label: "ModBox Themes" }, option$f({ value: "modbox classic" }, "Modbox"), option$f({ value: "modbox 2" }, "Modbox 2.0"), option$f({ value: "modbox artic" }, "Artic"), option$f({ value: "modbox cinnamon" }, "Cinnamon Roll [!]"), option$f({ value: "modbox ocean" }, "Ocean"), option$f({ value: "modbox rainbow" }, "Rainbow [!]"), option$f({ value: "modbox float" }, "Float [!]"), option$f({ value: "modbox windows" }, "Windows"), option$f({ value: "modbox grassland" }, "Grassland"), option$f({ value: "modbox dessert" }, "Dessert"), option$f({ value: "modbox kahoot" }, "Kahootiest"), option$f({ value: "modbox bitbeam" }, "Beam to the Bit [!]"), option$f({ value: "modbox egg" }, "Pretty Egg"), option$f({ value: "modbox pony" }, "Poniryoshka"), option$f({ value: "modbox gameboy" }, "Gameboy [!]"), option$f({ value: "modbox woodkid" }, "Woodkid [!]"), option$f({ value: "modbox midnight" }, "Midnight [!]"), option$f({ value: "modbox snedbox" }, "Snedbox"), option$f({ value: "modbox unnamed" }, "unnamed [!]"), option$f({ value: "modbox piano" }, "Piano [!]"), option$f({ value: "modbox halloween" }, "Halloween [!]"), option$f({ value: "modbox frozen" }, "FrozenOver❄️ [!]")), optgroup$2({ label: "ShitBox Themes" }, option$f({ value: "shitbox 1.0" }, "Shitbox 1.0"), option$f({ value: "shitbox 2.0" }, "Shitbox 2.0"), option$f({ value: "shitbox 3.0" }, "Shitbox 3.0/shitbox4"), option$f({ value: "shitbox ModBox 2.0" }, "Shitbox ModBox 2.0"), option$f({ value: "shitbox Realm" }, "Shitbox Realm [!]")), optgroup$2({ label: "Nepbox Themes" }, option$f({ value: "nepbox" }, "Nepbox"), option$f({ value: "nepbox laffey" }, "Laffey"), option$f({ value: "nepbox snedbox" }, "Snedbox (Nb) [!]"), option$f({ value: "nepbox piano" }, "Piano (Nb) [!]")), optgroup$2({ label: "Mod Default Themes" }, option$f({ value: "sandbox classic" }, "Sandbox"), option$f({ value: "harrybox" }, "Haileybox"), option$f({ value: "brucebox" }, "Brucebox"), option$f({ value: "nerdbox" }, "NerdBox"), option$f({ value: "zefbox" }, "Zefbox"), option$f({ value: "cardboardbox classic" }, "Cardboardbox"), option$f({ value: "blubox classic" }, "Blubox"), option$f({ value: "dogebox classic" }, "Dogebox"), option$f({ value: "dogebox dark" }, "Way too Dark (DB)/TOO DARK(BluB)"), option$f({ value: "wackybox" }, "Wackybox"), option$f({ value: "todbox dark mode" }, "Todbox Dark Mode"), option$f({ value: "mainbox 1.0" }, "Mainbox"), option$f({ value: "microbox" }, "MicroBox"), option$f({ value: "paandorasbox" }, "PaandorasBox"), option$f({ value: "foxbox" }, "FoxBox"), option$f({ value: "midbox" }, "Midbox"), option$f({ value: "gold light" }, "Gold Light"), option$f({ value: "dogebox2" }, "Dogebox2"), option$f({ value: "WeebBox" }, "WeebBox"), option$f({ value: "BoxBeep Dark" }, "BoxBeep Dark"), option$f({ value: "BoxBeep light" }, "BoxBeep Light"), option$f({ value: "birdbox dark" }, "BirdBox Dark"), option$f({ value: "birdbox light" }, "BirdBox Light"), option$f({ value: "ultrabox dark" }, "UltraBox"), option$f({ value: "slarmoosbox" }, "Slarmoo's Box"), option$f({ value: "lemmbox dark" }, "LemmBox Dark")), optgroup$2({ label: "Miscellaneous Themes" }, option$f({ value: "azur lane" }, "Azur Lane"), option$f({ value: "AWeebyssBox" }, "AWeebyssBox"), option$f({ value: "Deuteranopia" }, "Deuteranopia"), option$f({ value: "Protanopia" }, "Protanopia"), option$f({ value: "Tritanopia" }, "Tritanopia"), option$f({ value: "2012 Video Tutorial" }, "2012 Video Tutorial"), option$f({ value: "I am on fire" }, "I am on fire")));
             this._cancelButton = button$o({ class: "cancelButton" });
             this._okayButton = button$o({ class: "okayButton", style: "width:45%;" }, "Okay");
             this.lastTheme = this._doc.song.setSongTheme;
@@ -50759,6 +51440,9 @@ button.playButton::before {
             this._fileName.value = _doc.song.title;
             ExportPrompt._validateFileName(null, this._fileName);
             this._computedSamplesLabel.firstChild.textContent = this._doc.samplesToTime(this._doc.synth.getTotalSamples(this._enableIntro.checked, this._enableOutro.checked, +this._loopDropDown.value - 1));
+            if (this._doc.prompt == "quickExport") {
+                this._export();
+            }
         }
         changeFileName(newValue) {
             this._fileName.value = newValue;
@@ -51577,6 +52261,13 @@ You should be redirected to the song at:<br /><br />
             this.cleanUp = () => {
                 this._fileInput.removeEventListener("change", this._whenFileSelected);
                 this._cancelButton.removeEventListener("click", this._close);
+                window.removeEventListener("dragover", (event) => { event.preventDefault(); });
+                window.removeEventListener("dragenter", (event) => { event.preventDefault(); });
+                window.removeEventListener("dragleave", (event) => { event.preventDefault(); });
+                window.removeEventListener("drop", (event) => {
+                    event.preventDefault();
+                    this.handleDrop(event);
+                });
             };
             this._whenFileSelected = () => {
                 const file = this._fileInput.files[0];
@@ -51603,8 +52294,17 @@ You should be redirected to the song at:<br /><br />
                 }
                 else {
                     console.error("Unrecognized file extension.");
-                    this._close();
+                    return;
                 }
+            };
+            this.handleDrop = (e) => {
+                const files = e.dataTransfer.files;
+                if (!files)
+                    return;
+                if (files.length > 1)
+                    return;
+                this._fileInput.files = files;
+                this._whenFileSelected();
             };
             this._fileInput.select();
             setTimeout(() => this._fileInput.focus());
@@ -51612,9 +52312,16 @@ You should be redirected to the song at:<br /><br />
             this._cancelButton.addEventListener("click", this._close);
             this._importButton.addEventListener("click", this._importCategoryButton);
             this._exportButton.addEventListener("click", this._exportCategoryButton);
-            if (this._doc.prompt == "export") {
+            if (this._doc.prompt == "export" || this._doc.prompt == "quickExport") {
                 this._exportCategoryButton();
             }
+            window.addEventListener("dragover", (event) => { event.preventDefault(); });
+            window.addEventListener("dragenter", (event) => { event.preventDefault(); });
+            window.addEventListener("dragleave", (event) => { event.preventDefault(); });
+            window.addEventListener("drop", (event) => {
+                event.preventDefault();
+                this.handleDrop(event);
+            });
         }
         _parseMidiFile(buffer) {
             const reader = new ArrayBufferReader(new DataView(buffer));
@@ -54491,7 +55198,7 @@ You should be redirected to the song at:<br /><br />
             this._svgNoteBackground = SVG.pattern({ id: "patternEditorNoteBackground" + this._barOffset, x: "0", y: "0", patternUnits: "userSpaceOnUse" });
             this._svgDrumBackground = SVG.pattern({ id: "patternEditorDrumBackground" + this._barOffset, x: "0", y: "0", patternUnits: "userSpaceOnUse" });
             this._svgModBackground = SVG.pattern({ id: "patternEditorModBackground" + this._barOffset, x: "0", y: "0", patternUnits: "userSpaceOnUse" });
-            this._svgBackground = SVG.rect({ id: "pitchEditorBackground", x: "0", y: "0", style: `opacity: ${getLocalStorageItem("customThemeImageOpacity", "1")};`, "pointer-events": "none", fill: "url(#patternEditorNoteBackground" + this._barOffset + ")" });
+            this._svgBackground = SVG.rect({ id: "pitchEditorBackground", x: "0", y: "0", "pointer-events": "none", fill: "url(#patternEditorNoteBackground" + this._barOffset + ")" });
             this._svgNoteContainer = SVG.svg();
             this._svgPlayhead = SVG.rect({ x: "0", y: "0", width: "4", fill: ColorConfig.playhead, "pointer-events": "none" });
             this._selectionRect = SVG.rect({ class: "dashed-line dash-move", fill: ColorConfig.boxSelectionFill, stroke: ColorConfig.hoverPreview, "stroke-width": 2, "stroke-dasharray": "5, 3", "fill-opacity": "0.4", "pointer-events": "none", visibility: "hidden" });
@@ -58506,7 +59213,7 @@ You should be redirected to the song at:<br /><br />
     class ThemePrompt {
         constructor(_doc) {
             this._doc = _doc;
-            this._themeSelect = select$7({ style: "width: 100%;", id: "themeSelect" }, optgroup$1({ label: "AbyssBox Themes" }, option$7({ value: "AbyssBox Classic" }, "AbyssBox Classic"), option$7({ value: "AbyssBox Competitive" }, "AbyssBox Competitive"), option$7({ value: "AbyssBox Light" }, "AbyssBox Light"), option$7({ value: "AbyssBox 0.8" }, "AbyssBox 0.8"), option$7({ value: "AbyssBox Piano" }, "AbyssBox Piano [!]"), option$7({ value: "Half-Life" }, "Half-Life"), option$7({ value: "Half-Life: Source" }, "Half-Life: Source"), option$7({ value: "Doom 1993" }, "Doom 1993"), option$7({ value: "Undertale" }, "Undertale"), option$7({ value: "Yume Nikki" }, "Yume Nikki [!]"), option$7({ value: "Scratch" }, "Scratch"), option$7({ value: "Scratch Addons" }, "Scratch Addons"), option$7({ value: "Windows Xp" }, "Windows Xp"), option$7({ value: "Frutiger Aero" }, "Frutiger Aero"), option$7({ value: "Frutiger Aero Night" }, "Frutiger Aero Night"), option$7({ value: "Skeuomorphic" }, "Skeuomorphic/Early 2000's (LeoV)"), option$7({ value: "woodland" }, "Woodland"), option$7({ value: "corporate dark" }, "Corporate Dark"), option$7({ value: "corporate light" }, "Corporate Light"), option$7({ value: "Glyde" }, "Glyde"), option$7({ value: "starry studio" }, "Starry Studio"), option$7({ value: "Terminal 2.0 (AB)" }, "Terminal 2.0 (AB)"), option$7({ value: "Slushie" }, "Slushie"), option$7({ value: "Slushie Pixel" }, "Slushie 2"), option$7({ value: "BeepBox Pixel" }, "BeepBox Pixel"), option$7({ value: "forest 2" }, "Forest 2"), option$7({ value: "canyon 2" }, "Canyon 2"), option$7({ value: "Nebula 2" }, "Nebula 2"), option$7({ value: "Ghost House" }, "Ghost House"), option$7({ value: "Ghost House 2" }, "Ghost House 2")), optgroup$1({ label: "BeepBox Themes" }, option$7({ value: "dark classic" }, "BeepBox Dark"), option$7({ value: "light classic" }, "BeepBox Light"), option$7({ value: "dark competition" }, "BeepBox Competition Dark")), optgroup$1({ label: "JummBox Themes" }, option$7({ value: "jummbox classic" }, "JummBox Dark"), option$7({ value: "jummbox light" }, "JummBox Light"), option$7({ value: "forest" }, "Forest"), option$7({ value: "canyon" }, "Canyon"), option$7({ value: "midnight" }, "Midnight"), option$7({ value: "beachcombing" }, "Beachcombing"), option$7({ value: "violet verdant" }, "Violet Verdant"), option$7({ value: "sunset" }, "Sunset"), option$7({ value: "autumn" }, "Autumn"), option$7({ value: "fruit" }, "Shadowfruit"), option$7({ value: "toxic" }, "Toxic"), option$7({ value: "roe" }, "Roe"), option$7({ value: "moonlight" }, "Moonlight"), option$7({ value: "portal" }, "Portal"), option$7({ value: "fusion" }, "Fusion"), option$7({ value: "inverse" }, "Inverse"), option$7({ value: "nebula" }, "Nebula"), option$7({ value: "roe light" }, "Roe Light"), option$7({ value: "amoled dark" }, "High Contrast Dark"), option$7({ value: "energized" }, "Energized"), option$7({ value: "neapolitan" }, "Neapolitan"), option$7({ value: "mono" }, "Poly"), option$7({ value: "blutonium" }, "Blutonium")), optgroup$1({ label: "ModBox Themes" }, option$7({ value: "modbox classic" }, "Modbox"), option$7({ value: "modbox 2" }, "Modbox 2.0"), option$7({ value: "modbox artic" }, "Artic"), option$7({ value: "modbox cinnamon" }, "Cinnamon Roll [!]"), option$7({ value: "modbox ocean" }, "Ocean"), option$7({ value: "modbox rainbow" }, "Rainbow [!]"), option$7({ value: "modbox float" }, "Float [!]"), option$7({ value: "modbox windows" }, "Windows"), option$7({ value: "modbox grassland" }, "Grassland"), option$7({ value: "modbox dessert" }, "Dessert"), option$7({ value: "modbox kahoot" }, "Kahootiest"), option$7({ value: "modbox bitbeam" }, "Beam to the Bit [!]"), option$7({ value: "modbox egg" }, "Pretty Egg"), option$7({ value: "modbox pony" }, "Poniryoshka"), option$7({ value: "modbox gameboy" }, "Gameboy [!]"), option$7({ value: "modbox woodkid" }, "Woodkid [!]"), option$7({ value: "modbox midnight" }, "Midnight [!]"), option$7({ value: "modbox snedbox" }, "Snedbox"), option$7({ value: "modbox unnamed" }, "unnamed [!]"), option$7({ value: "modbox piano" }, "Piano [!]"), option$7({ value: "modbox halloween" }, "Halloween [!]"), option$7({ value: "modbox frozen" }, "FrozenOver❄️ [!]")), optgroup$1({ label: "ShitBox Themes" }, option$7({ value: "shitbox 1.0" }, "Shitbox 1.0"), option$7({ value: "shitbox 2.0" }, "Shitbox 2.0"), option$7({ value: "shitbox 3.0" }, "Shitbox 3.0/shitbox4"), option$7({ value: "shitbox ModBox 2.0" }, "Shitbox ModBox 2.0"), option$7({ value: "shitbox Realm" }, "Shitbox Realm [!]")), optgroup$1({ label: "Nepbox Themes" }, option$7({ value: "nepbox" }, "Nepbox"), option$7({ value: "nepbox laffey" }, "Laffey"), option$7({ value: "nepbox snedbox" }, "Snedbox (Nb) [!]"), option$7({ value: "nepbox piano" }, "Piano (Nb) [!]")), optgroup$1({ label: "Mod Default Themes" }, option$7({ value: "sandbox classic" }, "Sandbox"), option$7({ value: "harrybox" }, "Haileybox"), option$7({ value: "brucebox" }, "Brucebox"), option$7({ value: "nerdbox" }, "NerdBox"), option$7({ value: "zefbox" }, "Zefbox"), option$7({ value: "cardboardbox classic" }, "Cardboardbox"), option$7({ value: "blubox classic" }, "Blubox"), option$7({ value: "dogebox classic" }, "Dogebox"), option$7({ value: "dogebox dark" }, "Way too Dark (DB)/TOO DARK(BluB)"), option$7({ value: "wackybox" }, "Wackybox"), option$7({ value: "todbox dark mode" }, "Todbox Dark Mode"), option$7({ value: "mainbox 1.0" }, "Mainbox"), option$7({ value: "microbox" }, "MicroBox"), option$7({ value: "paandorasbox" }, "PaandorasBox"), option$7({ value: "foxbox" }, "FoxBox"), option$7({ value: "midbox" }, "Midbox"), option$7({ value: "gold light" }, "Gold Light"), option$7({ value: "dogebox2" }, "Dogebox2"), option$7({ value: "WeebBox" }, "WeebBox"), option$7({ value: "BoxBeep Dark" }, "BoxBeep Dark"), option$7({ value: "BoxBeep light" }, "BoxBeep Light"), option$7({ value: "birdbox dark" }, "BirdBox Dark"), option$7({ value: "birdbox light" }, "BirdBox Light")), optgroup$1({ label: "Miscellaneous Themes" }, option$7({ value: "azur lane" }, "Azur Lane"), option$7({ value: "AWeebyssBox" }, "AWeebyssBox"), option$7({ value: "Deuteranopia" }, "Deuteranopia"), option$7({ value: "Protanopia" }, "Protanopia"), option$7({ value: "Tritanopia" }, "Tritanopia"), option$7({ value: "2012 Video Tutorial" }, "2012 Video Tutorial"), option$7({ value: "I am on fire" }, "I am on fire"), option$7({ value: "custom" }, "Custom")));
+            this._themeSelect = select$7({ style: "width: 100%;", id: "themeSelect" }, optgroup$1({ label: "AbyssBox Themes" }, option$7({ value: "AbyssBox Classic" }, "AbyssBox Classic"), option$7({ value: "AbyssBox Competitive" }, "AbyssBox Competitive"), option$7({ value: "AbyssBox Light" }, "AbyssBox Light"), option$7({ value: "AbyssBox 0.8" }, "AbyssBox 0.8"), option$7({ value: "AbyssBox Piano" }, "AbyssBox Piano [!]"), option$7({ value: "Half-Life" }, "Half-Life"), option$7({ value: "Half-Life: Source" }, "Half-Life: Source"), option$7({ value: "Doom 1993" }, "Doom 1993"), option$7({ value: "Undertale" }, "Undertale"), option$7({ value: "Yume Nikki" }, "Yume Nikki [!]"), option$7({ value: "Scratch" }, "Scratch"), option$7({ value: "Scratch Addons" }, "Scratch Addons"), option$7({ value: "Windows Xp" }, "Windows Xp"), option$7({ value: "Frutiger Aero" }, "Frutiger Aero"), option$7({ value: "Frutiger Aero Night" }, "Frutiger Aero Night"), option$7({ value: "Skeuomorphic" }, "Skeuomorphic/Early 2000's (LeoV)"), option$7({ value: "woodland" }, "Woodland"), option$7({ value: "corporate dark" }, "Corporate Dark"), option$7({ value: "corporate light" }, "Corporate Light"), option$7({ value: "Glyde" }, "Glyde"), option$7({ value: "starry studio" }, "Starry Studio"), option$7({ value: "Terminal 2.0 (AB)" }, "Terminal 2.0 (AB)"), option$7({ value: "Slushie" }, "Slushie"), option$7({ value: "Slushie Pixel" }, "Slushie 2"), option$7({ value: "BeepBox Pixel" }, "BeepBox Pixel"), option$7({ value: "forest 2" }, "Forest 2"), option$7({ value: "canyon 2" }, "Canyon 2"), option$7({ value: "Nebula 2" }, "Nebula 2"), option$7({ value: "Ghost House" }, "Ghost House"), option$7({ value: "Ghost House 2" }, "Ghost House 2")), optgroup$1({ label: "BeepBox Themes" }, option$7({ value: "dark classic" }, "BeepBox Dark"), option$7({ value: "light classic" }, "BeepBox Light"), option$7({ value: "dark competition" }, "BeepBox Competition Dark")), optgroup$1({ label: "JummBox Themes" }, option$7({ value: "jummbox classic" }, "JummBox Dark"), option$7({ value: "jummbox light" }, "JummBox Light"), option$7({ value: "forest" }, "Forest"), option$7({ value: "canyon" }, "Canyon"), option$7({ value: "midnight" }, "Midnight"), option$7({ value: "beachcombing" }, "Beachcombing"), option$7({ value: "violet verdant" }, "Violet Verdant"), option$7({ value: "sunset" }, "Sunset"), option$7({ value: "autumn" }, "Autumn"), option$7({ value: "fruit" }, "Shadowfruit"), option$7({ value: "toxic" }, "Toxic"), option$7({ value: "roe" }, "Roe"), option$7({ value: "moonlight" }, "Moonlight"), option$7({ value: "portal" }, "Portal"), option$7({ value: "fusion" }, "Fusion"), option$7({ value: "inverse" }, "Inverse"), option$7({ value: "nebula" }, "Nebula"), option$7({ value: "roe light" }, "Roe Light"), option$7({ value: "amoled dark" }, "High Contrast Dark"), option$7({ value: "energized" }, "Energized"), option$7({ value: "neapolitan" }, "Neapolitan"), option$7({ value: "mono" }, "Poly"), option$7({ value: "blutonium" }, "Blutonium")), optgroup$1({ label: "ModBox Themes" }, option$7({ value: "modbox classic" }, "Modbox"), option$7({ value: "modbox 2" }, "Modbox 2.0"), option$7({ value: "modbox artic" }, "Artic"), option$7({ value: "modbox cinnamon" }, "Cinnamon Roll [!]"), option$7({ value: "modbox ocean" }, "Ocean"), option$7({ value: "modbox rainbow" }, "Rainbow [!]"), option$7({ value: "modbox float" }, "Float [!]"), option$7({ value: "modbox windows" }, "Windows"), option$7({ value: "modbox grassland" }, "Grassland"), option$7({ value: "modbox dessert" }, "Dessert"), option$7({ value: "modbox kahoot" }, "Kahootiest"), option$7({ value: "modbox bitbeam" }, "Beam to the Bit [!]"), option$7({ value: "modbox egg" }, "Pretty Egg"), option$7({ value: "modbox pony" }, "Poniryoshka"), option$7({ value: "modbox gameboy" }, "Gameboy [!]"), option$7({ value: "modbox woodkid" }, "Woodkid [!]"), option$7({ value: "modbox midnight" }, "Midnight [!]"), option$7({ value: "modbox snedbox" }, "Snedbox"), option$7({ value: "modbox unnamed" }, "unnamed [!]"), option$7({ value: "modbox piano" }, "Piano [!]"), option$7({ value: "modbox halloween" }, "Halloween [!]"), option$7({ value: "modbox frozen" }, "FrozenOver❄️ [!]")), optgroup$1({ label: "ShitBox Themes" }, option$7({ value: "shitbox 1.0" }, "Shitbox 1.0"), option$7({ value: "shitbox 2.0" }, "Shitbox 2.0"), option$7({ value: "shitbox 3.0" }, "Shitbox 3.0/shitbox4"), option$7({ value: "shitbox ModBox 2.0" }, "Shitbox ModBox 2.0"), option$7({ value: "shitbox Realm" }, "Shitbox Realm [!]")), optgroup$1({ label: "Nepbox Themes" }, option$7({ value: "nepbox" }, "Nepbox"), option$7({ value: "nepbox laffey" }, "Laffey"), option$7({ value: "nepbox snedbox" }, "Snedbox (Nb) [!]"), option$7({ value: "nepbox piano" }, "Piano (Nb) [!]")), optgroup$1({ label: "Mod Default Themes" }, option$7({ value: "sandbox classic" }, "Sandbox"), option$7({ value: "harrybox" }, "Haileybox"), option$7({ value: "brucebox" }, "Brucebox"), option$7({ value: "nerdbox" }, "NerdBox"), option$7({ value: "zefbox" }, "Zefbox"), option$7({ value: "cardboardbox classic" }, "Cardboardbox"), option$7({ value: "blubox classic" }, "Blubox"), option$7({ value: "dogebox classic" }, "Dogebox"), option$7({ value: "dogebox dark" }, "Way too Dark (DB)/TOO DARK(BluB)"), option$7({ value: "wackybox" }, "Wackybox"), option$7({ value: "todbox dark mode" }, "Todbox Dark Mode"), option$7({ value: "mainbox 1.0" }, "Mainbox"), option$7({ value: "microbox" }, "MicroBox"), option$7({ value: "paandorasbox" }, "PaandorasBox"), option$7({ value: "foxbox" }, "FoxBox"), option$7({ value: "midbox" }, "Midbox"), option$7({ value: "gold light" }, "Gold Light"), option$7({ value: "dogebox2" }, "Dogebox2"), option$7({ value: "WeebBox" }, "WeebBox"), option$7({ value: "BoxBeep Dark" }, "BoxBeep Dark"), option$7({ value: "BoxBeep light" }, "BoxBeep Light"), option$7({ value: "birdbox dark" }, "BirdBox Dark"), option$7({ value: "birdbox light" }, "BirdBox Light"), option$7({ value: "ultrabox dark" }, "UltraBox"), option$7({ value: "slarmoosbox" }, "Slarmoo's Box"), option$7({ value: "lemmbox dark" }, "LemmBox Dark")), optgroup$1({ label: "Miscellaneous Themes" }, option$7({ value: "azur lane" }, "Azur Lane"), option$7({ value: "AWeebyssBox" }, "AWeebyssBox"), option$7({ value: "Deuteranopia" }, "Deuteranopia"), option$7({ value: "Protanopia" }, "Protanopia"), option$7({ value: "Tritanopia" }, "Tritanopia"), option$7({ value: "2012 Video Tutorial" }, "2012 Video Tutorial"), option$7({ value: "I am on fire" }, "I am on fire"), option$7({ value: "custom" }, "Custom")));
             this._cancelButton = button$c({ class: "cancelButton" });
             this._okayButton = button$c({ class: "okayButton", style: "width:45%;" }, "Okay");
             this.lastTheme = window.localStorage.getItem("colorTheme");
@@ -58570,6 +59277,7 @@ You should be redirected to the song at:<br /><br />
     const t={id:"",classname:"",theme:"light",toggle:!0,popover:!0,position:"bottom-start",margin:4,preset:!0,color:"#000",default:"#000",target:"",disabled:!1,format:"rgb",singleInput:!1,inputs:!0,opacity:!0,preview:!0,copy:!0,swatches:[],toggleSwatches:!1,closeOnScroll:!1,i18n:{palette:"Color picker",buttons:{copy:"Copy color to clipboard",changeFormat:"Change color format",swatch:"Color swatch",toggleSwatches:"Toggle Swatches"},sliders:{hue:"Change hue",alpha:"Change opacity"}}},e="alwan",s=`${e}__container`,o=`${e}__palette`,r=`${e}__marker`,n=`${e}__preview`,i=`${e}__button `,a$2=`${e}__copy-button`,l=`${e}__slider `,h=`${e}__hue`,c=`${e}__alpha`,p$4=`${e}__input`,g=`${e}__inputs`,u=`${e}__swatch`,d=`${e}__swatches`,_=`${e}__reference `,b=`${e}__backdrop`,w=`${e}__toggle-button`,f=`${e}--open`,$$1=`${e}--collapse`,y=parseInt,{min:v,max:m,abs:x,round:A,PI:C}=Math,S=(t,e=100,s=0)=>t>e?e:t<s?s:t,k=t=>A((t%=360)<0?t+360:t),H=document,L=H.documentElement,M="button",O="open",V="close",z="color",B="click",E="pointerdown",I="keydown",j="input",D="change",F="blur",P="rgb",T="hsl",Z=["hex",P,T],K="afterbegin",N="afterend",R="beforeend",U="aria-label",q={ArrowUp:[0,-1],ArrowDown:[0,1],ArrowRight:[1,0],ArrowLeft:[-1,0]},G={deg:1,turn:360,rad:180/C,grad:.9},J=/^#[0-9a-f]{6}$/i,Q=/^hsla?\(\s*([+-]?\d*\.?\d+)(\w*)?\s*[\s,]\s*([+-]?\d*\.?\d+)%?\s*,?\s*([+-]?\d*\.?\d+)%?(?:\s*[\/,]\s*([+-]?\d*\.?\d+)(%)?)?\s*\)?$/,W=(t,e,s,o)=>{t.addEventListener(e,s,o);},X=(t,e,s)=>{t.removeEventListener(e,s);},Y=t=>"string"==typeof t,tt=t=>null!=t,et=t=>t instanceof Element,st=t=>Number.isFinite(Y(t)&&""!==t.trim()?+t:t),{keys:ot,assign:rt,setPrototypeOf:nt,prototype:it}=Object,{from:at,isArray:lt}=Array,ht=t=>tt(t)&&"object"==typeof t&&!lt(t)&&!et(t),ct=(t,e)=>ot(t).forEach((s=>e(s,t[s]))),pt=(t,e)=>(ht(t)||(t={}),ct(e,((e,s)=>{tt(s)&&rt(t,{[e]:ht(s)?pt(t[e]||{},s):s});})),t),gt=()=>H.body,ut=(t,e=gt())=>Y(t)&&t.trim()?at(e.querySelectorAll(t)):et(t)&&gt().contains(t)&&t!==gt()?[t]:[],dt=t=>ut(`${j},${M},[tabindex]`,t),_t=(t,e,s=R)=>{t&&e&&e.insertAdjacentElement(s,t);},bt=(t,e)=>{t.innerHTML=e;},wt=(t,e,s)=>{t&&t.setAttribute(e,s+"");},ft=(t,e,s,o,r,n)=>{const i=H.createElement(t);return e&&(i.className=e),o&&bt(i,o),ct(r||{},((t,e)=>{tt(e)&&wt(i,t,e);})),s&&_t(i,s,n),i},$t=(t,e,s,o)=>ft("div",t,e,"",s,o),yt=t=>(t&&t.remove(),null),vt=(t,e)=>(t.replaceWith(e),e),mt=(t,e,s,o,r,n,a)=>ft(M,i+t,e,s,rt({type:M,[U]:r,title:n||r},o),a),xt=(t,e,s,o=1)=>ft(j,l+t,e,"",{max:s,step:o,type:"range"}),At=(t,e)=>$t(s,t,{},e),Ct=(t,e,s)=>{t&&t.style.setProperty("--"+e,s+"");},St=(t,e,s)=>t.classList.toggle(e,s),kt=(t,e,s)=>{t.style.transform=`translate(${e}px,${s}px)`;},Ht=(t,e=[H])=>(t&&(t=t.parentElement),t&&t!==gt()?(/auto|scroll|overflow|clip|hidden/.test(getComputedStyle(t).overflow)&&e.push(t),Ht(t,e)):e),Lt=t=>{let e,s,o,r,n,i;return et(t)?({x:e,y:s,width:o,height:r,right:n,bottom:i}=t.getBoundingClientRect()):(e=s=0,o=n=L.clientWidth,r=i=L.clientHeight),[e,s,o,r,n,i]},Mt='<svg width="18" height="18" viewBox="0 0 24 24" aria-role="none"><path d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg>',Ot=(t,e=P)=>{let s=t.a,o="",r=e;return s<1&&(o+=", "+s,r+="a"),e===P?r+`(${t.r}, ${t.g}, ${t.b+o})`:r+`(${t.h}, ${t.s}%, ${t.l}%${o})`},Vt=ft("canvas").getContext("2d");function zt(t,e){let s,o,r="";Y(t)?r=t.trim():ht(t)&&(s=[P,T].find((e=>e.split("").every((e=>st(t[e]))))),s&&(r=Ot(t,s)));const[n,i,a,l,h,c="1",p]=Q.exec(r)||[];if(n)o={h:k(+i*(G[a]?G[a]:1)),s:S(+l),l:S(+h),a:S(+c/(p?100:1),1)},s=T;else if(s=P,Vt.fillStyle="#000",Vt.fillStyle=r,r=Vt.fillStyle,J.test(r))o={r:y(r.slice(1,3),16),g:y(r.slice(3,5),16),b:y(r.slice(5,7),16),a:1};else {const[t,e,s,n]=/\((.+)\)/.exec(r)[1].split(",").map((t=>+t));o={r:t,g:e,b:s,a:n};}return o.a=A(100*o.a)/100,r=Ot(o,s),e?r:[o,s,r]}const Bt={top:[1,5,4,0],bottom:[5,1,4,0],right:[4,0,1,5],left:[0,4,1,5]},Et={start:[0,1,2],center:[1,0,2],end:[2,1,0]},It=(t,e,s,{margin:o,position:r,toggle:n,closeOnScroll:i},{t:a,o:l})=>{o=st(o)?+o:0;const[h,c]=Y(r)?r.split("-"):[],p=Bt[h]||Bt.bottom,g=Et[c]||Et.center,u=Ht(t),d=e.style,_=()=>{d.height="";const s=Lt(H),r=Lt(t),n=Lt(e),i=[null,null];p.some((t=>{let e=t%2;const a=s[t],l=r[t],h=o+n[e+2];if(h<=x(a-l)){i[e]=l+(t<=1?-h:o),e=(e+1)%2;const a=n[e+2],c=r[e],p=r[e+4],u=s[e+4]-c,d=(a+r[e+2])/2;return g.some((t=>0===t&&a<=u?(i[e]=c,!0):1===t&&d<=p&&d<=u?(i[e]=p-d,!0):2===t&&a<=p&&(i[e]=p-a,!0))),!0}})),kt(e,...i.map(((t,e)=>(e&&null===t&&n[3]>s[5]&&(d.height=s[5]-6+"px",n[3]=s[5]-3),A(tt(t)?t:(s[e+4]-n[e+2])/2)))));},b=()=>{!a()&&n||(((t,e)=>e.every((e=>{const[s,o,,,r,n]=Lt(t),[i,a,,,l,h]=Lt(e);return o<h&&n>a&&s<l&&r>i})))(t,u)?a()?(_(),i&&l(!1)):l(!0,!0):l(!1,!0));},w=t=>{if(a()){const{target:o,key:r,shiftKey:n}=t;if("Escape"===r)l(!1);else if("Tab"===r){const r=dt(e),i=r[0],a=r.pop(),l=o!==s||n?n&&o===i||!n&&o===a?s:null:i;l&&(t.preventDefault(),l.focus());}}},f=({target:t})=>{!a()||t===s||e.contains(t)||at(s.labels||[]).some((e=>e.contains(t)))||l(!1);},$=t=>{u.forEach((e=>{t(e,"scroll",b);})),t(window,"resize",b),t(H,I,w),t(H,E,f);};return _(),$(W),{i:_,p:()=>{$(X),e.style.transform="";}}},jt=(t,s)=>{const l=t.config,y=$t(e,gt()),x=((t,e)=>{let s=e||mt("",gt());const o=()=>{t.u.o();};return {_:()=>s,$({preset:t,classname:r}){e&&t!==(e!==s)&&(t?(s=vt(e,mt()),e.id&&(s.id=e.id)):s=vt(s,e)),W(s,B,o),e&&!t||!Y(r)||(s.className=(i+_+r).trim());},p(){e?e!==s&&vt(s,e):yt(s);}}})(t,ut(s)[0]),A=(({v:t},e)=>{let s,n,i,a;const l=$t(o,e),h=$t(r,l),c=(e,[o,r]=[0,0])=>{let a,l,[c,p,g,u]=i;e?(s=e.clientX-c,n=e.clientY-p):(s+=o*g/100,n+=r*u/100),s=S(s,g),n=S(n,u),kt(h,s,n),a=1-n/u,l=a*(1-s/(2*g)),t.i({s:1===l||0===l?0:(a-l)/v(l,1-l)*100,l:100*l},1);},p=t=>{t.buttons?c(t):d(!1);},g=()=>{t.m(),d(!1);},u=()=>{t.m();},d=t=>{St(L,b,t),(t?W:X)(H,"pointermove",p),(t?W:X)(window,F,u);};return W(l,E,(e=>{a||(t.A(),i=Lt(l),c(e),d(!0),W(H,"pointerup",g,{once:!0}));})),W(l,I,(e=>{const s=q[e.key];s&&(e.preventDefault(),i=Lt(l),t.A(),c(null,s),t.m());})),{el:l,$({i18n:t,disabled:e}){wt(l,U,t.palette),wt(l,"tabindex",e?"":0),a=e;},C(t,e){let o=e+t*v(e,1-e);i=Lt(l),s=(o?2*(1-e/o):0)*i[2],n=(1-o)*i[3],kt(h,s,n);}}})(t,y),C=At(y),k=((t,e)=>{let s,o,r=!1;const i=t=>{r=t,bt(o,t?'<svg width="18" height="18" viewBox="0 0 24 24" aria-role="none"><path d="M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z"></path></svg>':Mt);},l=t=>{const e=ft(j,"",L,"",{value:t});e.select(),H.execCommand("copy"),yt(e),o.focus(),i(!0);},h=()=>{if(!r){const e=navigator.clipboard,s=t.v.S();e?e.writeText(s).then((()=>i(!0))).catch((()=>l(s))):l(s);}};return {$({preview:t,copy:l,i18n:c}){s=yt(s),o=yt(o),t&&(s=$t(n,e,{},K)),l&&(o=mt(a$2,s||e,Mt,{},c.buttons.copy,"",K),W(o,B,h),W(o,F,(()=>r&&i(!1))),W(o,"mouseout",(()=>o.blur())));}}})(t,C),M=(({v:t,k:e},s)=>{let o;const r=$t("",s),n=xt(h,r,360);return W(n,j,(()=>t.i({h:+n.value},2))),W(r,D,(()=>e.H(D))),{$({opacity:e,i18n:{sliders:s}}){o=yt(o),e?(o=xt(c,r,1,.01),W(o,j,(()=>t.i({a:+o.value},2)))):t.i({a:1}),wt(n,U,s.hue),wt(o,U,s.alpha);},L(t,e){n.value=t+"",o&&(o.value=e+"");}}})(t,C),T=((t,e)=>{let s,o,r,n,i,{config:a,v:l}=t,h=[],c=!1;const u=()=>a.singleInput||"hex"===h[n],d=t=>{let e=t.target.value,s={};c||(l.A(),c=!0),u()||(ct(i,((t,e)=>{s[t]=+e.value;})),e=Ot(s,h[n])),l.M(e,3,!1,!0);},_=()=>{i={},yt(o),o=$t(g,s,{},K);const e=h[n],r=u()?[e]:(e+(a.opacity?"a":"")).split(""),_=l.O;r.forEach((t=>{const e=ft("label","",o);i[t]=ft(j,p$4,e,"",{type:"text",value:_[t]}),ft("span","",e,t);})),W(o,j,d),W(o,D,(()=>{l.m(),c=!1;})),W(o,"focusin",(t=>t.target.select())),W(o,I,(e=>"Enter"===e.key&&t.u.o(!1)));},b=()=>{n=(n+1)%h.length,l.V(h[n]),_();};return {$({inputs:t,format:o,i18n:i}){s=yt(s),r=yt(r),h=Z,!0!==t&&(t=t||{},h=h.filter((e=>t[e])));const a=h.length;a||(h=Z),n=m(h.indexOf(o),0),l.V(h[n]),a&&(s=At(e,N),_(),a>1&&(r=mt("",s,'<svg width="15" height="15" viewBox="0 0 20 20" aria-role="none"><path d="M10 1L5 8h10l-5-7zm0 18l5-7H5l5 7z"></path></svg>',{},i.buttons.changeFormat),W(r,B,b)));},L(t){ct(i||{},((e,s)=>{s.value=t[e]+"";}));}}})(t,C),G=((t,e)=>{let s,o;return {$({swatches:r,toggleSwatches:n,i18n:{buttons:i}}){lt(r)&&(s=yt(s),o=yt(o),r.length&&(s=$t(d,e),r.forEach((t=>{Ct(mt(u,s,"",{},i.swatch,Y(t)?t:zt(t,!0)),z,zt(t,!0));})),n&&(o=mt(w,e,'<svg width="20" height="20" viewBox="0 0 24 24" aria-role="none"><path d="M6.984 14.016l5.016-5.016 5.016 5.016h-10.031z"></path></svg>',{},i.toggleSwatches),W(o,B,(()=>{St(s,$$1),t.u.B();}))),W(s,B,(({target:e})=>{e!==s&&t.v.M(e.style.getPropertyValue("--"+z),0,!0,!0);}))));}}})(t,y);let J,Q=!1,et=null;return {I(e){e=e||{};const s=this,o=y.dataset,r=t.v,{id:n,color:i}=e,{theme:a,toggle:h,popover:c,target:p,disabled:g}=pt(l,e);[x,A,k,M,T,G].forEach((t=>t.$(l))),J=x._();let u=ut(p)[0]||J;Y(n)&&(y.id=n),o.theme=a,o.display=c?"popover":"block",h||s.o(!0,!0),J.style.display=c||h?"":"none",et&&(et.p(),et=null),c?et=It(u,y,J,l,s):_t(y,u,u===J?N:R),tt(i)?r.M(i):r.i({}),[J,...dt(y)].forEach((t=>{t.disabled=!!g;})),g&&(c?s.o(!1,!0):h||s.o(!0,!0));},i(t,e){const{r:s,g:o,b:r,a:n,h:i,s:a,l:l,rgb:h}=t;Ct(J,z,h),Ct(y,P,`${s},${o},${r}`),Ct(y,"a",n),Ct(A.el,"h",i),1!==e&&2!==e&&(A.C(a/100,l/100),M.L(i,n)),3!==e&&T.L(t);},o(e=!Q,s=!1){e===Q||l.disabled&&(!s||e&&l.popover)||!l.toggle&&!s||(e&&et&&et.i(),Q=e,St(y,f,e),t.k.H(Q?O:V));},t:()=>Q,B(){et&&et.i();},p(){yt(y),et&&et.p(),x.p();}}},Dt=t=>(t<16?"0":"")+t.toString(16),Ft=(t,e,s)=>(t%=12,A(255*(s-e*v(s,1-s)*m(-1,v(t-3,9-t,1))))),Pt=t=>{const e={h:0,s:0,l:0,r:0,g:0,b:0,a:1,rgb:"",hsl:"",hex:""},s=t.k.H;let o,r,n;return {O:e,i(o,r,i=!0,a){n=e.hex,rt(e,o),rt(e,a||(({h:t,s:e,l:s})=>({r:Ft(t/=30,e/=100,s/=100),g:Ft(t+8,e,s),b:Ft(t+4,e,s)}))(e)),e.s=A(e.s),e.l=A(e.l),e.rgb=Ot(e),e.hsl=Ot(e,T),e.hex=(({r:t,g:e,b:s,a:o})=>"#"+Dt(t)+Dt(e)+Dt(s)+(o<1?Dt(A(255*o)):""))(e),t.u.i(e,r),i&&n!==e.hex&&s(z,e);},M(t,o,r,n){const[i,a,l]=zt(t);let h,c;e[a]!==l&&(a===P?(h=i,c=(({r:t,g:e,b:s,a:o})=>{const r=m(t/=255,e/=255,s/=255),n=v(t,e,s),i=r-n,a=(r+n)/2;return {h:k(60*(0===i?0:r===t?(e-s)/i%6:r===e?(s-t)/i+2:r===s?(t-e)/i+4:0)),s:i?i/(1-x(2*a-1))*100:0,l:100*a,a:o}})(h)):c=i,this.i(c,o,n,h),r&&s(D,e));},A(){r=e[o];},m(){r!==e[o]&&s(D,e);},V(e){o=t.config.format=e;},S:()=>e[o]}};class Tt{static version(){return "2.0.2"}static setDefaults(e){pt(t,e);}constructor(e,s){this.config=pt({},t),this.k=(t=>{const e={[O]:[],[V]:[],[D]:[],[z]:[]};return {H(s,o=t.v.O){t.config.disabled||(e[s]||[]).forEach((e=>{e(rt({type:s,source:t},o));}));},j(t,s){e[t]&&!e[t].includes(s)&&"function"==typeof s&&e[t].push(s);},D(t,s){tt(t)?e[t]&&(tt(s)?e[t]=e[t].filter((t=>t!==s)):e[t]=[]):ct(e,(t=>{e[t]=[];}));}}})(this),this.v=Pt(this),this.u=jt(this,e),this.u.I(s);}setOptions(t){this.u.I(t);}setColor(t){return this.v.M(t),this}getColor(){return {...this.v.O}}isOpen(){return this.u.t()}open(){this.u.o(!0);}close(){this.u.o(!1);}toggle(){this.u.o();}on(t,e){this.k.j(t,e);}off(t,e){this.k.D(t,e);}addSwatches(...t){this.u.I({swatches:this.config.swatches.concat(t)});}removeSwatches(...t){this.u.I({swatches:this.config.swatches.filter(((e,s)=>!t.some((t=>st(t)?+t===s:t===e))))});}enable(){this.u.I({disabled:!1});}disable(){this.u.I({disabled:!0});}reset(){this.v.M(this.config.default);}reposition(){this.u.B();}trigger(t){this.k.H(t);}destroy(){this.u.p(),ct(this,(t=>delete this[t])),nt(this,it);}}
 
     const { button: button$b, div: div$b, h2: h2$9, input: input$6, p: p$3, option: option$6, select: select$6 } = HTML;
+    const opacityValue = "1";
     const longText = `:root {
 	--page-margin: black;
 	--editor-background: black;
@@ -58728,7 +59436,7 @@ You should be redirected to the song at:<br /><br />
             this._editorCatagoryButton = button$b({ style: "border-image-source: none !important; height: auto; min-height: var(--button-size); margin: 0.5em; width:34%; color: var(--secondary-text);" }, "Editor");
             this._cssCatagoryButton = button$b({ style: "border-image-source: none !important; height: auto; min-height: var(--button-size); margin: 0.5em; width:34%; color: var(--secondary-text);" }, "Import/Export");
             this._fullThemeSelect = select$6({ style: "width: 100%;", id: "themeSelect" }, option$6({ selected: true, disabled: true, hidden: false }, "Pick a Base Theme"), option$6({ value: "AbyssBox Classic" }, "AbyssBox Classic"), option$6({ value: "AbyssBox Competitive" }, "AbyssBox Competitive"), option$6({ value: "AbyssBox Light" }, "AbyssBox Light"), option$6({ value: "AbyssBox 0.8" }, "AbyssBox 0.8"), option$6({ value: "AbyssBox Piano" }, "AbyssBox Piano"), option$6({ value: "Half-Life" }, "Half-Life"), option$6({ value: "Half-Life: Source" }, "Half-Life: Source"), option$6({ value: "Doom 1993" }, "Doom 1993"), option$6({ value: "Undertale" }, "Undertale"), option$6({ value: "Yume Nikki" }, "Yume Nikki [!]"), option$6({ value: "Scratch" }, "Scratch"), option$6({ value: "Scratch Addons" }, "Scratch Addons"), option$6({ value: "Windows Xp" }, "Windows Xp"), option$6({ value: "Frutiger Aero" }, "Frutiger Aero"), option$6({ value: "Frutiger Aero Night" }, "Frutiger Aero Night"), option$6({ value: "Skeuomorphic" }, "Skeuomorphic/Early 2000's (LeoV)"), option$6({ value: "woodland" }, "Woodland"), option$6({ value: "corporate dark" }, "Corporate Dark"), option$6({ value: "corporate light" }, "Corporate Light"), option$6({ value: "Glyde" }, "Glyde"), option$6({ value: "starry studio" }, "Starry Studio"), option$6({ value: "Terminal 2.0 (AB)" }, "Terminal 2.0 (AB)"), option$6({ value: "Slushie" }, "Slushie"), option$6({ value: "Slushie Pixel" }, "Slushie 2"), option$6({ value: "dark classic" }, "BeepBox Dark"), option$6({ value: "light classic" }, "BeepBox Light"), option$6({ value: "dark competition" }, "BeepBox Competition Dark"), option$6({ value: "BeepBox Pixel" }, "BeepBox Pixel"), option$6({ value: "jummbox classic" }, "JummBox Dark"), option$6({ value: "jummbox light" }, "JummBox Light"), option$6({ value: "gold light" }, "Gold Light"), option$6({ value: "forest" }, "Forest"), option$6({ value: "forest 2" }, "Forest 2"), option$6({ value: "canyon" }, "Canyon"), option$6({ value: "canyon 2" }, "Canyon 2"), option$6({ value: "midnight" }, "Midnight"), option$6({ value: "beachcombing" }, "Beachcombing"), option$6({ value: "violet verdant" }, "Violet Verdant"), option$6({ value: "sunset" }, "Sunset"), option$6({ value: "autumn" }, "Autumn"), option$6({ value: "fruit" }, "Shadowfruit"), option$6({ value: "toxic" }, "Toxic"), option$6({ value: "roe" }, "Roe"), option$6({ value: "moonlight" }, "Moonlight"), option$6({ value: "portal" }, "Portal"), option$6({ value: "fusion" }, "Fusion"), option$6({ value: "inverse" }, "Inverse"), option$6({ value: "nebula" }, "Nebula"), option$6({ value: "Nebula 2" }, "Nebula 2"), option$6({ value: "roe light" }, "Roe Light"), option$6({ value: "amoled dark" }, "High Contrast Dark"), option$6({ value: "energized" }, "Energized"), option$6({ value: "neapolitan" }, "Neapolitan"), option$6({ value: "mono" }, "Poly"), option$6({ value: "blutonium" }, "Blutonium"), option$6({ value: "modbox classic" }, "Modbox"), option$6({ value: "modbox 2" }, "Modbox 2.0"), option$6({ value: "modbox artic" }, "Artic"), option$6({ value: "modbox cinnamon" }, "Cinnamon Roll [!]"), option$6({ value: "modbox ocean" }, "Ocean"), option$6({ value: "modbox rainbow" }, "Rainbow [!]"), option$6({ value: "modbox float" }, "Float [!]"), option$6({ value: "modbox windows" }, "Windows"), option$6({ value: "modbox grassland" }, "Grassland"), option$6({ value: "modbox dessert" }, "Dessert"), option$6({ value: "modbox kahoot" }, "Kahootiest"), option$6({ value: "modbox bitbeam" }, "Beam to the Bit [!]"), option$6({ value: "modbox egg" }, "Pretty Egg"), option$6({ value: "modbox pony" }, "Poniryoshka"), option$6({ value: "modbox gameboy" }, "Gameboy [!]"), option$6({ value: "modbox woodkid" }, "Woodkid [!]"), option$6({ value: "modbox midnight" }, "Midnight [!]"), option$6({ value: "modbox snedbox" }, "Snedbox"), option$6({ value: "modbox unnamed" }, "unnamed [!]"), option$6({ value: "modbox piano" }, "Piano [!]"), option$6({ value: "modbox halloween" }, "Halloween [!]"), option$6({ value: "modbox frozen" }, "FrozenOver❄️ [!]"), option$6({ value: "Ghost House" }, "Ghost House"), option$6({ value: "Ghost House 2" }, "Ghost House 2"), option$6({ value: "azur lane" }, "Azur Lane"), option$6({ value: "sandbox classic" }, "Sandbox"), option$6({ value: "harrybox" }, "Haileybox"), option$6({ value: "brucebox" }, "Brucebox"), option$6({ value: "shitbox 1.0" }, "Shitbox 1.0"), option$6({ value: "shitbox 2.0" }, "Shitbox 2.0"), option$6({ value: "shitbox 3.0" }, "Shitbox 3.0/shitbox4"), option$6({ value: "shitbox ModBox 2.0" }, "Shitbox ModBox 2.0"), option$6({ value: "shitbox Realm" }, "Shitbox Realm [!]"), option$6({ value: "nerdbox" }, "NerdBox"), option$6({ value: "zefbox" }, "Zefbox"), option$6({ value: "cardboardbox classic" }, "Cardboardbox"), option$6({ value: "blubox classic" }, "Blubox"), option$6({ value: "dogebox classic" }, "Dogebox"), option$6({ value: "wackybox" }, "Wackybox"), option$6({ value: "todbox dark mode" }, "Todbox Dark Mode"), option$6({ value: "mainbox 1.0" }, "Mainbox"), option$6({ value: "microbox" }, "MicroBox"), option$6({ value: "paandorasbox" }, "PaandorasBox"), option$6({ value: "foxbox" }, "FoxBox"), option$6({ value: "midbox" }, "Midbox"), option$6({ value: "dogebox2" }, "Dogebox2"), option$6({ value: "nepbox" }, "Nepbox"), option$6({ value: "nepbox laffey" }, "Laffey"), option$6({ value: "nepbox snedbox" }, "Snedbox (Nb) [!]"), option$6({ value: "nepbox piano" }, "Piano (Nb) [!]"), option$6({ value: "WeebBox" }, "WeebBox"), option$6({ value: "BoxBeep Dark" }, "BoxBeep Dark"), option$6({ value: "BoxBeep light" }, "BoxBeep Light"), option$6({ value: "AWeebyssBox" }, "AWeebyssBox"), option$6({ value: "Deuteranopia" }, "Deuteranopia"), option$6({ value: "Protanopia" }, "Protanopia"), option$6({ value: "Tritanopia" }, "Tritanopia"), option$6({ value: "2012 Video Tutorial" }, "2012 Video Tutorial"), option$6({ value: "I am on fire" }, "I am on fire"), option$6({ value: "custom" }, "Custom"));
-            this._baseColorSelect = select$6({ style: "width: 100%; display:none; margin: 0.5em 0;", id: "baseColorSelect" }, option$6({ selected: true, disabled: true, hidden: false }, "Pick a Base Color Palette"), option$6({ value: "AbyssBox Classic" }, "AbyssBox Classic"), option$6({ value: "AbyssBox Competitive" }, "AbyssBox Competitive"), option$6({ value: "AbyssBox Light" }, "AbyssBox Light"), option$6({ value: "Half-Life" }, "Half-Life"), option$6({ value: "Doom 1993" }, "Doom 1993"), option$6({ value: "Undertale" }, "Undertale"), option$6({ value: "Yume Nikki" }, "Yume Nikki [!]"), option$6({ value: "Scratch" }, "Scratch"), option$6({ value: "Scratch Addons" }, "Scratch Addons"), option$6({ value: "Windows Xp" }, "Windows Xp"), option$6({ value: "Frutiger Aero" }, "Frutiger Aero"), option$6({ value: "Skeuomorphic" }, "Skeuomorphic/Early 2000's (LeoV)"), option$6({ value: "corporate dark" }, "Corporate Dark"), option$6({ value: "corporate light" }, "Corporate Light"), option$6({ value: "Glyde" }, "Glyde"), option$6({ value: "starry studio" }, "Starry Studio"), option$6({ value: "Terminal 2.0 (AB)" }, "Terminal 2.0 (AB)"), option$6({ value: "Slushie" }, "Slushie"), option$6({ value: "dark classic" }, "BeepBox Dark"), option$6({ value: "light classic" }, "BeepBox Light"), option$6({ value: "dark competition" }, "BeepBox Competition Dark"), option$6({ value: "jummbox classic" }, "JummBox Dark"), option$6({ value: "jummbox light" }, "JummBox Light"), option$6({ value: "gold light" }, "Gold Light"), option$6({ value: "forest" }, "Forest"), option$6({ value: "forest 2" }, "Forest 2"), option$6({ value: "canyon" }, "Canyon"), option$6({ value: "canyon 2" }, "Canyon 2"), option$6({ value: "midnight" }, "Midnight"), option$6({ value: "beachcombing" }, "Beachcombing"), option$6({ value: "violet verdant" }, "Violet Verdant"), option$6({ value: "sunset" }, "Sunset"), option$6({ value: "autumn" }, "Autumn"), option$6({ value: "fruit" }, "Shadowfruit"), option$6({ value: "toxic" }, "Toxic"), option$6({ value: "roe" }, "Roe"), option$6({ value: "moonlight" }, "Moonlight"), option$6({ value: "portal" }, "Portal"), option$6({ value: "fusion" }, "Fusion"), option$6({ value: "inverse" }, "Inverse"), option$6({ value: "nebula" }, "Nebula"), option$6({ value: "Nebula 2" }, "Nebula 2"), option$6({ value: "roe light" }, "Roe Light"), option$6({ value: "amoled dark" }, "High Contrast Dark"), option$6({ value: "energized" }, "Energized"), option$6({ value: "neapolitan" }, "Neapolitan"), option$6({ value: "mono" }, "Poly"), option$6({ value: "blutonium" }, "Blutonium"), option$6({ value: "modbox classic" }, "Modbox"), option$6({ value: "modbox 2" }, "Modbox 2.0"), option$6({ value: "modbox artic" }, "Artic"), option$6({ value: "modbox cinnamon" }, "Cinnamon Roll [!]"), option$6({ value: "modbox ocean" }, "Ocean"), option$6({ value: "modbox rainbow" }, "Rainbow [!]"), option$6({ value: "modbox float" }, "Float [!]"), option$6({ value: "modbox windows" }, "Windows"), option$6({ value: "modbox grassland" }, "Grassland"), option$6({ value: "modbox dessert" }, "Dessert"), option$6({ value: "modbox kahoot" }, "Kahootiest"), option$6({ value: "modbox bitbeam" }, "Beam to the Bit [!]"), option$6({ value: "modbox egg" }, "Pretty Egg"), option$6({ value: "modbox pony" }, "Poniryoshka"), option$6({ value: "modbox gameboy" }, "Gameboy [!]"), option$6({ value: "modbox woodkid" }, "Woodkid [!]"), option$6({ value: "modbox midnight" }, "Midnight [!]"), option$6({ value: "modbox snedbox" }, "Snedbox"), option$6({ value: "modbox unnamed" }, "unnamed [!]"), option$6({ value: "modbox piano" }, "Piano [!]"), option$6({ value: "modbox halloween" }, "Halloween [!]"), option$6({ value: "modbox frozen" }, "FrozenOver❄️ [!]"), option$6({ value: "Ghost House" }, "Ghost House"), option$6({ value: "azur lane" }, "Azur Lane"), option$6({ value: "modbox classic" }, "Modbox"), option$6({ value: "sandbox classic" }, "Sandbox"), option$6({ value: "harrybox" }, "Haileybox"), option$6({ value: "brucebox" }, "Brucebox"), option$6({ value: "shitbox 3.0" }, "Shitbox 1.0/3.0"), option$6({ value: "shitbox 2.0" }, "Shitbox 2.0"), option$6({ value: "nerdbox" }, "NerdBox"), option$6({ value: "zefbox" }, "Zefbox"), option$6({ value: "cardboardbox classic" }, "Cardboardbox"), option$6({ value: "blubox classic" }, "Blubox"), option$6({ value: "dogebox classic" }, "Dogebox"), option$6({ value: "wackybox" }, "Wackybox"), option$6({ value: "todbox dark mode" }, "Todbox Dark Mode"), option$6({ value: "mainbox 1.0" }, "Mainbox"), option$6({ value: "microbox" }, "MicroBox"), option$6({ value: "paandorasbox" }, "PaandorasBox"), option$6({ value: "foxbox" }, "FoxBox"), option$6({ value: "midbox" }, "Midbox"), option$6({ value: "dogebox2" }, "Dogebox2"), option$6({ value: "nepbox" }, "Nepbox"), option$6({ value: "BoxBeep Dark" }, "BoxBeep Dark"), option$6({ value: "BoxBeep light" }, "BoxBeep Light"), option$6({ value: "Deuteranopia" }, "Deuteranopia"), option$6({ value: "Protanopia" }, "Protanopia"), option$6({ value: "Tritanopia" }, "Tritanopia"), option$6({ value: "custom" }, "Custom"));
+            this._baseColorSelect = select$6({ style: "width: 100%; display:none; margin: 0.5em 0;", id: "baseColorSelect" }, option$6({ selected: true, disabled: true, hidden: false }, "Pick a Base Color Palette"), option$6({ value: "AbyssBox Classic" }, "AbyssBox Classic"), option$6({ value: "AbyssBox Competitive" }, "AbyssBox Competitive"), option$6({ value: "AbyssBox Light" }, "AbyssBox Light"), option$6({ value: "Half-Life" }, "Half-Life"), option$6({ value: "Doom 1993" }, "Doom 1993"), option$6({ value: "Undertale" }, "Undertale"), option$6({ value: "Yume Nikki" }, "Yume Nikki [!]"), option$6({ value: "Scratch" }, "Scratch"), option$6({ value: "Scratch Addons" }, "Scratch Addons"), option$6({ value: "Windows Xp" }, "Windows Xp"), option$6({ value: "Frutiger Aero" }, "Frutiger Aero"), option$6({ value: "Skeuomorphic" }, "Skeuomorphic/Early 2000's (LeoV)"), option$6({ value: "corporate dark" }, "Corporate Dark"), option$6({ value: "corporate light" }, "Corporate Light"), option$6({ value: "Glyde" }, "Glyde"), option$6({ value: "starry studio" }, "Starry Studio"), option$6({ value: "Terminal 2.0 (AB)" }, "Terminal 2.0 (AB)"), option$6({ value: "Slushie" }, "Slushie"), option$6({ value: "dark classic" }, "BeepBox Dark"), option$6({ value: "light classic" }, "BeepBox Light"), option$6({ value: "dark competition" }, "BeepBox Competition Dark"), option$6({ value: "jummbox classic" }, "JummBox Dark"), option$6({ value: "jummbox light" }, "JummBox Light"), option$6({ value: "gold light" }, "Gold Light"), option$6({ value: "forest" }, "Forest"), option$6({ value: "forest 2" }, "Forest 2"), option$6({ value: "canyon" }, "Canyon"), option$6({ value: "canyon 2" }, "Canyon 2"), option$6({ value: "midnight" }, "Midnight"), option$6({ value: "beachcombing" }, "Beachcombing"), option$6({ value: "violet verdant" }, "Violet Verdant"), option$6({ value: "sunset" }, "Sunset"), option$6({ value: "autumn" }, "Autumn"), option$6({ value: "fruit" }, "Shadowfruit"), option$6({ value: "toxic" }, "Toxic"), option$6({ value: "roe" }, "Roe"), option$6({ value: "moonlight" }, "Moonlight"), option$6({ value: "portal" }, "Portal"), option$6({ value: "fusion" }, "Fusion"), option$6({ value: "inverse" }, "Inverse"), option$6({ value: "nebula" }, "Nebula"), option$6({ value: "Nebula 2" }, "Nebula 2"), option$6({ value: "roe light" }, "Roe Light"), option$6({ value: "amoled dark" }, "High Contrast Dark"), option$6({ value: "energized" }, "Energized"), option$6({ value: "neapolitan" }, "Neapolitan"), option$6({ value: "mono" }, "Poly"), option$6({ value: "blutonium" }, "Blutonium"), option$6({ value: "modbox classic" }, "Modbox"), option$6({ value: "modbox 2" }, "Modbox 2.0"), option$6({ value: "modbox artic" }, "Artic"), option$6({ value: "modbox cinnamon" }, "Cinnamon Roll [!]"), option$6({ value: "modbox ocean" }, "Ocean"), option$6({ value: "modbox rainbow" }, "Rainbow [!]"), option$6({ value: "modbox float" }, "Float [!]"), option$6({ value: "modbox windows" }, "Windows"), option$6({ value: "modbox grassland" }, "Grassland"), option$6({ value: "modbox dessert" }, "Dessert"), option$6({ value: "modbox kahoot" }, "Kahootiest"), option$6({ value: "modbox bitbeam" }, "Beam to the Bit [!]"), option$6({ value: "modbox egg" }, "Pretty Egg"), option$6({ value: "modbox pony" }, "Poniryoshka"), option$6({ value: "modbox gameboy" }, "Gameboy [!]"), option$6({ value: "modbox woodkid" }, "Woodkid [!]"), option$6({ value: "modbox midnight" }, "Midnight [!]"), option$6({ value: "modbox snedbox" }, "Snedbox"), option$6({ value: "modbox unnamed" }, "unnamed [!]"), option$6({ value: "modbox piano" }, "Piano [!]"), option$6({ value: "modbox halloween" }, "Halloween [!]"), option$6({ value: "modbox frozen" }, "FrozenOver❄️ [!]"), option$6({ value: "Ghost House" }, "Ghost House"), option$6({ value: "azur lane" }, "Azur Lane"), option$6({ value: "modbox classic" }, "Modbox"), option$6({ value: "sandbox classic" }, "Sandbox"), option$6({ value: "harrybox" }, "Haileybox"), option$6({ value: "brucebox" }, "Brucebox"), option$6({ value: "shitbox 3.0" }, "Shitbox 1.0/3.0"), option$6({ value: "shitbox 2.0" }, "Shitbox 2.0"), option$6({ value: "nerdbox" }, "NerdBox"), option$6({ value: "zefbox" }, "Zefbox"), option$6({ value: "cardboardbox classic" }, "Cardboardbox"), option$6({ value: "blubox classic" }, "Blubox"), option$6({ value: "dogebox classic" }, "Dogebox"), option$6({ value: "wackybox" }, "Wackybox"), option$6({ value: "todbox dark mode" }, "Todbox Dark Mode"), option$6({ value: "mainbox 1.0" }, "Mainbox"), option$6({ value: "microbox" }, "MicroBox"), option$6({ value: "paandorasbox" }, "PaandorasBox"), option$6({ value: "foxbox" }, "FoxBox"), option$6({ value: "midbox" }, "Midbox"), option$6({ value: "dogebox2" }, "Dogebox2"), option$6({ value: "nepbox" }, "Nepbox"), option$6({ value: "BoxBeep Dark" }, "BoxBeep Dark"), option$6({ value: "BoxBeep light" }, "BoxBeep Light"), option$6({ value: "birdbox dark" }, "BirdBox Dark"), option$6({ value: "birdbox light" }, "BirdBox Light"), option$6({ value: "ultrabox dark" }, "UltraBox"), option$6({ value: "slarmoosbox" }, "Slarmoo's Box"), option$6({ value: "lemmbox dark" }, "LemmBox Dark"), option$6({ value: "Deuteranopia" }, "Deuteranopia"), option$6({ value: "Protanopia" }, "Protanopia"), option$6({ value: "Tritanopia" }, "Tritanopia"), option$6({ value: "custom" }, "Custom"));
             this._backgroundSelect = select$6({ style: "width: 100%; display:none; margin: 0.5em 0;", id: "backgroundSelect" }, option$6({ selected: true, disabled: true, hidden: false }, "Pick a Background"), option$6({ value: "none" }, "None"), option$6({ value: "AbyssBox Classic" }, "AbyssBox Classic"), option$6({ value: "AbyssBox Light" }, "AbyssBox Light"), option$6({ value: "Undertale" }, "Undertale"), option$6({ value: "Windows Xp" }, "Windows Xp"), option$6({ value: "Frutiger Aero" }, "Frutiger Aero"), option$6({ value: "Skeuomorphic" }, "Skeuomorphic/Early 2000's (LeoV)"), option$6({ value: "Glyde" }, "Glyde"), option$6({ value: "starry studio" }, "Starry Studio"), option$6({ value: "Slushie 2" }, "Slushie 2"), option$6({ value: "BeepBox Pixel" }, "BeepBox Pixel"), option$6({ value: "Forest 2" }, "Forest 2"), option$6({ value: "Canyon 2" }, "Canyon 2"), option$6({ value: "Nebula 2" }, "Nebula 2"), option$6({ value: "Ghost House 2" }, "Ghost House 2"), option$6({ value: "azur lane" }, "Azur Lane"));
             this._borderSelect = select$6({ style: "width: 100%; display:none; margin: 0.5em 0;", id: "borderSelect" }, option$6({ selected: true, disabled: true, hidden: false }, "Pick a Border"), option$6({ value: "none" }, "None"), option$6({ value: "AbyssBox Classic" }, "AbyssBox Classic"), option$6({ value: "AbyssBox Competitive" }, "AbyssBox Competitive"), option$6({ value: "AbyssBox Light" }, "AbyssBox Light"), option$6({ value: "Scratch" }, "Scratch"), option$6({ value: "Scratch Addons" }, "Scratch Addons"), option$6({ value: "Undertale" }, "Undertale"), option$6({ value: "Windows Xp" }, "Windows Xp"), option$6({ value: "Frutiger Aero" }, "Frutiger Aero"), option$6({ value: "Skeuomorphic" }, "Skeuomorphic/Early 2000's (LeoV)"), option$6({ value: "Glyde" }, "Glyde"), option$6({ value: "Slushie 2" }, "Slushie 2"), option$6({ value: "BeepBox Pixel" }, "BeepBox Pixel"), option$6({ value: "Forest 2" }, "Forest 2"), option$6({ value: "Canyon 2" }, "Canyon 2"), option$6({ value: "Nebula 2" }, "Nebula 2"), option$6({ value: "Ghost House 2" }, "Ghost House 2"));
             this._overlaySelect = select$6({ style: "width: 100%; display:none; margin: 0.5em 0;", id: "overlaySelect" }, option$6({ selected: true, disabled: true, hidden: false }, "Pick an Overlay"), option$6({ value: "none" }, "None"), option$6({ value: "scanlines" }, "Scanlines"), option$6({ value: "bandicam" }, "Bandicam"), option$6({ value: "fire" }, "Fire"), option$6({ value: "invert" }, "Screen Color Inversion"), option$6({ value: "480p" }, '"Low Quality" Blur (Mimics 480p)'), option$6({ value: "contrast" }, 'High Contrast'), option$6({ value: "Sepia" }, 'Sepia'), option$6({ value: "grayscale" }, 'Grayscale/Black and White'));
@@ -58967,7 +59675,6 @@ You should be redirected to the song at:<br /><br />
             };
             this._whenFileSelected = () => {
                 const file = this._fileInput.files[0];
-                const opacityValue = "0.2";
                 if (!file)
                     return;
                 const reader = new FileReader();
@@ -62331,7 +63038,7 @@ You should be redirected to the song at:<br /><br />
             this._defs = SVG.defs({}, this._gradient);
             this._volumeBarContainer = SVG.svg({ style: `touch-action: none; overflow: visible; margin: auto; max-width: 20vw;`, width: "160px", height: "100%", preserveAspectRatio: "none", viewBox: "0 0 160 12" }, this._defs, this._outVolumeBarBg, this._outVolumeBar, this._outVolumeCap);
             this._volumeBarBox = div({ class: "playback-volume-bar", style: "height: 12px; align-self: center;" }, this._volumeBarContainer);
-            this._fileMenu = select({ style: "width: 100%;" }, option({ selected: true, disabled: true, hidden: false }, "File"), option({ value: "new" }, "+ New Blank Song"), option({ value: "import" }, "↑ > Import/Export Song (" + EditorConfig.ctrlSymbol + "S)"), option({ value: "copyUrl" }, "⎘ Copy Song URL"), option({ value: "shareUrl" }, "⤳ Share Song URL"), option({ value: "shortenUrl" }, "… Shorten Song URL"), option({ value: "configureShortener" }, "🛠 > Customize Url Shortener"), option({ value: "viewPlayer" }, "▶ View in Song Player"), option({ value: "copyEmbed" }, "⎘ Copy HTML Embed Code"), option({ value: "songRecovery" }, "⚠ > Recover Recent Song"));
+            this._fileMenu = select({ style: "width: 100%;" }, option({ selected: true, disabled: true, hidden: false }, "File"), option({ value: "new" }, "+ New Blank Song"), option({ value: "import" }, "↑ > Import/Export Song (" + EditorConfig.ctrlSymbol + "S/" + EditorConfig.ctrlSymbol + "O)"), option({ value: "copyUrl" }, "⎘ Copy Song URL"), option({ value: "shareUrl" }, "⤳ Share Song URL"), option({ value: "shortenUrl" }, "… Shorten Song URL"), option({ value: "configureShortener" }, "🛠 > Customize Url Shortener"), option({ value: "viewPlayer" }, "▶ View in Song Player"), option({ value: "copyEmbed" }, "⎘ Copy HTML Embed Code"), option({ value: "songRecovery" }, "⚠ > Recover Recent Song"), option({ value: "openManual" }, "🕮 > Open Manual"));
             this._editMenu = select({ style: "width: 100%;" }, option({ selected: true, disabled: true, hidden: false }, "Edit"), option({ value: "undo" }, "Undo (Z)"), option({ value: "redo" }, "Redo (Y)"), option({ value: "copy" }, "Copy Pattern (C)"), option({ value: "pasteNotes" }, "Paste Pattern Notes (V)"), option({ value: "pasteNumbers" }, "Paste Pattern Numbers (" + EditorConfig.ctrlSymbol + "⇧V)"), option({ value: "insertBars" }, "Insert Bar (⏎)"), option({ value: "deleteBars" }, "Delete Selected Bars (⌫)"), option({ value: "insertChannel" }, "Insert Channel (" + EditorConfig.ctrlSymbol + "⏎)"), option({ value: "deleteChannel" }, "Delete Selected Channels (" + EditorConfig.ctrlSymbol + "⌫)"), option({ value: "selectChannel" }, "Select Channel (⇧A)"), option({ value: "selectAll" }, "Select All (A)"), option({ value: "duplicatePatterns" }, "Duplicate Reused Patterns (D)"), option({ value: "transposeUp" }, "Move Notes Up (+ or ⇧+)"), option({ value: "transposeDown" }, "Move Notes Down (- or ⇧-)"), option({ value: "moveNotesSideways" }, "> Move All Notes Sideways (W)"), option({ value: "generateEuclideanRhythm" }, "> Generate Euclidean Rhythm (E)"), option({ value: "beatsPerBar" }, "> Change Beats Per Bar (B)"), option({ value: "barCount" }, "> Change Song Length (L)"), option({ value: "channelSettings" }, "> Channel Settings (Q)"), option({ value: "limiterSettings" }, "> Limiter Settings (⇧L)"), option({ value: "addExternal" }, "> Add Custom Samples (⇧Q)"), option({ value: "songTheme" }, "> Set Theme For Song"), option({ value: "presetsPrompt" }, "> Select Presets"));
             this._optionsMenu = select({ style: "width: 100%;" }, option({ selected: true, disabled: true, hidden: false }, "Preferences"), optgroup({ label: "Technical" }, option({ value: "autoPlay" }, "Auto Play on Load"), option({ value: "autoFollow" }, "Auto Follow Playhead"), option({ value: "enableNotePreview" }, "Hear Added Notes"), option({ value: "notesOutsideScale" }, "Place Notes Out of Scale"), option({ value: "setDefaultScale" }, "Set Current Scale as Default"), option({ value: "alwaysFineNoteVol" }, "Always Fine Note Volume"), option({ value: "enableChannelMuting" }, "Enable Channel Muting"), option({ value: "instrumentCopyPaste" }, "Enable Copy/Paste Buttons"), option({ value: "instrumentImportExport" }, "Enable Import/Export Buttons"), option({ value: "displayBrowserUrl" }, "Enable Song Data in URL"), option({ value: "closePromptByClickoff" }, "Close prompts on click off"), option({ value: "oldMobileLayout" }, "Use the Old mobile layout (Reload)"), option({ value: "instrumentSettingsSimplifier" }, "Use Instrument Setting Tabs"), option({ value: "promptSongDetails" }, "Prompt Song Details on Load"), option({ value: "recordingSetup" }, "Note Recording...")), optgroup({ label: "Appearance" }, option({ value: "showThird" }, 'Highlight "Third" Note (SandBox)'), option({ value: "showFifth" }, 'Highlight "Fifth" Note'), option({ value: "advancedColorScheme" }, "Advanced Color Scheme (ModBox)"), option({ value: "notesFlashWhenPlayed" }, "Notes Flash When Played (DB2)"), option({ value: "showChannels" }, "Show All Channels"), option({ value: "showScrollBar" }, "Show Octave Scroll Bar"), option({ value: "showLetters" }, "Show Piano Keys"), option({ value: "displayVolumeBar" }, "Show Playback Volume"), option({ value: "showOscilloscope" }, "Show Oscilloscope"), option({ value: "showSampleLoadingStatus" }, "Show Sample Loading Status"), option({ value: "showDescription" }, "Show Description"), option({ value: "frostedGlassBackground" }, "Use Frosted Glass Prompt Backdrops"), option({ value: "displayShortcutButtons" }, "Display Mobile Shortcut Buttons"), option({ value: "oldModNotes" }, 'Use Old Mod Notes'), option({ value: "selectionCounter" }, 'Selection Counter'), option({ value: "layout" }, "> Set Layout"), option({ value: "colorTheme" }, "> Set Theme"), option({ value: "customFont" }, "> Set Font"), option({ value: "customTheme" }, "> Custom Theme")));
             this._scaleSelect = buildOptions(select(), Config.scales.map(scale => scale.name));
@@ -62354,6 +63061,17 @@ You should be redirected to the song at:<br /><br />
             this._ringModWaveText = span({ class: "tip", onclick: () => this._openPrompt("chipWave") }, "Wave: ");
             this._ringModWaveSelectRow = div({ class: "selectRow", style: "width: 100%;" }, this._ringModWaveText, this._ringModPulsewidthSlider.container, div({ class: "selectContainer", style: "width:40%;" }, this._ringModWaveSelect));
             this._ringModContainerRow = div({ class: "selectRow", style: "display:flex; flex-direction:column; height: 128px;" }, this._ringModRow, this._ringModHzSliderRow, this._rmOffsetHzSliderRow, this._ringModWaveSelectRow);
+            this._granularSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.granularRange, value: "0", step: "1" }), this._doc, (oldValue, newValue) => new ChangeGranular(this._doc, oldValue, newValue), false);
+            this._granularRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("granular") }, "Granular:"), this._granularSlider.container);
+            this._grainSizeSlider = new Slider(input({ style: "margin: 0;", type: "range", min: Config.grainSizeMin / Config.grainSizeStep, max: Config.grainSizeMax / Config.grainSizeStep, value: Config.grainSizeMin / Config.grainSizeStep, step: "1" }), this._doc, (oldValue, newValue) => new ChangeGrainSize(this._doc, oldValue, newValue), false);
+            this.grainSizeNum = div({ style: "font-size: 80%; ", id: "grainSizeNum" });
+            this._grainSizeSliderRow = div({ class: "selectRow", style: "width:100%;" }, div({ style: "display:flex; flex-direction:column; align-items:center;" }, span({ class: "tip", style: "font-size: smaller;", onclick: () => this._openPrompt("grainSize") }, "Grain: "), div({ style: `color: ${ColorConfig.secondaryText}; ` }, this.grainSizeNum)), this._grainSizeSlider.container);
+            this._grainAmountsSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.grainAmountsMax, value: 8, step: "1" }), this._doc, (oldValue, newValue) => new ChangeGrainAmounts(this._doc, oldValue, newValue), false);
+            this._grainAmountsRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("grainAmount") }, "Grain Freq:"), this._grainAmountsSlider.container);
+            this._grainRangeSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.grainRangeMax / Config.grainSizeStep, value: "0", step: "1" }), this._doc, (oldValue, newValue) => new ChangeGrainRange(this._doc, oldValue, newValue), false);
+            this.grainRangeNum = div({ style: "font-size: 80%; ", id: "grainRangeNum" });
+            this._grainRangeSliderRow = div({ class: "selectRow", style: "width:100%;" }, div({ style: "display:flex; flex-direction:column; align-items:center;" }, span({ class: "tip", style: "font-size: smaller;", onclick: () => this._openPrompt("grainRange") }, "Range: "), div({ style: `color: ${ColorConfig.secondaryText}; ` }, this.grainRangeNum)), this._grainRangeSlider.container);
+            this._granularContainerRow = div({ class: "", style: "display:flex; flex-direction:column;" }, this._granularRow, this._grainAmountsRow, this._grainSizeSliderRow, this._grainRangeSliderRow);
             this._reverbSlider = new Slider(input({ style: "margin: 0; position: sticky,", type: "range", min: "0", max: Config.reverbRange - 1, value: "0", step: "1" }), this._doc, (oldValue, newValue) => new ChangeReverb(this._doc, oldValue, newValue), false);
             this._reverbRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("reverb") }, "Reverb:"), this._reverbSlider.container);
             this._echoSustainSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.echoSustainRange - 1, value: "0", step: "1" }), this._doc, (oldValue, newValue) => new ChangeEchoSustain(this._doc, oldValue, newValue), false);
@@ -62571,7 +63289,7 @@ You should be redirected to the song at:<br /><br />
             this._feedbackRow2 = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("feedbackVolume") }, "Fdback Vol:"), this._feedbackAmplitudeSlider.container);
             this._addEnvelopeButton = button({ type: "button", class: "add-envelope" });
             this._instrumentDiv = div({ id: "InstrumentDiv" }, this._panSliderRow, this._panDropdownGroup, this._chipWaveSelectRow, this._chipNoiseSelectRow, this._useChipWaveAdvancedLoopControlsRow, this._chipWaveLoopModeSelectRow, this._chipWaveLoopStartRow, this._chipWaveLoopEndRow, this._chipWaveStartOffsetRow, this._chipWavePlayBackwardsRow, this._customWaveDraw, this._eqFilterTypeRow, this._eqFilterRow, this._eqFilterSimpleCutRow, this._eqFilterSimplePeakRow, this._fadeInOutRow, this._algorithmSelectRow, this._algorithm6OpSelectRow, this._phaseModGroup, this._feedbackRow1, this._feedback6OpRow1, this._feedbackRow2, this._spectrumRow, this._harmonicsRow, this._drumsetGroup, this._supersawDynamismRow, this._supersawSpreadRow, this._supersawShapeRow, this._pulseWidthRow, this._pulseWidthDropdownGroup, this._stringSustainRow, div({ style: "" }, this._unisonSelectRow), this._unisonDropdownGroup);
-            this._effectDiv = div({ id: "effectsDiv" }, div({ class: "effectsNameDiv", style: `padding: 2px 0; margin-left: 2em; display: flex; align-items: center;` }, span({ style: `flex-grow: 1; text-align: center;` }, span({ class: "tip", onclick: () => this._openPrompt("effects") }, "Effects")), div({ class: "effects-menu" }, this._effectsSelect)), div({ class: "effectsOpDiv" }, this._transitionRow, this._transitionDropdownGroup, this._chordSelectRow, this._chordDropdownGroup, this._pitchShiftRow, this._detuneSliderRow, this._vibratoSelectRow, this._vibratoDropdownGroup, this._noteFilterTypeRow, this._noteFilterRow, this._noteFilterSimpleCutRow, this._noteFilterSimplePeakRow, this._distortionRow, this._aliasingRow, this._bitcrusherQuantizationRow, this._bitcrusherFreqRow, this._chorusRow, this._echoSustainRow, this._echoDelayRow, this._reverbRow, this._ringModContainerRow, this._phaserMixRow, this._phaserFreqRow, this._phaserFeedbackRow, this._phaserStagesRow, this._upperNoteLimitRow, this._lowerNoteLimitRow, this._invertWaveRow));
+            this._effectDiv = div({ id: "effectsDiv" }, div({ class: "effectsNameDiv", style: `padding: 2px 0; margin-left: 2em; display: flex; align-items: center;` }, span({ style: `flex-grow: 1; text-align: center;` }, span({ class: "tip", onclick: () => this._openPrompt("effects") }, "Effects")), div({ class: "effects-menu" }, this._effectsSelect)), div({ class: "effectsOpDiv" }, this._transitionRow, this._transitionDropdownGroup, this._chordSelectRow, this._chordDropdownGroup, this._pitchShiftRow, this._detuneSliderRow, this._vibratoSelectRow, this._vibratoDropdownGroup, this._noteFilterTypeRow, this._noteFilterRow, this._noteFilterSimpleCutRow, this._noteFilterSimplePeakRow, this._distortionRow, this._aliasingRow, this._bitcrusherQuantizationRow, this._bitcrusherFreqRow, this._chorusRow, this._echoSustainRow, this._echoDelayRow, this._reverbRow, this._ringModContainerRow, this._phaserMixRow, this._phaserFreqRow, this._phaserFeedbackRow, this._phaserStagesRow, this._upperNoteLimitRow, this._lowerNoteLimitRow, this._invertWaveRow, this._granularContainerRow));
             this._envelopeDiv = div({ id: "envelopesDiv" }, div({ class: "envelopesNameDiv", style: `padding: 2px 0; margin-left: 2em; display: flex; align-items: center;` }, span({ style: `flex-grow: 1; text-align: center;` }, span({ class: "tip", onclick: () => this._openPrompt("envelopes") }, "Envelopes")), this._envelopeDropdown, this._addEnvelopeButton), div({ class: "envelopesOpDiv" }, this._envelopeDropdownGroup, this._envelopeEditor.container));
             this._customInstrumentSettingsGroup = div({ class: "editor-controls" }, this._instrumentDiv, this._effectDiv, this._envelopeDiv);
             this._instrumentCopyGroup = div({ class: "editor-controls" }, div({ class: "selectRow" }, this._instrumentCopyButton, this._instrumentPasteButton));
@@ -62709,6 +63427,9 @@ You should be redirected to the song at:<br /><br />
             };
             this.refocusStage = () => {
                 this.mainLayer.focus({ preventScroll: true });
+            };
+            this._dropHandler = () => {
+                this._openPrompt("import");
             };
             this._onFocusIn = (event) => {
                 if (this._doc.synth.recording && event.target != this.mainLayer && event.target != this._stopButton && event.target != this._volumeSlider.input) {
@@ -63725,6 +64446,16 @@ You should be redirected to the song at:<br /><br />
                         this._upperNoteLimitRow.style.display = "none";
                         this._lowerNoteLimitRow.style.display = "none";
                     }
+                    if (effectsIncludeGranular(instrument.effects)) {
+                        this._granularContainerRow.style.display = "";
+                        this._granularSlider.updateValue(instrument.granular);
+                        this._grainSizeSlider.updateValue(instrument.grainSize);
+                        this._grainAmountsSlider.updateValue(instrument.grainAmounts);
+                        this._grainRangeSlider.updateValue(instrument.grainRange);
+                    }
+                    else {
+                        this._granularContainerRow.style.display = "none";
+                    }
                     if (instrument.type == 0 || instrument.type == 9 || instrument.type == 5 || instrument.type == 7 || instrument.type == 3 || instrument.type == 6 || instrument.type == 2) {
                         this._unisonSelectRow.style.display = "";
                         setSelectedValue(this._unisonSelect, instrument.unison);
@@ -63947,8 +64678,8 @@ You should be redirected to the song at:<br /><br />
                                 settingList.push("note volume");
                                 settingList.push("mix volume");
                                 let tgtInstrumentTypes = [];
-                                let anyInstrumentAdvancedEQ = false, anyInstrumentSimpleEQ = false, anyInstrumentAdvancedNote = false, anyInstrumentSimpleNote = false, anyInstrumentArps = false, anyInstrumentPitchShifts = false, anyInstrumentDetunes = false, anyInstrumentVibratos = false, anyInstrumentNoteFilters = false, anyInstrumentDistorts = false, anyInstrumentBitcrushes = false, anyInstrumentPans = false, anyInstrumentChorus = false, anyInstrumentEchoes = false, anyInstrumentReverbs = false, anyInstrumentRMs = false, anyInstrumentPhasers = false, anyInstrumentHasEnvelopes = false;
-                                let allInstrumentNoteFilters = true, allInstrumentDetunes = true, allInstrumentVibratos = true, allInstrumentDistorts = true, allInstrumentBitcrushes = true, allInstrumentPans = true, allInstrumentChorus = true, allInstrumentEchoes = true, allInstrumentReverbs = true, anyInstrumentInvertWave = true;
+                                let anyInstrumentAdvancedEQ = false, anyInstrumentSimpleEQ = false, anyInstrumentAdvancedNote = false, anyInstrumentSimpleNote = false, anyInstrumentArps = false, anyInstrumentPitchShifts = false, anyInstrumentDetunes = false, anyInstrumentVibratos = false, anyInstrumentNoteFilters = false, anyInstrumentDistorts = false, anyInstrumentBitcrushes = false, anyInstrumentPans = false, anyInstrumentChorus = false, anyInstrumentEchoes = false, anyInstrumentReverbs = false, anyInstrumentRMs = false, anyInstrumentPhasers = false, anyInstrumentGranulars = false, anyInstrumentHasEnvelopes = false;
+                                let allInstrumentNoteFilters = true, allInstrumentDetunes = true, allInstrumentVibratos = true, allInstrumentDistorts = true, allInstrumentBitcrushes = true, allInstrumentPans = true, allInstrumentChorus = true, allInstrumentEchoes = true, allInstrumentReverbs = true, anyInstrumentInvertWave = true, allInstrumentGranulars = true;
                                 let instrumentCandidates = [];
                                 if (modInstrument >= channel.instruments.length) {
                                     for (let i = 0; i < channel.instruments.length; i++) {
@@ -64047,6 +64778,12 @@ You should be redirected to the song at:<br /><br />
                                     }
                                     else {
                                         anyInstrumentInvertWave = false;
+                                    }
+                                    if (effectsIncludeGranular(channel.instruments[instrumentIndex].effects)) {
+                                        anyInstrumentGranulars = true;
+                                    }
+                                    else {
+                                        allInstrumentGranulars = false;
                                     }
                                     if (channel.instruments[instrumentIndex].envelopes.length > 0) {
                                         anyInstrumentHasEnvelopes = true;
@@ -64177,6 +64914,18 @@ You should be redirected to the song at:<br /><br />
                                 }
                                 if (anyInstrumentInvertWave) {
                                     settingList.push("invert wave");
+                                }
+                                if (anyInstrumentGranulars) {
+                                    settingList.push("granular");
+                                    settingList.push("grain freq");
+                                    settingList.push("grain size");
+                                    settingList.push("grain range");
+                                }
+                                if (!allInstrumentGranulars) {
+                                    unusedSettingList.push("+ granular");
+                                    unusedSettingList.push("+ grain freq");
+                                    unusedSettingList.push("+ grain size");
+                                    unusedSettingList.push("+ grain range");
                                 }
                             }
                             buildOptions(this._modSetBoxes[mod], settingList);
@@ -64929,7 +65678,12 @@ You should be redirected to the song at:<br /><br />
                         if (canPlayNotes)
                             break;
                         if (event.ctrlKey || event.metaKey) {
-                            this._openPrompt("export");
+                            if (!event.shiftKey) {
+                                this._openPrompt("export");
+                            }
+                            else {
+                                this._openPrompt("quickExport");
+                            }
                             event.preventDefault();
                         }
                         else {
@@ -65800,8 +66554,8 @@ You should be redirected to the song at:<br /><br />
                     case "songRecovery":
                         this._openPrompt("songRecovery");
                         break;
-                    case "openTutorial":
-                        this._openPrompt("tutorial");
+                    case "openManual":
+                        window.open("./manual.html");
                         break;
                 }
                 this._fileMenu.selectedIndex = 0;
@@ -66201,6 +66955,7 @@ You should be redirected to the song at:<br /><br />
             this._fullscreenButton.addEventListener("click", this._goFullscreen);
             this._patternArea.addEventListener("mousedown", this._refocusStageNotEditing);
             this._trackArea.addEventListener("mousedown", this.refocusStage);
+            this._patternArea.addEventListener('dragover', this._dropHandler);
             this._volumeSlider.container.style.setProperty("flex-grow", "1");
             this._volumeSlider.container.style.setProperty("display", "flex");
             this._volumeBarContainer.style.setProperty("flex-grow", "1");
@@ -66560,6 +67315,8 @@ You should be redirected to the song at:<br /><br />
                     return this._phaserFeedbackSlider;
                 case Config.modulators.dictionary["phaser stages"].index:
                     return this._phaserStagesSlider;
+                case Config.modulators.dictionary["granular"].index:
+                    return this._granularSlider;
                 default:
                     return null;
             }
@@ -66587,6 +67344,9 @@ You should be redirected to the song at:<br /><br />
             if (promptName) {
                 switch (promptName) {
                     case "export":
+                        this.prompt = new ImportPrompt(this._doc);
+                        break;
+                    case "quickExport":
                         this.prompt = new ImportPrompt(this._doc);
                         break;
                     case "import":
