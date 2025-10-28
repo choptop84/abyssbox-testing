@@ -60320,6 +60320,26 @@ You should be redirected to the song at:<br /><br />
                         message = div$9(h2$7("Lower Note Limit"), p$1("Defines the lower limit in which notes will play, useful for advanced instruments."));
                     }
                     break;
+                case "granular":
+                    {
+                        message = div$9(h2$7("Granular Synthesis"), p$1(`This effect is based on granular synthesis! It takes random points from a wave and rearranges them to form "sonic clouds".`), p$1(`This particular slider controls the wet/dry mix of the granulation.`));
+                    }
+                    break;
+                case "grainSize":
+                    {
+                        message = div$9(h2$7("Grain Size"), p$1(`This setting controls the size of the grain.`));
+                    }
+                    break;
+                case "grainAmount":
+                    {
+                        message = div$9(h2$7("Grain Freq"), p$1(`This setting controls about how often a grain (a group of audio samples) is added to the output, from rarely to multiple at once.`));
+                    }
+                    break;
+                case "grainRange":
+                    {
+                        message = div$9(h2$7("Grain Range"), p$1(`This setting controls the range of randomization for grain sizes. `));
+                    }
+                    break;
                 default:
                     if (type.indexOf("modSetInfo") >= 0) {
                         let modNum = +type[type.length - 1];
