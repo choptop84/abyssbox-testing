@@ -229,12 +229,12 @@ var beepbox = (function (exports) {
                 sampleLoadingState.statusTable[chipWaveIndex] = 0;
                 sampleLoadingState.urlTable[chipWaveIndex] = "legacySamples";
             }
-            loadScript("samples.js")
-                .then(() => loadScript("samples2.js"))
-                .then(() => loadScript("samples3.js"))
-                .then(() => loadScript("drumsamples.js"))
-                .then(() => loadScript("wario_samples.js"))
-                .then(() => loadScript("kirby_samples.js"))
+            loadScript(`${location.pathname.includes("player") ? "." : ""}./samples/samples.js`)
+                .then(() => loadScript(`${location.pathname.includes("player") ? "." : ""}./samples/samples2.js`))
+                .then(() => loadScript(`${location.pathname.includes("player") ? "." : ""}./samples/samples3.js`))
+                .then(() => loadScript(`${location.pathname.includes("player") ? "." : ""}./samples/drumsamples.js`))
+                .then(() => loadScript(`${location.pathname.includes("player") ? "." : ""}./samples/wario_samples.js`))
+                .then(() => loadScript(`${location.pathname.includes("player") ? "." : ""}./samples/kirby_samples.js`))
                 .then(() => {
                 const chipWaveSamples = [
                     centerWave(kicksample),
@@ -344,7 +344,7 @@ var beepbox = (function (exports) {
                 sampleLoadingState.statusTable[chipWaveIndex] = 0;
                 sampleLoadingState.urlTable[chipWaveIndex] = "nintariboxSamples";
             }
-            loadScript("nintaribox_samples.js")
+            loadScript(`${location.pathname.includes("player") ? "." : ""}./samples/nintaribox_samples.js`)
                 .then(() => {
                 const chipWaveSamples = [
                     centerWave(chronoperc1finalsample),
@@ -395,7 +395,7 @@ var beepbox = (function (exports) {
                 sampleLoadingState.statusTable[chipWaveIndex] = 0;
                 sampleLoadingState.urlTable[chipWaveIndex] = "marioPaintboxSamples";
             }
-            loadScript("mario_paintbox_samples.js")
+            loadScript(`${location.pathname.includes("player") ? "." : ""}./samples/mario_paintbox_samples.js`)
                 .then(() => {
                 const chipWaveSamples = [
                     centerWave(catpaintboxsample),
@@ -436,6 +436,7 @@ var beepbox = (function (exports) {
     Config.releaseVal = 0.25;
     Config.willReloadForCustomSamples = false;
     Config.jsonFormat = "AbyssBox";
+    Config.maxEffectCount = 17;
     Config.scales = toNameMap([
         { name: "Free", realName: "chromatic", flags: [true, true, true, true, true, true, true, true, true, true, true, true] },
         { name: "Major", realName: "ionian", flags: [true, false, true, false, true, true, false, true, false, true, false, true] },
@@ -491,6 +492,8 @@ var beepbox = (function (exports) {
     Config.reverbShelfHz = 8000.0;
     Config.reverbShelfGain = Math.pow(2.0, -1.5);
     Config.reverbRange = 32;
+    Config.reverbWetRange = 32;
+    Config.reverbDryRange = 32;
     Config.reverbDelayBufferSize = 16384;
     Config.reverbDelayBufferMask = Config.reverbDelayBufferSize - 1;
     Config.phaserMixRange = 32;
@@ -741,7 +744,7 @@ var beepbox = (function (exports) {
         { name: "arpeggio", customInterval: false, arpeggiates: true, strumParts: 0, singleTone: true },
         { name: "custom interval", customInterval: true, arpeggiates: false, strumParts: 0, singleTone: true },
     ]);
-    Config.maxChordSize = 9;
+    Config.maxChordSize = 97;
     Config.operatorCount = 4;
     Config.maxPitchOrOperatorCount = Math.max(Config.maxChordSize, Config.operatorCount + 2);
     Config.algorithms = toNameMap([
@@ -1125,8 +1128,10 @@ var beepbox = (function (exports) {
         { name: "chorus", computeIndex: 55, displayName: "chorus", interleave: false, isFilter: false, maxCount: 1, effect: 1, compatibleInstruments: null },
         { name: "echoSustain", computeIndex: 56, displayName: "echo sustain", interleave: false, isFilter: false, maxCount: 1, effect: 6, compatibleInstruments: null },
         { name: "reverb", computeIndex: 57, displayName: "reverb", interleave: false, isFilter: false, maxCount: 1, effect: 0, compatibleInstruments: null },
-        { name: "panning", computeIndex: 58, displayName: "panning", interleave: false, isFilter: false, maxCount: 1, effect: 2, compatibleInstruments: null },
-        { name: "arpeggioSpeed", computeIndex: 59, displayName: "arpeggio speed", interleave: false, isFilter: false, maxCount: 1, effect: 11, compatibleInstruments: null },
+        { name: "reverbWet", computeIndex: 58, displayName: "reverb wet mix", interleave: false, isFilter: false, maxCount: 1, effect: 0, compatibleInstruments: null },
+        { name: "reverbDry", computeIndex: 59, displayName: "reverb dry mix", interleave: false, isFilter: false, maxCount: 1, effect: 0, compatibleInstruments: null },
+        { name: "panning", computeIndex: 60, displayName: "panning", interleave: false, isFilter: false, maxCount: 1, effect: 2, compatibleInstruments: null },
+        { name: "arpeggioSpeed", computeIndex: 61, displayName: "arpeggio speed", interleave: false, isFilter: false, maxCount: 1, effect: 11, compatibleInstruments: null },
         { name: "granular", computeIndex: 48, displayName: "granular", interleave: false, isFilter: false, maxCount: 1, effect: 16, compatibleInstruments: null },
         { name: "grainFreq", computeIndex: 49, displayName: "grain freq", interleave: false, isFilter: false, maxCount: 1, effect: 16, compatibleInstruments: null },
         { name: "grainSize", computeIndex: 50, displayName: "grain size", interleave: false, isFilter: false, maxCount: 1, effect: 16, compatibleInstruments: null },
@@ -1441,7 +1446,7 @@ var beepbox = (function (exports) {
             promptDesc: ["This setting controls the number of phaser stages in your insturment, just like the phaser stages slider.", "At $LO, your instrument will have no phaser stages. At $HI, it will be at maximum.", "[OVERWRITING] [$LO - $HI]"] },
         { name: "song pitch shift",
             pianoName: "Song Pitch Shift",
-            maxRawVol: (Config.pitchShiftRange * 2) - 2, newNoteVol: Config.pitchShiftRange, forSong: true, convertRealFactor: -Config.pitchShiftRange + 1, associatedEffect: 7,
+            maxRawVol: (Config.pitchShiftRange * 2) - 2, newNoteVol: Config.pitchShiftRange - 1, forSong: true, convertRealFactor: -Config.pitchShiftRange + 1, associatedEffect: 7,
             promptName: "Songwide Pitch Shift",
             promptDesc: ["This setting controls the pitch offset of all instruments regardless of whether or not the instrument has the effect itself, just like the pitch shift slider.", "At $MID your instrument will have no pitch shift. This increases as you decrease toward $LO pitches (half-steps) at the low end, or increases towards +$HI pitches at the high end.", "[ADDITIVE] [$LO - $HI] [pitch]"] },
         { name: "individual envelope speed",
@@ -1473,6 +1478,21 @@ var beepbox = (function (exports) {
             maxRawVol: Config.grainRangeMax / Config.grainSizeStep, newNoteVol: 0, forSong: false, convertRealFactor: 0, associatedEffect: 16,
             promptName: "Grain Range",
             promptDesc: ["This setting controls the range of values for your grain size of the granular effect in your instrument, from no variation to a lot", "The number shown in the mod channel is multiplied by " + Config.grainSizeStep + " to get the actual grain size.", "[OVERWRITING] [$LO - $HI]"] },
+        { name: "song eq",
+            pianoName: "Song EQ",
+            maxRawVol: 10, newNoteVol: 0, forSong: true, convertRealFactor: 0, associatedEffect: 17,
+            promptName: "Song EQ Filter",
+            promptDesc: ["This setting overwrites every instrument's eq filter. You can do this in a few separate ways, similar to the per instrument eq filter modulator.", "When the option 'morph' is selected, your modulator values will indicate a sub-filter index of your EQ filter to 'morph' to over time. For example, a change from 0 to 1 means your main filter (default) will morph to sub-filter 1 over the specified duration. You can shape the main filter and sub-filters in the large filter editor ('+' button). If your two filters' number, type, and order of filter dots all match up, the morph will happen smoothly and you'll be able to hear them changing. If they do not match up, the filters will simply jump between each other.", "Note that filters will morph based on endpoints in the pattern editor. So, if you specify a morph from sub-filter 1 to 4 but do not specifically drag in new endpoints for 2 and 3, it will morph directly between 1 and 4 without going through the others.", "If you target Dot X or Dot Y, you can finely tune the coordinates of a single dot for your filter. The number of available dots to choose is dependent on your main filter's dot count.", "[OVERWRITING] [$LO - $HI]"] },
+        { name: "reverb wet",
+            pianoName: "Reverb Wet Volume",
+            maxRawVol: Config.reverbWetRange, newNoteVol: 0, forSong: false, convertRealFactor: 0, associatedEffect: 0,
+            promptName: "Reverb Wet Volume",
+            promptDesc: ["This setting controls the volume of the wet samples in your reverb, just like the reverb (Wet) slider.", "At $LO, your instrument will have no wetness. At $HI, it will be at maximum.", "[OVERWRITING] [$LO - $HI]"] },
+        { name: "reverb dry",
+            pianoName: "Reverb Dry Volume",
+            maxRawVol: Config.reverbDryRange, newNoteVol: 0, forSong: false, convertRealFactor: 0, associatedEffect: 0,
+            promptName: "Reverb Dry Volume",
+            promptDesc: ["This setting controls the volume of the dry samples in your reverb, just like the reverb (Dry) slider.", "At $LO, your instrument will have no wetness. At $HI, it will be at maximum.", "[OVERWRITING] [$LO - $HI]"] },
     ]);
     function centerWave(wave) {
         let sum = 0.0;
@@ -1862,8 +1882,9 @@ var beepbox = (function (exports) {
             return (_a = EditorConfig.presetCategories[0].presets.dictionary) === null || _a === void 0 ? void 0 : _a[TypePresets === null || TypePresets === void 0 ? void 0 : TypePresets[instrument]];
         }
     }
-    EditorConfig.version = "1.7";
-    EditorConfig.versionDisplayName = "AbyssBox " + EditorConfig.version;
+    EditorConfig.version = "1.8";
+    EditorConfig.isExperimental = location.pathname.includes("/abyssbox-experimental/") ? "Experimental " : "";
+    EditorConfig.versionDisplayName = "AbyssBox " + EditorConfig.isExperimental + EditorConfig.version;
     EditorConfig.releaseNotesURL = "./patch_notes.html";
     EditorConfig.isOnMac = /^Mac/i.test(navigator.platform) || /Mac OS X/i.test(navigator.userAgent) || /^(iPhone|iPad|iPod)/i.test(navigator.platform) || /(iPhone|iPad|iPod)/i.test(navigator.userAgent);
     EditorConfig.ctrlSymbol = EditorConfig.isOnMac ? "⌘" : "Ctrl+";
@@ -2245,6 +2266,12 @@ var beepbox = (function (exports) {
                 { name: "Distortion Bass", generalMidi: false, settings: { "type": "Picked String", "eqFilter": [{ "type": "low-pass", "cutoffHz": 4756.83, "linearGain": 0.25 }, { "type": "high-pass", "cutoffHz": 88.39, "linearGain": 1.4142 }, { "type": "low-pass", "cutoffHz": 8000, "linearGain": 0.5 }, { "type": "peak", "cutoffHz": 1000, "linearGain": 0.5 }], "eqFilterType": false, "eqSimpleCut": 10, "eqSimplePeak": 0, "envelopeSpeed": 12, "discreteEnvelope": false, "eqSubFilters0": [{ "type": "low-pass", "cutoffHz": 4756.83, "linearGain": 0.25 }, { "type": "high-pass", "cutoffHz": 88.39, "linearGain": 1.4142 }, { "type": "low-pass", "cutoffHz": 8000, "linearGain": 0.5 }, { "type": "peak", "cutoffHz": 1000, "linearGain": 0.5 }], "effects": ["note filter", "distortion", "bitcrusher", "phaser"], "noteFilterType": false, "noteSimpleCut": 10, "noteSimplePeak": 0, "noteFilter": [{ "type": "high-pass", "cutoffHz": 88.39, "linearGain": 1.4142 }, { "type": "low-pass", "cutoffHz": 4000, "linearGain": 0.5 }], "noteSubFilters0": [{ "type": "high-pass", "cutoffHz": 88.39, "linearGain": 1.4142 }, { "type": "low-pass", "cutoffHz": 4000, "linearGain": 0.5 }], "distortion": 43, "aliases": false, "bitcrusherOctave": 6, "bitcrusherQuantization": 0, "phaserMix": 65, "phaserFreq": 19, "phaserFeedback": 61, "phaserStages": 52, "panDelay": 10, "fadeInSeconds": 0, "fadeOutTicks": 6, "harmonics": [86, 100, 100, 86, 86, 86, 86, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 71], "unison": "none", "stringSustain": 64, "envelopes": [{ "target": "noteFilterFreq", "envelope": "note size", "index": 1 }, { "target": "phaserFeedback", "envelope": "twang 3" }] } },
                 { name: "Phased Overdrive Guitar", generalMidi: false, settings: { "type": "Picked String", "eqFilter": [{ "type": "low-pass", "cutoffHz": 4756.83, "linearGain": 0.7071 }, { "type": "high-pass", "cutoffHz": 250, "linearGain": 1 }, { "type": "low-pass", "cutoffHz": 6727.17, "linearGain": 1.4142 }, { "type": "peak", "cutoffHz": 840.9, "linearGain": 0.3536 }], "eqFilterType": false, "eqSimpleCut": 10, "eqSimplePeak": 0, "envelopeSpeed": 12, "discreteEnvelope": false, "eqSubFilters0": [{ "type": "low-pass", "cutoffHz": 4756.83, "linearGain": 0.7071 }, { "type": "high-pass", "cutoffHz": 250, "linearGain": 1 }, { "type": "low-pass", "cutoffHz": 6727.17, "linearGain": 1.4142 }, { "type": "peak", "cutoffHz": 840.9, "linearGain": 0.3536 }], "effects": ["note filter", "distortion", "bitcrusher", "phaser"], "noteFilterType": false, "noteSimpleCut": 10, "noteSimplePeak": 0, "noteFilter": [{ "type": "high-pass", "cutoffHz": 297.3, "linearGain": 2 }, { "type": "low-pass", "cutoffHz": 2378.41, "linearGain": 0.7071 }], "noteSubFilters0": [{ "type": "high-pass", "cutoffHz": 297.3, "linearGain": 2 }, { "type": "low-pass", "cutoffHz": 2378.41, "linearGain": 0.7071 }], "distortion": 71, "aliases": false, "bitcrusherOctave": 6, "bitcrusherQuantization": 0, "phaserMix": 100, "phaserFreq": 19, "phaserFeedback": 61, "phaserStages": 52, "panDelay": 10, "fadeInSeconds": 0, "fadeOutTicks": 12, "harmonics": [86, 100, 100, 86, 86, 86, 86, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 71], "unison": "none", "stringSustain": 64, "envelopes": [{ "target": "noteFilterFreq", "envelope": "note size", "index": 1 }, { "target": "phaserFeedback", "envelope": "twang 2" }] } },
                 { name: "Phased Picked Guitar", generalMidi: false, settings: { "type": "Picked String", "eqFilter": [{ "type": "low-pass", "cutoffHz": 4756.83, "linearGain": 0.7071 }, { "type": "high-pass", "cutoffHz": 250, "linearGain": 1 }, { "type": "low-pass", "cutoffHz": 6727.17, "linearGain": 1.4142 }, { "type": "peak", "cutoffHz": 840.9, "linearGain": 0.3536 }], "eqFilterType": false, "eqSimpleCut": 10, "eqSimplePeak": 0, "envelopeSpeed": 12, "discreteEnvelope": false, "eqSubFilters0": [{ "type": "low-pass", "cutoffHz": 4756.83, "linearGain": 0.7071 }, { "type": "high-pass", "cutoffHz": 250, "linearGain": 1 }, { "type": "low-pass", "cutoffHz": 6727.17, "linearGain": 1.4142 }, { "type": "peak", "cutoffHz": 840.9, "linearGain": 0.3536 }], "effects": ["note filter", "distortion", "bitcrusher", "chorus", "echo", "phaser"], "noteFilterType": false, "noteSimpleCut": 10, "noteSimplePeak": 0, "noteFilter": [{ "type": "high-pass", "cutoffHz": 297.3, "linearGain": 2 }, { "type": "low-pass", "cutoffHz": 2378.41, "linearGain": 0.7071 }], "noteSubFilters0": [{ "type": "high-pass", "cutoffHz": 297.3, "linearGain": 2 }, { "type": "low-pass", "cutoffHz": 2378.41, "linearGain": 0.7071 }], "distortion": 29, "aliases": false, "bitcrusherOctave": 6, "bitcrusherQuantization": 0, "phaserMix": 77, "phaserFreq": 19, "phaserFeedback": 61, "phaserStages": 52, "panDelay": 10, "chorus": 43, "echoSustain": 43, "echoDelayBeats": 1, "fadeInSeconds": 0, "fadeOutTicks": 12, "harmonics": [86, 100, 100, 86, 86, 86, 86, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 71], "unison": "none", "stringSustain": 64, "envelopes": [{ "target": "noteFilterFreq", "envelope": "note size", "index": 1 }, { "target": "phaserMix", "envelope": "twang -1" }] } },
+            ]) },
+        { name: "AbyssBox Templates", presets: toNameMap([
+                { name: "Template Bass", generalMidi: false, settings: { "type": "FM", "eqFilter": [{ "type": "low-pass", "cutoffHz": 11313.71, "linearGain": 0.1768 }], "eqFilterType": true, "eqSimpleCut": 6, "eqSimplePeak": 0, "envelopeSpeed": 12, "eqSubFilters1": [], "effects": ["bitcrusher"], "bitcrusherOctave": 4.5, "bitcrusherQuantization": 0, "panDelay": 10, "fadeInSeconds": 0, "fadeOutTicks": -1, "algorithm": "1←2←3←4", "feedbackType": "2→3", "feedbackAmplitude": 2, "operators": [{ "frequency": "1×", "amplitude": 15, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "0.5×", "amplitude": 10, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "7×", "amplitude": 4, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "10×", "amplitude": 8, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }], "envelopes": [{ "target": "operatorAmplitude", "envelope": "twang 1", "index": 2 }, { "target": "operatorAmplitude", "envelope": "twang 1", "index": 3 }] } },
+                { name: "Template Organ", generalMidi: false, settings: { "type": "FM", "eqFilter": [{ "type": "low-pass", "cutoffHz": 16000, "linearGain": 0.3536 }], "eqFilterType": true, "eqSimpleCut": 8, "eqSimplePeak": 0, "envelopeSpeed": 12, "eqSubFilters1": [], "effects": ["note filter"], "noteFilterType": true, "noteSimpleCut": 8, "noteSimplePeak": 0, "noteFilter": [{ "type": "low-pass", "cutoffHz": 16000, "linearGain": 0.3536 }], "noteSubFilters1": [{ "type": "low-pass", "cutoffHz": 16000, "linearGain": 0.3536 }], "panDelay": 10, "fadeInSeconds": 0.0125, "fadeOutTicks": 6, "algorithm": "1 2 3 4", "feedbackType": "1→2", "feedbackAmplitude": 0, "operators": [{ "frequency": "1×", "amplitude": 15, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "2×", "amplitude": 15, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "3×", "amplitude": 15, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "4×", "amplitude": 15, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }], "envelopes": [] } },
+                { name: "Template Soft Lead", generalMidi: false, settings: { "type": "FM", "eqFilter": [{ "type": "low-pass", "cutoffHz": 19027.31, "linearGain": 0.7071 }], "eqFilterType": true, "eqSimpleCut": 10, "eqSimplePeak": 0, "envelopeSpeed": 12, "eqSubFilters1": [], "effects": [], "panDelay": 10, "fadeInSeconds": 0.0263, "fadeOutTicks": 12, "algorithm": "1←(2 3 4)", "feedbackType": "1⟲", "feedbackAmplitude": 0, "operators": [{ "frequency": "1×", "amplitude": 15, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "8×", "amplitude": 5, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }], "envelopes": [{ "target": "operatorAmplitude", "envelope": "twang 1", "index": 1 }] } },
+                { name: "Template Noise", generalMidi: false, settings: { "type": "FM", "eqFilter": [{ "type": "low-pass", "cutoffHz": 19027.31, "linearGain": 0.7071 }], "eqFilterType": true, "eqSimpleCut": 10, "eqSimplePeak": 0, "envelopeSpeed": 12, "eqSubFilters1": [], "effects": [], "panDelay": 10, "fadeInSeconds": 0, "fadeOutTicks": -1, "algorithm": "1←(2 3 4)", "feedbackType": "1→2", "feedbackAmplitude": 15, "operators": [{ "frequency": "1×", "amplitude": 15, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 15, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }], "envelopes": [] } },
             ]) },
         { name: "AbyssBox's Spooky Presets", presets: toNameMap([
                 { name: "Ghost House", generalMidi: false, settings: { "type": "FM", "eqFilter": [], "eqFilterType": false, "eqSimpleCut": 10, "eqSimplePeak": 0, "envelopeSpeed": 12, "discreteEnvelope": false, "eqSubFilters0": [], "effects": ["transition type", "vibrato", "bitcrusher"], "transition": "normal", "clicklessTransition": false, "vibrato": "heavy", "vibratoDepth": 0.45, "vibratoDelay": 0, "vibratoSpeed": 10, "vibratoType": 0, "bitcrusherOctave": 3.5, "bitcrusherQuantization": 43, "panDelay": 10, "fadeInSeconds": 0, "fadeOutTicks": -3, "algorithm": "1←(2 3←4)", "feedbackType": "1⟲", "feedbackAmplitude": 0, "operators": [{ "frequency": "1×", "amplitude": 15, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 4, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 6, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 7, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }], "envelopes": [{ "target": "noteVolume", "envelope": "punch" }] } },
@@ -2983,8 +3010,8 @@ var beepbox = (function (exports) {
 		--file-page-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-file.png");
 		--edit-pencil-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-edit.png");
 		--preferences-gear-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-preferences.png");
-		--instrument-copy-symbol: url("./image_assets/icon-copy.png");
-		--instrument-paste-symbol: url("./image_assets/icon-paste.png");
+		--instrument-copy-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-copy.png");
+		--instrument-paste-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-paste.png");
 		--play-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-play.png");
 		--pause-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-pause.png");
 		--record-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-record.png");
@@ -2999,28 +3026,28 @@ var beepbox = (function (exports) {
 		--export-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-export.png");
 		--export-instrument-symbol: var(--export-symbol);
 		--import-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-import.png");
-		--undo-symbol: url("./image_assets/icon-undo.png");
-		--redo-symbol: url("./image_assets/icon-redo.png");
-		--copy-symbol: url("./image_assets/icon-copy.png");
-		--paste-symbol: url("./image_assets/icon-paste.png");
-		--insert-channel-symbol: url("./image_assets/icon-insertChannel.png");
-		--delete-channel-symbol: url("./image_assets/icon-deleteChannel.png");
-		--select-all-symbol: url("./image_assets/icon-SelectAll.png");
-		--duplicate-symbol: url("./image_assets/icon-duplicate.png");
-		--notes-up-symbol: url("./image_assets/moveNotesUp.png");
-		--notes-down-symbol: url("./image_assets/moveNotesDown.png");
-		--loop-bar-symbol: url("./image_assets/icon-singleBarLoop.png");
-		--fullscreen-symbol: url("./image_assets/icon-fullscreen.png");
-	--loop-within-bar-symbol: url("./image_assets/icon-loop-bar.png");
-	--loop-full-song-symbol: url("./image_assets/icon-loop-song.png");
-	--dont-loop-symbol: url("./image_assets/icon-loop-once.png");
+		--undo-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-undo.png");
+		--redo-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-redo.png");
+		--copy-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-copy.png");
+		--paste-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-paste.png");
+		--insert-channel-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-insertChannel.png");
+		--delete-channel-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-deleteChannel.png");
+		--select-all-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-SelectAll.png");
+		--duplicate-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-duplicate.png");
+		--notes-up-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/moveNotesUp.png");
+		--notes-down-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/moveNotesDown.png");
+		--loop-bar-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-singleBarLoop.png");
+		--fullscreen-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-fullscreen.png");
+	--loop-within-bar-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-bar.png");
+	--loop-full-song-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-song.png");
+	--dont-loop-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-once.png");
 		}
 		
 			
 
 			/* sets background image */
 			body {
-			background-image: url("./image_assets/stripesbg.gif") !important;
+			background-image: url("${location.pathname.includes("player") ? "." : ""}./image_assets/stripesbg.gif") !important;
 			background-position: center;
 			background-repeat: repeat;
 
@@ -3036,7 +3063,7 @@ var beepbox = (function (exports) {
 			} */
 
 			#text-content {
-    				border-image-source: url("./image_assets/abyssbox_border.png");
+    				border-image-source: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_border.png");
     				border-image-slice: 4 fill; 
    				border-image-width: 8px; 
 				border-image-repeat: stretch; 
@@ -3049,7 +3076,7 @@ var beepbox = (function (exports) {
     				image-rendering: optimizeSpeed !important;             /* IE */
 				}
 			#beepboxEditorContainer {
-    				border-image-source: url("./image_assets/abyssbox_border.png");
+    				border-image-source: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_border.png");
     				border-image-slice: 4 fill; 
    				border-image-width: 8px; 
 				border-image-repeat: stretch;
@@ -3081,7 +3108,7 @@ var beepbox = (function (exports) {
 			button.importInstrumentButton, 
 			.beepboxEditor select, 
 			.beepboxEditor .select2-selection__rendered {
-    				border-image-source: url("./image_assets/abyssbox_border.png") !important;
+    				border-image-source: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_border.png") !important;
     				border-image-slice: 4 fill !important; 
    				border-image-width: 4px !important; 
 				border-image-repeat: stretch !important;
@@ -3093,7 +3120,7 @@ var beepbox = (function (exports) {
     				image-rendering: pixelated !important;                 /* Future browsers */
     				image-rendering: optimizeSpeed !important;             /* IE */
 
-					cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+					cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 				}
 
 			div.selectRow button:not(.copyButton,.pasteButton,.exportInstrumentButton,.importInstrumentButton) {
@@ -3113,7 +3140,7 @@ var beepbox = (function (exports) {
 			@font-face {
 		   font-family: "AbyssType_small";
 		   src:
- 		   url("./image_assets/abysstype_small.otf") format("opentype") tech(color-COLRv1),
+ 		   url("${location.pathname.includes("player") ? "." : ""}./image_assets/abysstype_small.otf") format("opentype") tech(color-COLRv1),
 			}
 
 			
@@ -3122,72 +3149,72 @@ var beepbox = (function (exports) {
 
 			.beepboxEditor input[type="range"]::-webkit-slider-thumb
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]::-webkit-slider-runnable-track
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]:focus::-webkit-slider-runnable-track
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]::-ms-thumb
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]::-ms-track
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]:focus::-ms-track
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]::-moz-range-thumb
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]::-moz-range-track
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]:focus::-moz-range-track
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="text"],
 			.beepboxEditor input[type="number"]
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="checkbox"]
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="checkbox"]:checked
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="checkbox"]:checked:after
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 
 			div.selectRow span {
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 
 			`,
@@ -3334,8 +3361,8 @@ var beepbox = (function (exports) {
 		--file-page-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-file.png");
 		--edit-pencil-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-edit.png");
 		--preferences-gear-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-preferences.png");
-		--instrument-copy-symbol: url("./image_assets/icon-copy.png");
-		--instrument-paste-symbol: url("./image_assets/icon-paste.png");
+		--instrument-copy-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-copy.png");
+		--instrument-paste-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-paste.png");
 		--play-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-play.png");
 		--pause-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-pause.png");
 		--record-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-record.png");
@@ -3350,21 +3377,21 @@ var beepbox = (function (exports) {
 		--export-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-export.png");
 		--export-instrument-symbol: var(--export-symbol);
 		--import-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-import.png");
-		--undo-symbol: url("./image_assets/icon-undo.png");
-		--redo-symbol: url("./image_assets/icon-redo.png");
-		--copy-symbol: url("./image_assets/icon-copy.png");
-		--paste-symbol: url("./image_assets/icon-paste.png");
-		--insert-channel-symbol: url("./image_assets/icon-insertChannel.png");
-		--delete-channel-symbol: url("./image_assets/icon-deleteChannel.png");
-		--select-all-symbol: url("./image_assets/icon-SelectAll.png");
-		--duplicate-symbol: url("./image_assets/icon-duplicate.png");
-		--notes-up-symbol: url("./image_assets/moveNotesUp.png");
-		--notes-down-symbol: url("./image_assets/moveNotesDown.png");
-		--loop-bar-symbol: url("./image_assets/icon-singleBarLoop.png");
-		--fullscreen-symbol: url("./image_assets/icon-fullscreen.png");
-		--loop-within-bar-symbol: url("./image_assets/icon-loop-bar.png");
-	--loop-full-song-symbol: url("./image_assets/icon-loop-song.png");
-	--dont-loop-symbol: url("./image_assets/icon-loop-once.png");
+		--undo-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-undo.png");
+		--redo-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-redo.png");
+		--copy-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-copy.png");
+		--paste-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-paste.png");
+		--insert-channel-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-insertChannel.png");
+		--delete-channel-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-deleteChannel.png");
+		--select-all-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-SelectAll.png");
+		--duplicate-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-duplicate.png");
+		--notes-up-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/moveNotesUp.png");
+		--notes-down-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/moveNotesDown.png");
+		--loop-bar-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-singleBarLoop.png");
+		--fullscreen-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-fullscreen.png");
+		--loop-within-bar-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-bar.png");
+	--loop-full-song-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-song.png");
+	--dont-loop-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-once.png");
 		}
 		
 			
@@ -3374,7 +3401,7 @@ var beepbox = (function (exports) {
 			@font-face {
 		   font-family: "AbyssType_small";
 		   src:
- 		   url("./image_assets/abysstype_small.otf") format("opentype") tech(color-COLRv1),
+ 		   url("${location.pathname.includes("player") ? "." : ""}./image_assets/abysstype_small.otf") format("opentype") tech(color-COLRv1),
 			}
 
 			.beepboxEditor button,
@@ -3449,72 +3476,72 @@ var beepbox = (function (exports) {
 
 			.beepboxEditor input[type="range"]::-webkit-slider-thumb
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]::-webkit-slider-runnable-track
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]:focus::-webkit-slider-runnable-track
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]::-ms-thumb
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]::-ms-track
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]:focus::-ms-track
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]::-moz-range-thumb
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]::-moz-range-track
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]:focus::-moz-range-track
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="text"],
 			.beepboxEditor input[type="number"]
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="checkbox"]
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="checkbox"]:checked
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="checkbox"]:checked:after
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 
 			div.selectRow span {
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 
 			`,
@@ -3661,7 +3688,7 @@ var beepbox = (function (exports) {
 
 				/* sets background image */
 				body {
-				background-image: url("./image_assets/stripesbg_light.gif") !important;
+				background-image: url("${location.pathname.includes("player") ? "." : ""}./image_assets/stripesbg_light.gif") !important;
 				background-position: center;
 				background-repeat: repeat;
 	
@@ -3672,7 +3699,7 @@ var beepbox = (function (exports) {
 				image-rendering: optimizeSpeed !important;             /* IE */
 					}		
 			#text-content {
-    				border-image-source: url("./image_assets/abyssbox_border_light.png");
+    				border-image-source: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_border_light.png");
     				border-image-slice: 4 fill; 
    				border-image-width: 8px; 
 				border-image-repeat: stretch; 
@@ -3685,7 +3712,7 @@ var beepbox = (function (exports) {
     				image-rendering: optimizeSpeed !important;             /* IE */
 				}
 			#beepboxEditorContainer {
-    				border-image-source: url("./image_assets/abyssbox_border_light.png");
+    				border-image-source: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_border_light.png");
     				border-image-slice: 4 fill; 
    				border-image-width: 8px; 
 				border-image-repeat: stretch;
@@ -3717,7 +3744,7 @@ var beepbox = (function (exports) {
 				button.importInstrumentButton, 
 				.beepboxEditor select, 
 				.beepboxEditor .select2-selection__rendered {
-						border-image-source: url("./image_assets/abyssbox_border_light.png") !important;
+						border-image-source: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_border_light.png") !important;
 						border-image-slice: 4 fill !important; 
 					   border-image-width: 4px !important; 
 					border-image-repeat: stretch !important;
@@ -3729,7 +3756,7 @@ var beepbox = (function (exports) {
 						image-rendering: pixelated !important;                 /* Future browsers */
 						image-rendering: optimizeSpeed !important;             /* IE */
 	
-						cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+						cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 					}
 	
 				div.selectRow button:not(.copyButton,.pasteButton,.exportInstrumentButton,.importInstrumentButton) {
@@ -3747,8 +3774,8 @@ var beepbox = (function (exports) {
 		--file-page-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-file.png");
 		--edit-pencil-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-edit.png");
 		--preferences-gear-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-preferences.png");
-		--instrument-copy-symbol: url("./image_assets/icon-copy.png");
-		--instrument-paste-symbol: url("./image_assets/icon-paste.png");
+		--instrument-copy-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-copy.png");
+		--instrument-paste-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-paste.png");
 		--play-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-play.png");
 		--pause-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-pause.png");
 		--record-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-record.png");
@@ -3763,21 +3790,21 @@ var beepbox = (function (exports) {
 		--export-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-export.png");
 		--export-instrument-symbol: var(--export-symbol);
 		--import-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-import.png");
-		--undo-symbol: url("./image_assets/icon-undo.png");
-		--redo-symbol: url("./image_assets/icon-redo.png");
-		--copy-symbol: url("./image_assets/icon-copy.png");
-		--paste-symbol: url("./image_assets/icon-paste.png");
-		--insert-channel-symbol: url("./image_assets/icon-insertChannel.png");
-		--delete-channel-symbol: url("./image_assets/icon-deleteChannel.png");
-		--select-all-symbol: url("./image_assets/icon-SelectAll.png");
-		--duplicate-symbol: url("./image_assets/icon-duplicate.png");
-		--notes-up-symbol: url("./image_assets/moveNotesUp.png");
-		--notes-down-symbol: url("./image_assets/moveNotesDown.png");
-		--loop-bar-symbol: url("./image_assets/icon-singleBarLoop.png");
-		--fullscreen-symbol: url("./image_assets/icon-fullscreen.png");
-		--loop-within-bar-symbol: url("./image_assets/icon-loop-bar.png");
-	--loop-full-song-symbol: url("./image_assets/icon-loop-song.png");
-	--dont-loop-symbol: url("./image_assets/icon-loop-once.png");
+		--undo-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-undo.png");
+		--redo-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-redo.png");
+		--copy-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-copy.png");
+		--paste-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-paste.png");
+		--insert-channel-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-insertChannel.png");
+		--delete-channel-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-deleteChannel.png");
+		--select-all-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-SelectAll.png");
+		--duplicate-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-duplicate.png");
+		--notes-up-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/moveNotesUp.png");
+		--notes-down-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/moveNotesDown.png");
+		--loop-bar-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-singleBarLoop.png");
+		--fullscreen-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-fullscreen.png");
+		--loop-within-bar-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-bar.png");
+	--loop-full-song-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-song.png");
+	--dont-loop-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-once.png");
 		}
 		
 			
@@ -3787,7 +3814,7 @@ var beepbox = (function (exports) {
 			@font-face {
 		   font-family: "AbyssType_small";
 		   src:
- 		   url("./image_assets/abysstype_small.otf") format("opentype") tech(color-COLRv1),
+ 		   url("${location.pathname.includes("player") ? "." : ""}./image_assets/abysstype_small.otf") format("opentype") tech(color-COLRv1),
 			}
 
 			button.envelopeDropdown, div.selectRow button:not(.copyButton,.pasteButton,.exportInstrumentButton,.importInstrumentButton) {
@@ -3802,72 +3829,72 @@ var beepbox = (function (exports) {
 
 			.beepboxEditor input[type="range"]::-webkit-slider-thumb
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]::-webkit-slider-runnable-track
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]:focus::-webkit-slider-runnable-track
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]::-ms-thumb
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]::-ms-track
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]:focus::-ms-track
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]::-moz-range-thumb
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]::-moz-range-track
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]:focus::-moz-range-track
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="text"],
 			.beepboxEditor input[type="number"]
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="checkbox"]
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="checkbox"]:checked
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="checkbox"]:checked:after
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 
 			div.selectRow span {
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 
 			`,
@@ -4000,6 +4027,428 @@ var beepbox = (function (exports) {
 			--note-flash: #ffffff;
 			--note-flash-secondary: #ffffff77;
 			--empty-sample-bar: #260b1b;
+				}
+			`,
+        "AbyssBox Comp simple": `
+			:root { 		
+			--page-margin: #000000; 		
+			--editor-background: #000000; 		
+			--hover-preview: white; 		
+			--playhead: rgba(255, 255, 255, 0.9); 		
+			--primary-text: white; 		
+			--secondary-text: #ffcedd; 		
+			--inverted-text: black;	 		
+			--text-selection: rgba(119,68,255,0.99); 		
+			--box-selection-fill: #bf2c5d; 		
+			--loop-accent: #873a51; 		
+			--link-accent: #df88ff; 		
+			--ui-widget-background: #581b3e; 		
+			--ui-widget-focus: #000000; 		
+			--pitch-background: #240f15; 		
+			--tonic: #a34b65; 		
+			--fifth-note: #75001e; 	
+			--third-note: #75002c;		
+			--white-piano-key: #cca5c7; 		
+			--black-piano-key: #402f2f;
+			--white-piano-key-text: #131200;		
+			--black-piano-key-text: #fff;		 		
+			--use-color-formula: true; 		
+			--track-editor-bg-pitch: #571c40; 		
+			--track-editor-bg-pitch-dim: #290d0d; 		
+			--track-editor-bg-noise: #571131; 		
+			--track-editor-bg-noise-dim: #330a28; 		
+			--track-editor-bg-mod: #54083c; 		
+			--track-editor-bg-mod-dim: #360426; 		
+			--multiplicative-mod-slider: #9f6082; 		
+			--overwriting-mod-slider: #9e3470; 		
+			--indicator-primary: #b3498f; 		
+			--indicator-secondary: #541d40; 		
+			--select2-opt-group: #4f191e; 		
+			--input-box-outline: #18041a; 		
+			--mute-button-normal: #dd5d94;	 		
+			--mute-button-mod: #ba364c; 		
+			--mod-label-primary: #541625; 		
+			--mod-label-secondary-text: rgb(120, 87, 86); 
+			--mod-label-primary-text: gray; 
+			--mod-title: #bf2c5d;
+			--progress-bar: #bf2c5d;
+			--empty-sample-bar: #0d0d0d;
+
+			--pitch-secondary-channel-hue: -80; 		
+			--pitch-secondary-channel-hue-scale: 0; 		
+			--pitch-secondary-channel-sat: 43; 		
+			--pitch-secondary-channel-sat-scale: 0.1; 		
+			--pitch-secondary-channel-lum: 40; 		
+			--pitch-secondary-channel-lum-scale: 0.05; 
+		
+			--pitch-primary-channel-hue: -53; 		
+			--pitch-primary-channel-hue-scale: 6.1; 		
+			--pitch-primary-channel-sat: 75; 		
+			--pitch-primary-channel-sat-scale: 0.1; 		
+			--pitch-primary-channel-lum: 67.5; 		
+			--pitch-primary-channel-lum-scale: 0.05; 	
+	
+			--pitch-secondary-note-hue: -34; 		
+			--pitch-secondary-note-hue-scale: 6.1; 		
+			--pitch-secondary-note-sat: 93.9; 		
+			--pitch-secondary-note-sat-scale: 0.1; 		
+			--pitch-secondary-note-lum: 25; 		
+			--pitch-secondary-note-lum-scale: 0.05; 
+		
+			--pitch-primary-note-hue: -53; 		
+			--pitch-primary-note-hue-scale: 6.1; 		
+			--pitch-primary-note-sat: 100; 		
+			--pitch-primary-note-sat-scale: 0.05; 		
+			--pitch-primary-note-lum: 85.6; 		
+			--pitch-primary-note-lum-scale: 0.025; 
+		
+			--noise-secondary-channel-hue: 0; 		
+			--noise-secondary-channel-hue-scale: 2; 		
+			--noise-secondary-channel-sat: 65; 		
+			--noise-secondary-channel-sat-scale: 0; 		
+			--noise-secondary-channel-lum: 42; 		
+			--noise-secondary-channel-lum-scale: 0; 
+		
+			--noise-primary-channel-hue: 0; 		
+			--noise-primary-channel-hue-scale: 1; 		
+			--noise-primary-channel-sat: 100; 		
+			--noise-primary-channel-sat-scale: 1; 		
+			--noise-primary-channel-lum: 63.5; 		
+			--noise-primary-channel-lum-scale: 0; 
+		
+			--noise-secondary-note-hue: 24; 		
+			--noise-secondary-note-hue-scale: 2; 		
+			--noise-secondary-note-sat: 100; 		
+			--noise-secondary-note-sat-scale: 0; 		
+			--noise-secondary-note-lum: 35; 		
+			--noise-secondary-note-lum-scale: 0; 	
+	
+			--noise-primary-note-hue: 24; 		
+			--noise-primary-note-hue-scale: 2; 		
+			--noise-primary-note-sat: 100; 		
+			--noise-primary-note-sat-scale: 1; 		
+			--noise-primary-note-lum: 60; 		
+			--noise-primary-note-lum-scale: 1; 	
+	
+			--mod-secondary-channel-hue: 55; 		
+			--mod-secondary-channel-hue-scale: 1.5; 		
+			--mod-secondary-channel-sat: 100; 		
+			--mod-secondary-channel-sat-scale: 0; 		
+			--mod-secondary-channel-lum: 20; 		
+			--mod-secondary-channel-lum-scale: 0; 
+		
+			--mod-primary-channel-hue: 55; 		
+			--mod-primary-channel-hue-scale: 1.5; 		
+			--mod-primary-channel-sat: 96; 		
+			--mod-primary-channel-sat-scale: 0; 		
+			--mod-primary-channel-lum: 50; 		
+			--mod-primary-channel-lum-scale: 0; 
+		
+			--mod-secondary-note-hue: 55; 		
+			--mod-secondary-note-hue-scale: 1.5; 		
+			--mod-secondary-note-sat: 92; 		
+			--mod-secondary-note-sat-scale: 0; 		
+			--mod-secondary-note-lum: 45; 		
+			--mod-secondary-note-lum-scale: 0; 
+		
+			--mod-primary-note-hue: 55; 		
+			--mod-primary-note-hue-scale: 1.5; 		
+			--mod-primary-note-sat: 96; 		
+			--mod-primary-note-sat-scale: 0; 		
+			--mod-primary-note-lum: 85; 		
+			--mod-primary-note-lum-scale: 0; 
+
+			--note-flash: #ffffff;
+			--note-flash-secondary: #ffffff77;
+
+			--oscilloscope-line-R: var(--ui-widget-background);
+			--oscilloscope-line-L: var(--secondary-text);
+
+			--scrollbar-color: #bf2c5d;
+				}		
+			`,
+        "AbyssBox Light simple": `
+			:root { 		
+			--page-margin: #e0adbc; 		
+			--editor-background: #e0adbc; 		
+			--hover-preview: white; 		
+			--playhead: rgba(255, 255, 255, 0.9); 		
+			--primary-text: #6110d9; 		
+			--secondary-text: #cc1338;		
+			--inverted-text:  #e8bcc9;	 		
+			--text-selection: rgba(119,68,255,0.99); 		
+			--box-selection-fill: #bf2c5d; 		
+			--loop-accent: #8c346a; 		
+			--link-accent: #8c346a; 		
+			--ui-widget-background: #eec8de;		
+			--ui-widget-focus: #eec8de; 		
+			--pitch-background: #eddadf; 		
+			--tonic: #f5f0f1; 		
+			--fifth-note: #ffb5c9; 	
+			--third-note: #ffa6f0;		
+			--white-piano-key: #cca5c7; 		
+			--black-piano-key: #402f2f;
+			--white-piano-key-text: #131200;		
+			--black-piano-key-text: #fff;	 		
+			--use-color-formula: true; 		
+			--track-editor-bg-pitch: #edbecc;	
+			--track-editor-bg-pitch-dim: #e0adbc; 		
+			--track-editor-bg-noise: #edbecc;		
+			--track-editor-bg-noise-dim: #e0adbc;		
+			--track-editor-bg-mod: #edbecc; 		
+			--track-editor-bg-mod-dim: #e0adbc;		
+			--multiplicative-mod-slider: #9f6082; 		
+			--overwriting-mod-slider: #9e3470; 		
+			--indicator-primary: #b3498f; 		
+			--indicator-secondary: #541d40; 		
+			--select2-opt-group: #4f191e; 		
+			--input-box-outline: #18041a; 		
+			--mute-button-normal: #dd5d94;	 		
+			--mute-button-mod: #ba364c; 		
+			--mod-label-primary: #541625; 		
+			--mod-label-secondary-text: rgb(120, 87, 86); 
+			--mod-label-primary-text: gray; 
+			--mod-title: #cc1338;
+			--progress-bar: #cc1338;
+			--empty-sample-bar: #d9a0b1;
+
+			--pitch-secondary-channel-hue: -80; 		
+			--pitch-secondary-channel-hue-scale: 0; 		
+			--pitch-secondary-channel-sat: 255; 		
+			--pitch-secondary-channel-sat-scale: 0.1; 		
+			--pitch-secondary-channel-lum: 30; 		
+			--pitch-secondary-channel-lum-scale: 0.05; 
+		
+			--pitch-primary-channel-hue: -53; 		
+			--pitch-primary-channel-hue-scale: 6.1; 		
+			--pitch-primary-channel-sat: 255; 		
+			--pitch-primary-channel-sat-scale: 0.1; 		
+			--pitch-primary-channel-lum: 60; 		
+			--pitch-primary-channel-lum-scale: 0.05; 	
+	
+			--pitch-secondary-note-hue: -34; 		
+			--pitch-secondary-note-hue-scale: 6.1; 		
+			--pitch-secondary-note-sat: 255; 		
+			--pitch-secondary-note-sat-scale: 0.1; 		
+			--pitch-secondary-note-lum: 30; 		
+			--pitch-secondary-note-lum-scale: 0.05; 
+		
+			--pitch-primary-note-hue: -53; 		
+			--pitch-primary-note-hue-scale: 6.1; 		
+			--pitch-primary-note-sat: 255; 		
+			--pitch-primary-note-sat-scale: 0.05; 		
+			--pitch-primary-note-lum: 60; 		
+			--pitch-primary-note-lum-scale: 0.025; 
+		
+			--noise-secondary-channel-hue: 0; 		
+			--noise-secondary-channel-hue-scale: 2; 		
+			--noise-secondary-channel-sat: 255; 		
+			--noise-secondary-channel-sat-scale: 0; 		
+			--noise-secondary-channel-lum: 30; 		
+			--noise-secondary-channel-lum-scale: 0; 
+		
+			--noise-primary-channel-hue: 0; 		
+			--noise-primary-channel-hue-scale: 1; 		
+			--noise-primary-channel-sat: 255; 		
+			--noise-primary-channel-sat-scale: 1; 		
+			--noise-primary-channel-lum: 60; 		
+			--noise-primary-channel-lum-scale: 0; 
+		
+			--noise-secondary-note-hue: 24; 		
+			--noise-secondary-note-hue-scale: 2; 		
+			--noise-secondary-note-sat: 255; 		
+			--noise-secondary-note-sat-scale: 0; 		
+			--noise-secondary-note-lum: 30; 		
+			--noise-secondary-note-lum-scale: 0; 	
+	
+			--noise-primary-note-hue: 24; 		
+			--noise-primary-note-hue-scale: 2; 		
+			--noise-primary-note-sat: 255; 		
+			--noise-primary-note-sat-scale: 1; 		
+			--noise-primary-note-lum: 60; 		
+			--noise-primary-note-lum-scale: 1; 	
+	
+			--mod-secondary-channel-hue: 55; 		
+			--mod-secondary-channel-hue-scale: 1.5; 		
+			--mod-secondary-channel-sat: 255; 		
+			--mod-secondary-channel-sat-scale: 0; 		
+			--mod-secondary-channel-lum: 30; 		
+			--mod-secondary-channel-lum-scale: 0; 
+		
+			--mod-primary-channel-hue: 55; 		
+			--mod-primary-channel-hue-scale: 1.5; 		
+			--mod-primary-channel-sat: 255; 		
+			--mod-primary-channel-sat-scale: 0; 		
+			--mod-primary-channel-lum: 60; 		
+			--mod-primary-channel-lum-scale: 0; 
+		
+			--mod-secondary-note-hue: 55; 		
+			--mod-secondary-note-hue-scale: 1.5; 		
+			--mod-secondary-note-sat: 255; 		
+			--mod-secondary-note-sat-scale: 0; 		
+			--mod-secondary-note-lum: 30; 		
+			--mod-secondary-note-lum-scale: 0; 
+		
+			--mod-primary-note-hue: 55; 		
+			--mod-primary-note-hue-scale: 1.5; 		
+			--mod-primary-note-sat: 255; 		
+			--mod-primary-note-sat-scale: 0; 		
+			--mod-primary-note-lum: 60; 		
+			--mod-primary-note-lum-scale: 0; 	
+			--note-flash: #ffffff;
+			--note-flash-secondary: #ffffff77;
+
+			--oscilloscope-line-R: var(--ui-widget-background);
+			--oscilloscope-line-L: var(--secondary-text);
+
+			--scrollbar-color: #bf2c5d;
+			}
+			`,
+        "AbyssBox Piano simple": ` 
+			:root {		
+			--page-margin: #450320; 		
+			--editor-background: #450320; 		
+			--hover-preview: white; 		
+			--playhead: rgba(255, 255, 255, 0.9); 		
+			--primary-text: white; 		
+			--secondary-text: #ffcedd; 		
+			--inverted-text: #450320;	 		
+			--text-selection: rgba(119,68,255,0.99); 		
+			--box-selection-fill: #1e0915; 		
+			--loop-accent: #873a51; 		
+			--link-accent: #df88ff; 		
+			--ui-widget-background: #800d4f; 		
+			--ui-widget-focus: #a01565;
+            --pitch-background: #5e2233;  	
+            --use-piano-scheme: true;	
+            --pitch-black-key: #4d1a28; 				
+            --pitch-white-key: #5e2233; 
+            --tonic: #873a51; 	
+			--white-tonic: #873a51; 	
+            --black-tonic: #68182f;	
+			--white-fifth-note: #911d3b; 	
+            --fifth-note: #911d3b; 
+            --black-fifth-note: #6e001d; 	
+			--white-third-note: #880d3c;	
+            --third-note: #880d3c;	
+            --black-third-note: #660f30; 	
+			--white-piano-key: #cca5c7; 		
+			--black-piano-key: #402f2f;
+			--white-piano-key-text: #131200;		
+			--black-piano-key-text: #fff;		 		
+			--use-color-formula: true; 		
+			--track-editor-bg-pitch: #7b0f52; 		
+			--track-editor-bg-pitch-dim: #560738; 		
+			--track-editor-bg-noise: #7b0f38; 		
+			--track-editor-bg-noise-dim: #5f0b2b; 		
+			--track-editor-bg-mod: #731116; 		
+			--track-editor-bg-mod-dim: #52060a; 		
+			--multiplicative-mod-slider: #9f6082; 		
+			--overwriting-mod-slider: #9e3470; 		
+			--indicator-primary: #b3498f; 		
+			--indicator-secondary: #541d40; 		
+			--select2-opt-group: #4f191e; 		
+			--input-box-outline: #18041a; 		
+			--mute-button-normal: #dd5d94;	 		
+			--mute-button-mod: #ba364c; 		
+			--mod-label-primary: #541625; 		
+			--mod-label-secondary-text: rgb(120, 87, 86); 
+			--mod-label-primary-text: gray; 
+			--mod-title: #bf2c5d;
+			--progress-bar: #bf2c5d;
+			--empty-sample-bar: #38021a;
+
+			--pitch-secondary-channel-hue: -80; 		
+			--pitch-secondary-channel-hue-scale: 0; 		
+			--pitch-secondary-channel-sat: 43; 		
+			--pitch-secondary-channel-sat-scale: 0.1; 		
+			--pitch-secondary-channel-lum: 40; 		
+			--pitch-secondary-channel-lum-scale: 0.05; 
+		
+			--pitch-primary-channel-hue: -53; 		
+			--pitch-primary-channel-hue-scale: 6.1; 		
+			--pitch-primary-channel-sat: 75; 		
+			--pitch-primary-channel-sat-scale: 0.1; 		
+			--pitch-primary-channel-lum: 67.5; 		
+			--pitch-primary-channel-lum-scale: 0.05; 	
+	
+			--pitch-secondary-note-hue: -34; 		
+			--pitch-secondary-note-hue-scale: 6.1; 		
+			--pitch-secondary-note-sat: 93.9; 		
+			--pitch-secondary-note-sat-scale: 0.1; 		
+			--pitch-secondary-note-lum: 25; 		
+			--pitch-secondary-note-lum-scale: 0.05; 
+		
+			--pitch-primary-note-hue: -53; 		
+			--pitch-primary-note-hue-scale: 6.1; 		
+			--pitch-primary-note-sat: 100; 		
+			--pitch-primary-note-sat-scale: 0.05; 		
+			--pitch-primary-note-lum: 85.6; 		
+			--pitch-primary-note-lum-scale: 0.025; 
+		
+			--noise-secondary-channel-hue: 0; 		
+			--noise-secondary-channel-hue-scale: 2; 		
+			--noise-secondary-channel-sat: 65; 		
+			--noise-secondary-channel-sat-scale: 0; 		
+			--noise-secondary-channel-lum: 42; 		
+			--noise-secondary-channel-lum-scale: 0; 
+		
+			--noise-primary-channel-hue: 0; 		
+			--noise-primary-channel-hue-scale: 1; 		
+			--noise-primary-channel-sat: 100; 		
+			--noise-primary-channel-sat-scale: 1; 		
+			--noise-primary-channel-lum: 63.5; 		
+			--noise-primary-channel-lum-scale: 0; 
+		
+			--noise-secondary-note-hue: 24; 		
+			--noise-secondary-note-hue-scale: 2; 		
+			--noise-secondary-note-sat: 100; 		
+			--noise-secondary-note-sat-scale: 0; 		
+			--noise-secondary-note-lum: 35; 		
+			--noise-secondary-note-lum-scale: 0; 	
+	
+			--noise-primary-note-hue: 24; 		
+			--noise-primary-note-hue-scale: 2; 		
+			--noise-primary-note-sat: 100; 		
+			--noise-primary-note-sat-scale: 1; 		
+			--noise-primary-note-lum: 60; 		
+			--noise-primary-note-lum-scale: 1; 	
+	
+			--mod-secondary-channel-hue: 55; 		
+			--mod-secondary-channel-hue-scale: 1.5; 		
+			--mod-secondary-channel-sat: 100; 		
+			--mod-secondary-channel-sat-scale: 0; 		
+			--mod-secondary-channel-lum: 20; 		
+			--mod-secondary-channel-lum-scale: 0; 
+		
+			--mod-primary-channel-hue: 55; 		
+			--mod-primary-channel-hue-scale: 1.5; 		
+			--mod-primary-channel-sat: 96; 		
+			--mod-primary-channel-sat-scale: 0; 		
+			--mod-primary-channel-lum: 50; 		
+			--mod-primary-channel-lum-scale: 0; 
+		
+			--mod-secondary-note-hue: 55; 		
+			--mod-secondary-note-hue-scale: 1.5; 		
+			--mod-secondary-note-sat: 92; 		
+			--mod-secondary-note-sat-scale: 0; 		
+			--mod-secondary-note-lum: 45; 		
+			--mod-secondary-note-lum-scale: 0; 
+		
+			--mod-primary-note-hue: 55; 		
+			--mod-primary-note-hue-scale: 1.5; 		
+			--mod-primary-note-sat: 96; 		
+			--mod-primary-note-sat-scale: 0; 		
+			--mod-primary-note-lum: 85; 		
+			--mod-primary-note-lum-scale: 0; 	
+
+			--note-flash: #ffffff;
+			--note-flash-secondary: #ffffff77;
+
+			--oscilloscope-line-R: var(--ui-widget-background);
+			--oscilloscope-line-L: var(--secondary-text);
+
+			--scrollbar-color: #bf2c5d;
 				}
 			`,
         "AbyssBox Piano": ` 
@@ -4153,8 +4602,8 @@ var beepbox = (function (exports) {
 		--file-page-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-file.png");
 		--edit-pencil-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-edit.png");
 		--preferences-gear-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-preferences.png");
-		--instrument-copy-symbol: url("./image_assets/icon-copy.png");
-		--instrument-paste-symbol: url("./image_assets/icon-paste.png");
+		--instrument-copy-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-copy.png");
+		--instrument-paste-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-paste.png");
 		--play-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-play.png");
 		--pause-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-pause.png");
 		--record-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-record.png");
@@ -4169,21 +4618,21 @@ var beepbox = (function (exports) {
 		--export-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-export.png");
 		--export-instrument-symbol: var(--export-symbol);
 		--import-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-import.png");
-		--undo-symbol: url("./image_assets/icon-undo.png");
-		--redo-symbol: url("./image_assets/icon-redo.png");
-		--copy-symbol: url("./image_assets/icon-copy.png");
-		--paste-symbol: url("./image_assets/icon-paste.png");
-		--insert-channel-symbol: url("./image_assets/icon-insertChannel.png");
-		--delete-channel-symbol: url("./image_assets/icon-deleteChannel.png");
-		--select-all-symbol: url("./image_assets/icon-SelectAll.png");
-		--duplicate-symbol: url("./image_assets/icon-duplicate.png");
-		--notes-up-symbol: url("./image_assets/moveNotesUp.png");
-		--notes-down-symbol: url("./image_assets/moveNotesDown.png");
-		--loop-bar-symbol: url("./image_assets/icon-singleBarLoop.png");
-		--fullscreen-symbol: url("./image_assets/icon-fullscreen.png");
-		--loop-within-bar-symbol: url("./image_assets/icon-loop-bar.png");
-	--loop-full-song-symbol: url("./image_assets/icon-loop-song.png");
-	--dont-loop-symbol: url("./image_assets/icon-loop-once.png");
+		--undo-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-undo.png");
+		--redo-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-redo.png");
+		--copy-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-copy.png");
+		--paste-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-paste.png");
+		--insert-channel-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-insertChannel.png");
+		--delete-channel-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-deleteChannel.png");
+		--select-all-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-SelectAll.png");
+		--duplicate-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-duplicate.png");
+		--notes-up-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/moveNotesUp.png");
+		--notes-down-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/moveNotesDown.png");
+		--loop-bar-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-singleBarLoop.png");
+		--fullscreen-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-fullscreen.png");
+		--loop-within-bar-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-bar.png");
+	--loop-full-song-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-song.png");
+	--dont-loop-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-once.png");
 		}
 		
 			
@@ -4263,7 +4712,7 @@ var beepbox = (function (exports) {
     				image-rendering: pixelated !important;                 /* Future browsers */
     				image-rendering: optimizeSpeed !important;             /* IE */
 
-					cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+					cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 				}
 
 			div.selectRow button:not(.copyButton,.pasteButton,.exportInstrumentButton,.importInstrumentButton) {
@@ -4283,7 +4732,7 @@ var beepbox = (function (exports) {
 			@font-face {
 		   font-family: "AbyssType_small";
 		   src:
- 		   url("./image_assets/abysstype_small.otf") format("opentype") tech(color-COLRv1),
+ 		   url("${location.pathname.includes("player") ? "." : ""}./image_assets/abysstype_small.otf") format("opentype") tech(color-COLRv1),
 			}
 
 			
@@ -4292,72 +4741,72 @@ var beepbox = (function (exports) {
 
 			.beepboxEditor input[type="range"]::-webkit-slider-thumb
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]::-webkit-slider-runnable-track
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]:focus::-webkit-slider-runnable-track
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]::-ms-thumb
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]::-ms-track
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]:focus::-ms-track
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]::-moz-range-thumb
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]::-moz-range-track
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]:focus::-moz-range-track
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="text"],
 			.beepboxEditor input[type="number"]
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="checkbox"]
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="checkbox"]:checked
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="checkbox"]:checked:after
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 
 			div.selectRow span {
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			`,
         "Frutiger Aero": `
@@ -4525,6 +4974,16 @@ var beepbox = (function (exports) {
 			image-rendering: optimizeSpeed !important;             /* IE */
 		}
 
+		.beepboxEditor .effectExt {
+			margin-top: 8px;
+			margin-bottom: 8px;
+			background: linear-gradient(#596c8a54, #273449a6);
+			padding: 4px;
+			border-radius: 7px;
+			box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.2), 0px 1px 4px 1px rgba(0, 0, 0, 0.3), inset 0px 1px 0px 0px rgba(255, 255, 255, 0.3);
+			border-top: none !important;
+		}
+		
 		div.mute-button.muted::before {
 			background: #fff0 !important;
 			background-image: url("https://choptop84.github.io/choptop84s-image-repository/vistaSpeakerIconMuted.png") !important;
@@ -5039,6 +5498,16 @@ var beepbox = (function (exports) {
 			opacity: 0 !important;
 		}
 
+		.beepboxEditor .effectExt {
+			margin-top: 8px;
+			margin-bottom: 8px;
+			background: linear-gradient(#8a598054, #332749a6);
+			padding: 4px;
+			border-radius: 7px;
+			box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.2), 0px 1px 4px 1px rgba(0, 0, 0, 0.3), inset 0px 1px 0px 0px rgba(255, 255, 255, 0.3);
+			border-top: none !important;
+		}
+
 		div.mute-button::before {
 			background: #fff0 !important;
 			background-image: url("https://choptop84.github.io/choptop84s-image-repository/vistaSpeakerIcon.png") !important;
@@ -5122,7 +5591,7 @@ var beepbox = (function (exports) {
 			  }
 
 			div.prompt.noSelection{
-				background: linear-gradient(#84aef080, #2a3d6a80) !important; 
+				background: linear-gradient(#e384f080, #682a6a80) !important; 
 				opacity: 77;
 				backdrop-filter: blur(14px);
 			}  
@@ -6142,7 +6611,7 @@ var beepbox = (function (exports) {
 		 
 		.beepboxEditor .prompt
 		{
-			background: radial-gradient(farthest-corner at 50% 0px, #1d0700, #110400) !important;
+			background: radial-gradient(farthest-corner at 50% 0px, #27241e, #13120f) !important
 		}
 		 
 		#beepboxEditorContainer {
@@ -6531,7 +7000,7 @@ var beepbox = (function (exports) {
 			@font-face {
 		   font-family: "Varela";
 		   src:
- 		   url("./image_assets/Varela.ttf") format("truetype") tech(color-COLRv1),
+ 		   url("${location.pathname.includes("player") ? "." : ""}./image_assets/Varela.ttf") format("truetype") tech(color-COLRv1),
 			}
 
 			/* sets background image */
@@ -6876,7 +7345,7 @@ var beepbox = (function (exports) {
 			}
 
 			#text-content {
-    				border-image-source: url("./image_assets/abyssbox_border.png");
+    				border-image-source: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_border.png");
     				border-image-slice: 4 fill; 
    				border-image-width: 8px; 
 				border-image-repeat: stretch; 
@@ -6889,7 +7358,7 @@ var beepbox = (function (exports) {
     				image-rendering: optimizeSpeed !important;             /* IE */
 				}
 			#beepboxEditorContainer {
-    				border-image-source: url("./image_assets/abyssbox_border.png");
+    				border-image-source: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_border.png");
     				border-image-slice: 4 fill; 
    				border-image-width: 8px; 
 				border-image-repeat: stretch;
@@ -6903,7 +7372,7 @@ var beepbox = (function (exports) {
 
 				}
 			 .beepboxEditor button, .beepboxEditor select, .beepboxEditor .select2-selection__rendered {
-    				border-image-source: url("./image_assets/abyssbox_border.png") !important;
+    				border-image-source: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_border.png") !important;
     				border-image-slice: 4 fill !important; 
    				border-image-width: 4px !important; 
 				border-image-repeat: stretch !important;
@@ -6921,7 +7390,7 @@ var beepbox = (function (exports) {
 				}
 
 				#firstImage {
-					background-image: url("./image_assets/viviandbelle.png") !important;
+					background-image: url("${location.pathname.includes("player") ? "." : ""}./image_assets/viviandbelle.png") !important;
 					background-repeat: no-repeat !important;
 					background-size: 100% 100% !important;
 				}
@@ -6930,7 +7399,7 @@ var beepbox = (function (exports) {
 			@font-face {
 		   font-family: "AbyssType_small";
 		   src:
- 		   url("./image_assets/abysstype_small.otf") format("opentype") tech(color-COLRv1),
+ 		   url("${location.pathname.includes("player") ? "." : ""}./image_assets/abysstype_small.otf") format("opentype") tech(color-COLRv1),
 			}
 
 			
@@ -7073,7 +7542,7 @@ var beepbox = (function (exports) {
 		}
 		.instructions-column > section:first-of-type > p:first-of-type:after {
 		display: block;
-		content: url("./image_assets/wide-gordon.png");
+		content: url("${location.pathname.includes("player") ? "." : ""}./image_assets/wide-gordon.png");
 		width: inherit;
 		height: contain;
 		text-align: center;
@@ -7081,7 +7550,7 @@ var beepbox = (function (exports) {
 		}
 		/* sets background image */
 		body {
-		background-image: url("./image_assets/lambda.png") !important;
+		background-image: url("${location.pathname.includes("player") ? "." : ""}./image_assets/lambda.png") !important;
 		background-size: cover !important;
 		background-position: center !important;
 		background-repeat: no-repeat !important;
@@ -7093,7 +7562,7 @@ var beepbox = (function (exports) {
 			@font-face {
 		   font-family: "trebuc";
 		   src:
- 		   url("./image_assets/trebuc.otf") format("opentype") tech(color-COLRv1),
+ 		   url("${location.pathname.includes("player") ? "." : ""}./image_assets/trebuc.otf") format("opentype") tech(color-COLRv1),
 			}
 
 			html {
@@ -7241,7 +7710,7 @@ var beepbox = (function (exports) {
 		}
 		.instructions-column > section:first-of-type > p:first-of-type:after {
 		display: block;
-		content: url("./image_assets/wide-gordon.png");
+		content: url("${location.pathname.includes("player") ? "." : ""}./image_assets/wide-gordon.png");
 		width: inherit;
 		height: contain;
 		text-align: center;
@@ -7249,7 +7718,7 @@ var beepbox = (function (exports) {
 		}
 		/* sets background image */
 		body {
-		background-image: url("./image_assets/lambda.png") !important;
+		background-image: url("${location.pathname.includes("player") ? "." : ""}./image_assets/lambda.png") !important;
 		background-position: center;
 		background-repeat: repeat;
 			}
@@ -8054,12 +8523,12 @@ var beepbox = (function (exports) {
 		}
 		#text-content > section > h1 {
 		margin: auto;
-		content: url("./image_assets/AbyssBox_DOOM.png");
+		content: url("${location.pathname.includes("player") ? "." : ""}./image_assets/AbyssBox_DOOM.png");
 		}
 				
 				/* sets background image */
 		body {
-		background-image: url("./image_assets/doomsky.png") !important;
+		background-image: url("${location.pathname.includes("player") ? "." : ""}./image_assets/doomsky.png") !important;
 		background-size: cover;
 		background-position: center;
 		background-repeat: no-repeat;
@@ -8072,7 +8541,7 @@ var beepbox = (function (exports) {
 			@font-face {
 		   font-family: "doomfont";
 		   src:
- 		   url("./image_assets/doomfont.otf") format("opentype") tech(color-COLRv1),
+ 		   url("${location.pathname.includes("player") ? "." : ""}./image_assets/doomfont.otf") format("opentype") tech(color-COLRv1),
 			}
 
 			html {
@@ -8462,8 +8931,8 @@ var beepbox = (function (exports) {
 		--file-page-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-file.png");
 		--edit-pencil-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-edit.png");
 		--preferences-gear-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-preferences.png");
-		--instrument-copy-symbol: url("./image_assets/icon-copy.png");
-		--instrument-paste-symbol: url("./image_assets/icon-paste.png");
+		--instrument-copy-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-copy.png");
+		--instrument-paste-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-paste.png");
 		--play-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-play.png");
 		--pause-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-pause.png");
 		--record-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-record.png");
@@ -8478,21 +8947,21 @@ var beepbox = (function (exports) {
 		--export-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-export.png");
 		--export-instrument-symbol: var(--export-symbol);
 		--import-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-import.png");
-		--undo-symbol: url("./image_assets/icon-undo.png");
-		--redo-symbol: url("./image_assets/icon-redo.png");
-		--copy-symbol: url("./image_assets/icon-copy.png");
-		--paste-symbol: url("./image_assets/icon-paste.png");
-		--insert-channel-symbol: url("./image_assets/icon-insertChannel.png");
-		--delete-channel-symbol: url("./image_assets/icon-deleteChannel.png");
-		--select-all-symbol: url("./image_assets/icon-SelectAll.png");
-		--duplicate-symbol: url("./image_assets/icon-duplicate.png");
-		--notes-up-symbol: url("./image_assets/moveNotesUp.png");
-		--notes-down-symbol: url("./image_assets/moveNotesDown.png");
-		--loop-bar-symbol: url("./image_assets/icon-singleBarLoop.png");
-		--fullscreen-symbol: url("./image_assets/icon-fullscreen.png");
-		--loop-within-bar-symbol: url("./image_assets/icon-loop-bar.png");
-		--loop-full-song-symbol: url("./image_assets/icon-loop-song.png");
-		--dont-loop-symbol: url("./image_assets/icon-loop-once.png");
+		--undo-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-undo.png");
+		--redo-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-redo.png");
+		--copy-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-copy.png");
+		--paste-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-paste.png");
+		--insert-channel-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-insertChannel.png");
+		--delete-channel-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-deleteChannel.png");
+		--select-all-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-SelectAll.png");
+		--duplicate-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-duplicate.png");
+		--notes-up-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/moveNotesUp.png");
+		--notes-down-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/moveNotesDown.png");
+		--loop-bar-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-singleBarLoop.png");
+		--fullscreen-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-fullscreen.png");
+		--loop-within-bar-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-bar.png");
+		--loop-full-song-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-song.png");
+		--dont-loop-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-once.png");
 		}
 		
 		.spIcon {
@@ -8758,7 +9227,7 @@ var beepbox = (function (exports) {
 				@font-face {
 					font-family: "tahoma";
 					src:
-					 url("./image_assets/tahoma.otf") format("opentype") tech(color-COLRv1),
+					 url("${location.pathname.includes("player") ? "." : ""}./image_assets/tahoma.otf") format("opentype") tech(color-COLRv1),
 					 image-rendering: -moz-crisp-edges !important;         /* Firefox */
 					 image-rendering: -webkit-optimize-contrast !important; /* Webkit (Chrome/Safari) */
 					 image-rendering: -o-crisp-edges !important;            /* Opera */
@@ -8926,21 +9395,21 @@ var beepbox = (function (exports) {
 				}
 
 		* {
-		cursor: url("./image_assets/xpcursor.png"), auto !important;
-		--play-symbol:url("./image_assets/xpPlay.png");
-		--pause-symbol:url("./image_assets/xpPause.png");
-		--record-symbol:url("./image_assets/xpRecord.png");
-		--stop-symbol:url("./image_assets/xpStop.png");
-		--prev-bar-symbol:url("./image_assets/xpBackward.png");
-		--next-bar-symbol:url("./image_assets/xpForward.png");
-		--file-page-symbol: url("./image_assets/xpFile.png");
-		--edit-pencil-symbol: url("./image_assets/xpEdit.png");
-		--preferences-gear-symbol: url("./image_assets/xpPreferences.png");
-		--muted-symbol: url("./image_assets/xpSpeakerMute.png");
-		--unmuted-symbol: url("./image_assets/xpSpeaker.png");
-		--volume-symbol: url("./image_assets/xpSpeaker.png");
-		--zoom-in-symbol: url("./image_assets/xpZoomIn.png");
-		--zoom-out-symbol: url("./image_assets/xpZoomOut.png");
+		cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpcursor.png"), auto !important;
+		--play-symbol:url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpPlay.png");
+		--pause-symbol:url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpPause.png");
+		--record-symbol:url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpRecord.png");
+		--stop-symbol:url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpStop.png");
+		--prev-bar-symbol:url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpBackward.png");
+		--next-bar-symbol:url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpForward.png");
+		--file-page-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpFile.png");
+		--edit-pencil-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpEdit.png");
+		--preferences-gear-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpPreferences.png");
+		--muted-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpSpeakerMute.png");
+		--unmuted-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpSpeaker.png");
+		--volume-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpSpeaker.png");
+		--zoom-in-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpZoomIn.png");
+		--zoom-out-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpZoomOut.png");
 		}
 
 		.beepboxEditor button,
@@ -8967,7 +9436,7 @@ var beepbox = (function (exports) {
 			}
 
 		div.mute-button::before {
-			background-image: url("./image_assets/xpSpeaker.png") !important;
+			background-image: url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpSpeaker.png") !important;
 			background-size: 120% !important;
 			background-position-x: center !important;
 			background-position-y: center !important;
@@ -8981,7 +9450,7 @@ var beepbox = (function (exports) {
 		}
 
 		div.mute-button.muted::before {
-			background-image: url("./image_assets/xpSpeakerMute.png") !important;
+			background-image: url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpSpeakerMute.png") !important;
 			background-size: 120% !important;
 			background-position-x: center !important;
 			background-position-y: center !important;
@@ -8995,7 +9464,7 @@ var beepbox = (function (exports) {
 		}
 
 		button.recordButton::Before {
-			background-image: url("./image_assets/xpRecord.png") !important;
+			background-image: url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpRecord.png") !important;
 			background-size: 64% !important;
 			background-position: center !important;
 			background-repeat: no-repeat !important;
@@ -9009,7 +9478,7 @@ var beepbox = (function (exports) {
 		}
 
 		button.stopButton::Before {
-			background-image: url("./image_assets/xpStop.png") !important;
+			background-image: url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpStop.png") !important;
 			background-size: 64% !important;
 			background-position: center !important;
 			background-repeat: no-repeat !important;
@@ -9023,7 +9492,7 @@ var beepbox = (function (exports) {
 		}
 
 		button.pauseButton::Before {
-			background-image: url("./image_assets/xpPause.png") !important;
+			background-image: url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpPause.png") !important;
 			background-size: 64% !important;
 			background-position: center !important;
 			background-repeat: no-repeat !important;
@@ -9037,7 +9506,7 @@ var beepbox = (function (exports) {
 		}
 
 		.beepboxEditor span.volume-speaker {
-			background-image: url("./image_assets/xpSpeaker.png");
+			background-image: url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpSpeaker.png");
 			background-position: center !important;
 			background-repeat: no-repeat !important;
 
@@ -9050,7 +9519,7 @@ var beepbox = (function (exports) {
 
 		div.selectContainer.menu.file::before {
 
-			background-image: url("./image_assets/xpFile.png");
+			background-image: url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpFile.png");
 			background-size: 64%;
 			background-position-x: center;
 			background-position-y: center;
@@ -9064,7 +9533,7 @@ var beepbox = (function (exports) {
 
 		div.selectContainer.menu.edit::before {
 
-			background-image: url("./image_assets/xpEdit.png");
+			background-image: url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpEdit.png");
 			background-size: 64%;
 			background-position-x: center;
 			background-position-y: center;
@@ -9077,7 +9546,7 @@ var beepbox = (function (exports) {
 		}
 		div.selectContainer.menu.preferences::before {
 
-			background-image: url("./image_assets/xpPreferences.png");
+			background-image: url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpPreferences.png");
 			background-size: 64%;
 			background-position-x: center;
 			background-position-y: center;
@@ -9090,7 +9559,7 @@ var beepbox = (function (exports) {
 		}
 		button.playButton::before {
 
-			background-image: url("./image_assets/xpPlay.png") !important;
+			background-image: url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpPlay.png") !important;
 			background-size: 64% !important;
 			background-position: center !important;
 
@@ -9103,7 +9572,7 @@ var beepbox = (function (exports) {
 		}
 
 		.beepboxEditor button.prevBarButton::before {
-			background-image: url("./image_assets/xpBackward.png") !important;
+			background-image: url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpBackward.png") !important;
 			background-size: 64% !important;
 			background-position: center !important;
 
@@ -9117,7 +9586,7 @@ var beepbox = (function (exports) {
 		}
 
 		.beepboxEditor button.nextBarButton::before {
-			background-image: url("./image_assets/xpForward.png") !important;
+			background-image: url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpForward.png") !important;
 			background-size: 64% !important;
 			background-position: center !important;
 
@@ -9131,7 +9600,7 @@ var beepbox = (function (exports) {
 		}
 
 		.beepboxEditor .zoomInButton::before {
-			background-image: url("./image_assets/xpZoomIn.png") !important;
+			background-image: url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpZoomIn.png") !important;
 			background-position: center !important;
 
 
@@ -9144,7 +9613,7 @@ var beepbox = (function (exports) {
 		}
 
 		.beepboxEditor .zoomOutButton::before {
-			background-image: url("./image_assets/xpZoomOut.png") !important;
+			background-image: url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpZoomOut.png") !important;
 			background-position: center !important;
 
 
@@ -9157,7 +9626,7 @@ var beepbox = (function (exports) {
 		}
 
 		.beepboxEditor input[type="range"]::-moz-range-thumb {
-			background-image: url("./image_assets/scrollbar.png") !important;
+			background-image: url("${location.pathname.includes("player") ? "." : ""}./image_assets/scrollbar.png") !important;
 			background-position: center !important;
 			background-size: inherit !important;
 
@@ -9179,12 +9648,12 @@ var beepbox = (function (exports) {
 		}
 		#text-content > section > h1 {
 		margin: auto;
-		content: url("./image_assets/AbyssBox_XP.png");
+		content: url("${location.pathname.includes("player") ? "." : ""}./image_assets/AbyssBox_XP.png");
 		}
 
 				/* sets background image */
 		body {
-		background-image: url("./image_assets/xphills.png") !important;
+		background-image: url("${location.pathname.includes("player") ? "." : ""}./image_assets/xphills.png") !important;
 		background-size: cover;
 		background-position: center;
 		background-repeat: no-repeat;
@@ -9214,7 +9683,7 @@ var beepbox = (function (exports) {
 				margin-top: 15px;
 				}
 			#beepboxEditorContainer {
-    				border-image-source: url("./image_assets/xptextbg.png");
+    				border-image-source: url("${location.pathname.includes("player") ? "." : ""}./image_assets/xptextbg.png");
     				border-image-slice: 11 fill; 
    				border-image-width: 11px; 
 				border-image-repeat: stretch;
@@ -9269,7 +9738,7 @@ var beepbox = (function (exports) {
 			}
 
 			#firstImage {
-				background-image: url("./image_assets/xpsongeditorbg.png") !important;
+				background-image: url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpsongeditorbg.png") !important;
 				background-repeat: no-repeat !important;
 				background-size: 100% 100% !important;
 			}
@@ -9294,7 +9763,7 @@ var beepbox = (function (exports) {
 			}
 			
 			.beepboxEditor select:focus {
-					border-image-source: url("./image_assets/xpbuttonpressedbg.png");
+					border-image-source: url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpbuttonpressedbg.png");
 					border-image-slice: 4 fill; 
 					border-image-width: 4px; 
 					border-image-repeat: repeat;
@@ -9311,7 +9780,7 @@ var beepbox = (function (exports) {
 					border-radius: 0px;
 					width: 13px !important;
 					height: 13px !important;
-					background-image:url("./image_assets/xpCheckmarkBlank.png");
+					background-image:url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpCheckmarkBlank.png");
 					background-repeat:no-repeat;
 
 					image-rendering: -moz-crisp-edges !important;         /* Firefox */
@@ -9336,7 +9805,7 @@ var beepbox = (function (exports) {
 					text-align: center;
 					content: "";
 					background-repeat:no-repeat;
-					background-image:url("./image_assets/xpCheckmark.png");
+					background-image:url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpCheckmark.png");
 					image-rendering: -moz-crisp-edges !important;         /* Firefox */
 					image-rendering: -webkit-optimize-contrast !important; /* Webkit (Chrome/Safari) */
 					image-rendering: -o-crisp-edges !important;            /* Opera */
@@ -9547,6 +10016,15 @@ var beepbox = (function (exports) {
 			--mod-title: #1D1C1D;
 			}
 
+			.beepboxEditor .effectExt {
+				margin-top: 8px;
+				margin-bottom: 8px;
+				background: #151516;
+				padding: 4px;
+				border-radius: 7px;
+				border-top: none !important;
+			}
+
 			.channelBox {
 			border-radius: 25px;
 			}
@@ -9687,6 +10165,15 @@ var beepbox = (function (exports) {
 			--disabled-note-primary:    #999;
 			--disabled-note-secondary:  #666;
 			--mod-title: #1D1C1D;
+			}
+
+			.beepboxEditor .effectExt {
+				margin-top: 8px;
+				margin-bottom: 8px;
+				background: #E3E1DE;
+				padding: 4px;
+				border-radius: 7px;
+				border-top: none !important;
 			}
 
 			.channelBox {
@@ -9839,7 +10326,7 @@ var beepbox = (function (exports) {
 						@font-face {
 					   font-family: "Workbench";
 					   src:
-						url("./image_assets/Workbench.ttf") format("truetype") tech(color-COLRv1),
+						url("${location.pathname.includes("player") ? "." : ""}./image_assets/Workbench.ttf") format("truetype") tech(color-COLRv1),
 						}
 			
 						html {
@@ -10109,8 +10596,8 @@ var beepbox = (function (exports) {
 				--file-page-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-file.png");
 				--edit-pencil-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-edit.png");
 				--preferences-gear-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-preferences.png");
-				--instrument-copy-symbol: url("./image_assets/icon-copy.png");
-				--instrument-paste-symbol: url("./image_assets/icon-paste.png");
+				--instrument-copy-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-copy.png");
+				--instrument-paste-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-paste.png");
 				--play-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-play.png");
 				--pause-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-pause.png");
 				--record-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-record.png");
@@ -10125,32 +10612,32 @@ var beepbox = (function (exports) {
 				--export-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-export.png");
 				--export-instrument-symbol: var(--export-symbol);
 				--import-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-import.png");
-				--undo-symbol: url("./image_assets/icon-undo.png");
-				--redo-symbol: url("./image_assets/icon-redo.png");
-				--copy-symbol: url("./image_assets/icon-copy.png");
-				--paste-symbol: url("./image_assets/icon-paste.png");
-				--insert-channel-symbol: url("./image_assets/icon-insertChannel.png");
-				--delete-channel-symbol: url("./image_assets/icon-deleteChannel.png");
-				--select-all-symbol: url("./image_assets/icon-SelectAll.png");
-				--duplicate-symbol: url("./image_assets/icon-duplicate.png");
-				--notes-up-symbol: url("./image_assets/moveNotesUp.png");
-				--notes-down-symbol: url("./image_assets/moveNotesDown.png");
-				--loop-bar-symbol: url("./image_assets/icon-singleBarLoop.png");
-				--fullscreen-symbol: url("./image_assets/icon-fullscreen.png");
-				--loop-within-bar-symbol: url("./image_assets/icon-loop-bar.png");
-	--loop-full-song-symbol: url("./image_assets/icon-loop-song.png");
-	--dont-loop-symbol: url("./image_assets/icon-loop-once.png");
+				--undo-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-undo.png");
+				--redo-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-redo.png");
+				--copy-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-copy.png");
+				--paste-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-paste.png");
+				--insert-channel-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-insertChannel.png");
+				--delete-channel-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-deleteChannel.png");
+				--select-all-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-SelectAll.png");
+				--duplicate-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-duplicate.png");
+				--notes-up-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/moveNotesUp.png");
+				--notes-down-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/moveNotesDown.png");
+				--loop-bar-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-singleBarLoop.png");
+				--fullscreen-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-fullscreen.png");
+				--loop-within-bar-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-bar.png");
+	--loop-full-song-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-song.png");
+	--dont-loop-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-once.png");
 				} 
 					@font-face {
 				   font-family: "AbyssType";
 				   src:
-					url("./image_assets/abysstype.otf") format("opentype") tech(color-COLRv1),
+					url("${location.pathname.includes("player") ? "." : ""}./image_assets/abysstype.otf") format("opentype") tech(color-COLRv1),
 					}
 			
 					@font-face {
 				   font-family: "AbyssType_small";
 				   src:
-					url("./image_assets/abysstype_small.otf") format("opentype") tech(color-COLRv1),
+					url("${location.pathname.includes("player") ? "." : ""}./image_assets/abysstype_small.otf") format("opentype") tech(color-COLRv1),
 					}
 			
 					body {
@@ -10714,8 +11201,8 @@ var beepbox = (function (exports) {
 					--file-page-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-file.png");
 					--edit-pencil-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-edit.png");
 					--preferences-gear-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-preferences.png");
-					--instrument-copy-symbol: url("./image_assets/icon-copy.png");
-					--instrument-paste-symbol: url("./image_assets/icon-paste.png");
+					--instrument-copy-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-copy.png");
+					--instrument-paste-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-paste.png");
 					--play-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-play.png");
 					--pause-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-pause.png");
 					--record-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-record.png");
@@ -10730,32 +11217,32 @@ var beepbox = (function (exports) {
 					--export-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-export.png");
 					--export-instrument-symbol: var(--export-symbol);
 					--import-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-import.png");
-					--undo-symbol: url("./image_assets/icon-undo.png");
-					--redo-symbol: url("./image_assets/icon-redo.png");
-					--copy-symbol: url("./image_assets/icon-copy.png");
-					--paste-symbol: url("./image_assets/icon-paste.png");
-					--insert-channel-symbol: url("./image_assets/icon-insertChannel.png");
-					--delete-channel-symbol: url("./image_assets/icon-deleteChannel.png");
-					--select-all-symbol: url("./image_assets/icon-SelectAll.png");
-					--duplicate-symbol: url("./image_assets/icon-duplicate.png");
-					--notes-up-symbol: url("./image_assets/moveNotesUp.png");
-					--notes-down-symbol: url("./image_assets/moveNotesDown.png");
-					--loop-bar-symbol: url("./image_assets/icon-singleBarLoop.png");
-					--fullscreen-symbol: url("./image_assets/icon-fullscreen.png");
-					--loop-within-bar-symbol: url("./image_assets/icon-loop-bar.png");
-	--loop-full-song-symbol: url("./image_assets/icon-loop-song.png");
-	--dont-loop-symbol: url("./image_assets/icon-loop-once.png");
+					--undo-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-undo.png");
+					--redo-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-redo.png");
+					--copy-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-copy.png");
+					--paste-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-paste.png");
+					--insert-channel-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-insertChannel.png");
+					--delete-channel-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-deleteChannel.png");
+					--select-all-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-SelectAll.png");
+					--duplicate-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-duplicate.png");
+					--notes-up-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/moveNotesUp.png");
+					--notes-down-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/moveNotesDown.png");
+					--loop-bar-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-singleBarLoop.png");
+					--fullscreen-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-fullscreen.png");
+					--loop-within-bar-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-bar.png");
+	--loop-full-song-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-song.png");
+	--dont-loop-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-once.png");
 					}
 					
 						@font-face {
 					   font-family: "AbyssType";
 					   src:
-						url("./image_assets/abysstype.otf") format("opentype") tech(color-COLRv1),
+						url("${location.pathname.includes("player") ? "." : ""}./image_assets/abysstype.otf") format("opentype") tech(color-COLRv1),
 						}
 
 						/* sets background image */
 						body {
-						background-image: url("./image_assets/diamondsbg.gif") !important;
+						background-image: url("${location.pathname.includes("player") ? "." : ""}./image_assets/diamondsbg.gif") !important;
 						background-position: center;
 						background-repeat: repeat;
 			
@@ -10767,7 +11254,7 @@ var beepbox = (function (exports) {
 							}
 			
 						#text-content {
-								border-image-source: url("./image_assets/beepbox_pixel_border.png");
+								border-image-source: url("${location.pathname.includes("player") ? "." : ""}./image_assets/beepbox_pixel_border.png");
 								border-image-slice: 4 fill; 
 							   border-image-width: 8px; 
 							border-image-repeat: stretch; 
@@ -10780,7 +11267,7 @@ var beepbox = (function (exports) {
 								image-rendering: optimizeSpeed !important;             /* IE */
 							}
 						#beepboxEditorContainer {
-								border-image-source: url("./image_assets/beepbox_pixel_border.png");
+								border-image-source: url("${location.pathname.includes("player") ? "." : ""}./image_assets/beepbox_pixel_border.png");
 								border-image-slice: 4 fill; 
 							   border-image-width: 8px; 
 							border-image-repeat: stretch;
@@ -10812,7 +11299,7 @@ var beepbox = (function (exports) {
 						button.importInstrumentButton, 
 						.beepboxEditor select, 
 						.beepboxEditor .select2-selection__rendered {
-								border-image-source: url("./image_assets/beepbox_pixel_border.png") !important;
+								border-image-source: url("${location.pathname.includes("player") ? "." : ""}./image_assets/beepbox_pixel_border.png") !important;
 								border-image-slice: 4 fill !important; 
 							   border-image-width: 4px !important; 
 							border-image-repeat: stretch !important;
@@ -10824,7 +11311,7 @@ var beepbox = (function (exports) {
 								image-rendering: pixelated !important;                 /* Future browsers */
 								image-rendering: optimizeSpeed !important;             /* IE */
 			
-								cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+								cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 							}
 			
 						.beepboxEditor .channelBox {
@@ -10873,7 +11360,7 @@ var beepbox = (function (exports) {
 						@font-face {
 					   font-family: "AbyssType_small";
 					   src:
-						url("./image_assets/abysstype_small.otf") format("opentype") tech(color-COLRv1),
+						url("${location.pathname.includes("player") ? "." : ""}./image_assets/abysstype_small.otf") format("opentype") tech(color-COLRv1),
 						}
 			
 						html {
@@ -10886,72 +11373,72 @@ var beepbox = (function (exports) {
 			
 						.beepboxEditor input[type="range"]::-webkit-slider-thumb
 						{
-							cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+							cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 						}
 						 
 						.beepboxEditor input[type="range"]::-webkit-slider-runnable-track
 						{
-							cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+							cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 						}
 						 
 						.beepboxEditor input[type="range"]:focus::-webkit-slider-runnable-track
 						{
-							cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+							cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 						}
 						 
 						.beepboxEditor input[type="range"]::-ms-thumb
 						{
-							cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+							cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 						}
 						 
 						.beepboxEditor input[type="range"]::-ms-track
 						{
-							cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+							cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 						}
 						 
 						.beepboxEditor input[type="range"]:focus::-ms-track
 						{
-							cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+							cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 						}
 						 
 						.beepboxEditor input[type="range"]::-moz-range-thumb
 						{
-							cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+							cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 						}
 						 
 						.beepboxEditor input[type="range"]::-moz-range-track
 						{
-							cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+							cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 						}
 						 
 						.beepboxEditor input[type="range"]:focus::-moz-range-track
 						{
-							cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+							cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 						}
 						 
 						.beepboxEditor input[type="text"],
 						.beepboxEditor input[type="number"]
 						{
-							cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+							cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 						}
 						 
 						.beepboxEditor input[type="checkbox"]
 						{
-							cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+							cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 						}
 						 
 						.beepboxEditor input[type="checkbox"]:checked
 						{
-							cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+							cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 						}
 						 
 						.beepboxEditor input[type="checkbox"]:checked:after
 						{
-							cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+							cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 						}
 			
 						div.selectRow span {
-							cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+							cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 						}
 			
 			`,
@@ -11750,7 +12237,7 @@ var beepbox = (function (exports) {
 
 					/* sets background image */
 					body {
-						background-image: url("./image_assets/Forest2Trees.png") !important;
+						background-image: url("${location.pathname.includes("player") ? "." : ""}./image_assets/Forest2Trees.png") !important;
 						background-size: cover;
 						background-position: center top; /* Adjusted to align with the top */
   						background-repeat: no-repeat;
@@ -11763,7 +12250,7 @@ var beepbox = (function (exports) {
 						}
 						#text-content {
 						--editor-background: (255, 255, 255, 0);
-							border-image-source: url("./image_assets/forest2_border.png");
+							border-image-source: url("${location.pathname.includes("player") ? "." : ""}./image_assets/forest2_border.png");
 							border-image-slice: 16 fill; 
 						   	border-image-width: 32px; 
 							border-image-repeat: repeat; 
@@ -11777,7 +12264,7 @@ var beepbox = (function (exports) {
 						}
 					#beepboxEditorContainer {
 						--editor-background: (255, 255, 255, 0);
-							border-image-source: url("./image_assets/forest2_border.png");
+							border-image-source: url("${location.pathname.includes("player") ? "." : ""}./image_assets/forest2_border.png");
 							border-image-slice: 16 fill; 
 						   	border-image-width: 32px; 
 							border-image-repeat: repeat; 
@@ -11793,7 +12280,7 @@ var beepbox = (function (exports) {
 							image-rendering: optimizeSpeed !important;             /* IE */ 
 						}
 					.beepboxEditor button, .beepboxEditor select, .beepboxEditor .select2-selection__rendered, button {
-							border-image-source: url("./image_assets/forest2_border2.png") !important;
+							border-image-source: url("${location.pathname.includes("player") ? "." : ""}./image_assets/forest2_border2.png") !important;
 							border-image-slice: 4 fill !important; 
 						   border-image-width: 4px !important; 
 						border-image-repeat: stretch !important;
@@ -11815,12 +12302,12 @@ var beepbox = (function (exports) {
 					border-radius: 5px;
 					} */
 					* {
-						cursor: url("./image_assets/pixel_cursor.png"), auto !important;
+						cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/pixel_cursor.png"), auto !important;
 						--file-page-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-file.png");
 						--edit-pencil-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-edit.png");
 						--preferences-gear-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-preferences.png");
-						--instrument-copy-symbol: url("./image_assets/icon-copy.png");
-						--instrument-paste-symbol: url("./image_assets/icon-paste.png");
+						--instrument-copy-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-copy.png");
+						--instrument-paste-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-paste.png");
 						--play-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-play.png");
 						--pause-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-pause.png");
 						--record-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-record.png");
@@ -11835,26 +12322,26 @@ var beepbox = (function (exports) {
 						--export-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-export.png");
 						--export-instrument-symbol: var(--export-symbol);
 						--import-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-import.png");
-						--undo-symbol: url("./image_assets/icon-undo.png");
-						--redo-symbol: url("./image_assets/icon-redo.png");
-						--copy-symbol: url("./image_assets/icon-copy.png");
-						--paste-symbol: url("./image_assets/icon-paste.png");
-						--insert-channel-symbol: url("./image_assets/icon-insertChannel.png");
-						--delete-channel-symbol: url("./image_assets/icon-deleteChannel.png");
-						--select-all-symbol: url("./image_assets/icon-SelectAll.png");
-						--duplicate-symbol: url("./image_assets/icon-duplicate.png");
-						--notes-up-symbol: url("./image_assets/moveNotesUp.png");
-						--notes-down-symbol: url("./image_assets/moveNotesDown.png");
-						--loop-bar-symbol: url("./image_assets/icon-singleBarLoop.png");
-						--fullscreen-symbol: url("./image_assets/icon-fullscreen.png");
-						--loop-within-bar-symbol: url("./image_assets/icon-loop-bar.png");
-	--loop-full-song-symbol: url("./image_assets/icon-loop-song.png");
-	--dont-loop-symbol: url("./image_assets/icon-loop-once.png");
+						--undo-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-undo.png");
+						--redo-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-redo.png");
+						--copy-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-copy.png");
+						--paste-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-paste.png");
+						--insert-channel-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-insertChannel.png");
+						--delete-channel-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-deleteChannel.png");
+						--select-all-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-SelectAll.png");
+						--duplicate-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-duplicate.png");
+						--notes-up-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/moveNotesUp.png");
+						--notes-down-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/moveNotesDown.png");
+						--loop-bar-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-singleBarLoop.png");
+						--fullscreen-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-fullscreen.png");
+						--loop-within-bar-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-bar.png");
+	--loop-full-song-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-song.png");
+	--dont-loop-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-once.png");
 						} 
 							@font-face {
 						   font-family: "AbyssType";
 						   src:
-							url("./image_assets/abysstype.otf") format("opentype") tech(color-COLRv1),
+							url("${location.pathname.includes("player") ? "." : ""}./image_assets/abysstype.otf") format("opentype") tech(color-COLRv1),
 							}
 				
 							button.envelopeDropdown, div.selectRow button:not(.copyButton,.pasteButton,.exportInstrumentButton,.importInstrumentButton) {
@@ -11865,7 +12352,7 @@ var beepbox = (function (exports) {
 							@font-face {
 						   font-family: "AbyssType_small";
 						   src:
-							url("./image_assets/abysstype_small.otf") format("opentype") tech(color-COLRv1),
+							url("${location.pathname.includes("player") ? "." : ""}./image_assets/abysstype_small.otf") format("opentype") tech(color-COLRv1),
 							}
 				
 							html {
@@ -12114,12 +12601,12 @@ var beepbox = (function (exports) {
 			}
 			
 			* {
-				cursor: url("./image_assets/pixel_cursor.png"), auto !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/pixel_cursor.png"), auto !important;
 				--file-page-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-file.png");
 				--edit-pencil-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-edit.png");
 				--preferences-gear-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-preferences.png");
-				--instrument-copy-symbol: url("./image_assets/icon-copy.png");
-				--instrument-paste-symbol: url("./image_assets/icon-paste.png");
+				--instrument-copy-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-copy.png");
+				--instrument-paste-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-paste.png");
 				--play-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-play.png");
 				--pause-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-pause.png");
 				--record-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-record.png");
@@ -12134,33 +12621,33 @@ var beepbox = (function (exports) {
 				--export-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-export.png");
 				--export-instrument-symbol: var(--export-symbol);
 				--import-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-import.png");
-				--undo-symbol: url("./image_assets/icon-undo.png");
-				--redo-symbol: url("./image_assets/icon-redo.png");
-				--copy-symbol: url("./image_assets/icon-copy.png");
-				--paste-symbol: url("./image_assets/icon-paste.png");
-				--insert-channel-symbol: url("./image_assets/icon-insertChannel.png");
-				--delete-channel-symbol: url("./image_assets/icon-deleteChannel.png");
-				--select-all-symbol: url("./image_assets/icon-SelectAll.png");
-				--duplicate-symbol: url("./image_assets/icon-duplicate.png");
-				--notes-up-symbol: url("./image_assets/moveNotesUp.png");
-				--notes-down-symbol: url("./image_assets/moveNotesDown.png");
-				--loop-bar-symbol: url("./image_assets/icon-singleBarLoop.png");
-				--fullscreen-symbol: url("./image_assets/icon-fullscreen.png");
-				--loop-within-bar-symbol: url("./image_assets/icon-loop-bar.png");
-	--loop-full-song-symbol: url("./image_assets/icon-loop-song.png");
-	--dont-loop-symbol: url("./image_assets/icon-loop-once.png");
+				--undo-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-undo.png");
+				--redo-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-redo.png");
+				--copy-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-copy.png");
+				--paste-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-paste.png");
+				--insert-channel-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-insertChannel.png");
+				--delete-channel-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-deleteChannel.png");
+				--select-all-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-SelectAll.png");
+				--duplicate-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-duplicate.png");
+				--notes-up-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/moveNotesUp.png");
+				--notes-down-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/moveNotesDown.png");
+				--loop-bar-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-singleBarLoop.png");
+				--fullscreen-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-fullscreen.png");
+				--loop-within-bar-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-bar.png");
+	--loop-full-song-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-song.png");
+	--dont-loop-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-once.png");
 				} 
 			
 			@font-face {
 				font-family: "AbyssType";
 				src:
-				 url("./image_assets/abysstype.otf") format("opentype") tech(color-COLRv1),
+				 url("${location.pathname.includes("player") ? "." : ""}./image_assets/abysstype.otf") format("opentype") tech(color-COLRv1),
 				 }
 			
 				 @font-face {
 				font-family: "AbyssType_small";
 				src:
-				 url("./image_assets/abysstype_small.otf") format("opentype") tech(color-COLRv1),
+				 url("${location.pathname.includes("player") ? "." : ""}./image_assets/abysstype_small.otf") format("opentype") tech(color-COLRv1),
 				 }
 			
 				 #pattern-area {
@@ -14292,7 +14779,7 @@ var beepbox = (function (exports) {
 			}
 
 			body {
-				background-image: url("./image_assets/stars.gif") !important;
+				background-image: url("${location.pathname.includes("player") ? "." : ""}./image_assets/stars.gif") !important;
 				background-size: contain !important;
 				background-position: center top !important;
 				  background-repeat: repeat !important;
@@ -14305,7 +14792,7 @@ var beepbox = (function (exports) {
 				}
 			#text-content {
 				--editor-background: rgba(255, 255, 255, 0);
-					border-image-source: url("./image_assets/nebula2_border.png");
+					border-image-source: url("${location.pathname.includes("player") ? "." : ""}./image_assets/nebula2_border.png");
 					border-image-slice: 16 fill; 
 					   border-image-width: 32px; 
 					border-image-repeat: repeat; 
@@ -14319,7 +14806,7 @@ var beepbox = (function (exports) {
 				}
 			#beepboxEditorContainer {
 				--editor-background: rgba(255, 255, 255, 0);
-					border-image-source: url("./image_assets/nebula2_border.png");
+					border-image-source: url("${location.pathname.includes("player") ? "." : ""}./image_assets/nebula2_border.png");
 					border-image-slice: 16 fill; 
 					   border-image-width: 32px; 
 					border-image-repeat: repeat; 
@@ -14335,7 +14822,7 @@ var beepbox = (function (exports) {
 					image-rendering: optimizeSpeed !important;             /* IE */ 
 				}
 			.beepboxEditor button, .beepboxEditor select, .beepboxEditor .select2-selection__rendered, button {
-					border-image-source: url("./image_assets/nebula2_border2.png") !important;
+					border-image-source: url("${location.pathname.includes("player") ? "." : ""}./image_assets/nebula2_border2.png") !important;
 					border-image-slice: 4 fill !important; 
 				   border-image-width: 4px !important; 
 				border-image-repeat: stretch !important;
@@ -14354,12 +14841,12 @@ var beepbox = (function (exports) {
 			border-radius: 5px;
 			} */
 			* {
-				cursor: url("./image_assets/pixel_cursor.png"), auto !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/pixel_cursor.png"), auto !important;
 				--file-page-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-file.png");
 				--edit-pencil-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-edit.png");
 				--preferences-gear-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-preferences.png");
-				--instrument-copy-symbol: url("./image_assets/icon-copy.png");
-				--instrument-paste-symbol: url("./image_assets/icon-paste.png");
+				--instrument-copy-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-copy.png");
+				--instrument-paste-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-paste.png");
 				--play-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-play.png");
 				--pause-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-pause.png");
 				--record-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-record.png");
@@ -14374,32 +14861,32 @@ var beepbox = (function (exports) {
 				--export-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-export.png");
 				--export-instrument-symbol: var(--export-symbol);
 				--import-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-import.png");
-				--undo-symbol: url("./image_assets/icon-undo.png");
-				--redo-symbol: url("./image_assets/icon-redo.png");
-				--copy-symbol: url("./image_assets/icon-copy.png");
-				--paste-symbol: url("./image_assets/icon-paste.png");
-				--insert-channel-symbol: url("./image_assets/icon-insertChannel.png");
-				--delete-channel-symbol: url("./image_assets/icon-deleteChannel.png");
-				--select-all-symbol: url("./image_assets/icon-SelectAll.png");
-				--duplicate-symbol: url("./image_assets/icon-duplicate.png");
-				--notes-up-symbol: url("./image_assets/moveNotesUp.png");
-				--notes-down-symbol: url("./image_assets/moveNotesDown.png");
-				--loop-bar-symbol: url("./image_assets/icon-singleBarLoop.png");
-				--fullscreen-symbol: url("./image_assets/icon-fullscreen.png");
-				--loop-within-bar-symbol: url("./image_assets/icon-loop-bar.png");
-	--loop-full-song-symbol: url("./image_assets/icon-loop-song.png");
-	--dont-loop-symbol: url("./image_assets/icon-loop-once.png");
+				--undo-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-undo.png");
+				--redo-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-redo.png");
+				--copy-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-copy.png");
+				--paste-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-paste.png");
+				--insert-channel-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-insertChannel.png");
+				--delete-channel-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-deleteChannel.png");
+				--select-all-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-SelectAll.png");
+				--duplicate-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-duplicate.png");
+				--notes-up-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/moveNotesUp.png");
+				--notes-down-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/moveNotesDown.png");
+				--loop-bar-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-singleBarLoop.png");
+				--fullscreen-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-fullscreen.png");
+				--loop-within-bar-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-bar.png");
+	--loop-full-song-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-song.png");
+	--dont-loop-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-once.png");
 				} 
 					@font-face {
 				   font-family: "AbyssType";
 				   src:
-					url("./image_assets/abysstype.otf") format("opentype") tech(color-COLRv1),
+					url("${location.pathname.includes("player") ? "." : ""}./image_assets/abysstype.otf") format("opentype") tech(color-COLRv1),
 					}
 		
 					@font-face {
 				   font-family: "AbyssType_small";
 				   src:
-					url("./image_assets/abysstype_small.otf") format("opentype") tech(color-COLRv1),
+					url("${location.pathname.includes("player") ? "." : ""}./image_assets/abysstype_small.otf") format("opentype") tech(color-COLRv1),
 					}
 		
 					html {
@@ -15386,12 +15873,12 @@ var beepbox = (function (exports) {
 		--note-flash-secondary: #ffffff77; }
 	
 		* {
-		cursor: url("./image_assets/pixel_cursor.png"), auto !important;
+		cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/pixel_cursor.png"), auto !important;
 		--file-page-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-file.png");
 		--edit-pencil-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-edit.png");
 		--preferences-gear-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-preferences.png");
-		--instrument-copy-symbol: url("./image_assets/icon-copy.png");
-		--instrument-paste-symbol: url("./image_assets/icon-paste.png");
+		--instrument-copy-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-copy.png");
+		--instrument-paste-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-paste.png");
 		--play-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-play.png");
 		--pause-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-pause.png");
 		--record-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-record.png");
@@ -15406,26 +15893,26 @@ var beepbox = (function (exports) {
 		--export-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-export.png");
 		--export-instrument-symbol: var(--export-symbol);
 		--import-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-import.png");
-		--undo-symbol: url("./image_assets/icon-undo.png");
-		--redo-symbol: url("./image_assets/icon-redo.png");
-		--copy-symbol: url("./image_assets/icon-copy.png");
-		--paste-symbol: url("./image_assets/icon-paste.png");
-		--insert-channel-symbol: url("./image_assets/icon-insertChannel.png");
-		--delete-channel-symbol: url("./image_assets/icon-deleteChannel.png");
-		--select-all-symbol: url("./image_assets/icon-SelectAll.png");
-		--duplicate-symbol: url("./image_assets/icon-duplicate.png");
-		--notes-up-symbol: url("./image_assets/moveNotesUp.png");
-		--notes-down-symbol: url("./image_assets/moveNotesDown.png");
-		--loop-bar-symbol: url("./image_assets/icon-singleBarLoop.png");
-		--fullscreen-symbol: url("./image_assets/icon-fullscreen.png");
-		--loop-within-bar-symbol: url("./image_assets/icon-loop-bar.png");
-	--loop-full-song-symbol: url("./image_assets/icon-loop-song.png");
-	--dont-loop-symbol: url("./image_assets/icon-loop-once.png");
+		--undo-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-undo.png");
+		--redo-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-redo.png");
+		--copy-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-copy.png");
+		--paste-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-paste.png");
+		--insert-channel-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-insertChannel.png");
+		--delete-channel-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-deleteChannel.png");
+		--select-all-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-SelectAll.png");
+		--duplicate-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-duplicate.png");
+		--notes-up-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/moveNotesUp.png");
+		--notes-down-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/moveNotesDown.png");
+		--loop-bar-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-singleBarLoop.png");
+		--fullscreen-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-fullscreen.png");
+		--loop-within-bar-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-bar.png");
+	--loop-full-song-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-song.png");
+	--dont-loop-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-once.png");
 		} 
 			@font-face {
 		   font-family: "AbyssType";
 		   src:
-			url("./image_assets/abysstype.otf") format("opentype") tech(color-COLRv1),
+			url("${location.pathname.includes("player") ? "." : ""}./image_assets/abysstype.otf") format("opentype") tech(color-COLRv1),
 			}
 	
 			#beepboxEditorContainer, .track-area, .beepboxEditor, #text-content, div.noSelection, .beepboxEditor .loopEditor {
@@ -15435,7 +15922,7 @@ var beepbox = (function (exports) {
 			@font-face {
 		   font-family: "AbyssType_small";
 		   src:
-			url("./image_assets/abysstype_small.otf") format("opentype") tech(color-COLRv1),
+			url("${location.pathname.includes("player") ? "." : ""}./image_assets/abysstype_small.otf") format("opentype") tech(color-COLRv1),
 			}
 	
 			body {
@@ -23224,18 +23711,18 @@ var beepbox = (function (exports) {
 		}
 		.instructions-column > section:first-of-type > p:first-of-type:after {
 		display: block;
-		content: url("./image_assets/UltraboxAzurLaneThemeStarterSquad.png");
+		content: url("${location.pathname.includes("player") ? "." : ""}./image_assets/UltraboxAzurLaneThemeStarterSquad.png");
 		width: 100%;
 		text-align: center;
 		margin-top: 25px;
 		}
 		/* sets cursor */
 		* {
-		cursor: url("./image_assets/UltraBoxAzurLaneThemeMouse.png"), auto !important;
+		cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/UltraBoxAzurLaneThemeMouse.png"), auto !important;
 		}
 		/* sets background image */
 		body {
-		background-image: url("./image_assets/UltraBoxAzurLaneThemeMemoryTaskBackground.png") !important;
+		background-image: url("${location.pathname.includes("player") ? "." : ""}./image_assets/UltraBoxAzurLaneThemeMemoryTaskBackground.png") !important;
 		background-size: cover;
 		background-position: center;
 		background-repeat: no-repeat;
@@ -23249,7 +23736,7 @@ var beepbox = (function (exports) {
 		}
 		#text-content > section > h1 {
 		margin: auto;
-		content: url("./image_assets/UltraBoxALThemeLogo.png");
+		content: url("${location.pathname.includes("player") ? "." : ""}./image_assets/UltraBoxALThemeLogo.png");
 		}
 	}`,
         "WeebBox": `
@@ -24652,8 +25139,6 @@ content: "";
   height: var(--button-size);
   left: 3px;
   top: 0;
-  mask-image: var(--loop-within-bar-symbol);
-  -webkit-mask-image: var(--loop-within-bar-symbol);
   pointer-events: none;
   background: currentColor;
   mask-repeat: no-repeat;
@@ -24665,6 +25150,21 @@ content: "";
   image-rendering: -o-crisp-edges !important;
   image-rendering: pixelated !important;
   image-rendering: optimizeSpeed !important;
+}
+
+.songLoopButton.a1::before {
+      mask-image: var(--loop-within-bar-symbol);
+      -webkit-mask-image: var(--loop-within-bar-symbol);
+}
+
+.songLoopButton.a2::before {
+    mask-image: var(--loop-full-song-symbol);
+    -webkit-mask-image: var(--loop-full-song-symbol);
+}
+
+.songLoopButton.a3::before {
+    mask-image: var(--dont-loop-symbol);
+    -webkit-mask-image: var(--dont-loop-symbol);
 }
 
 .beepboxEditor {
@@ -24804,7 +25304,6 @@ content: "";
 
 .beepboxEditor .settings-area {
 	grid-area: settings-area;
-	display: grid;
     grid-template-columns: auto;
     grid-template-rows: min-content min-content min-content min-content min-content;
     grid-template-areas: "version-area" "play-pause-area" "menu-area" "song-settings-area" "instrument-settings-area";
@@ -25860,6 +26359,32 @@ content: "";
 	font-weight: inherit;
 	cursor: pointer;
 }
+
+.beepboxEditor input[type="checkbox"] {
+  background-color: ${ColorConfig.editorBackground};
+  appearance: none;
+  border: 1px ${ColorConfig.uiWidgetBackground} solid;
+  height: 1em;
+  width: 1em;
+  border-radius: 5px;
+}
+
+.beepboxEditor input[type="checkbox"]:checked {
+  display: flex;
+  justify-content: center;
+  background-color: ${ColorConfig.uiWidgetBackground};
+}
+
+.beepboxEditor input[type="checkbox"]:checked::after {
+  text-align: center;
+  font-size: 0.6em;
+  content: "✓";
+  color: currentColor;
+  width: 1em;
+  height: 1em;
+  font-weight: bold;
+}
+
 .mobileEditMenuIcon {
   content: "";
   pointer-events: none;
@@ -26364,6 +26889,28 @@ button.mobilePauseButton::before {
 	justify-content: space-between;
 }
 
+.beepboxEditor .effectExt {
+	border-top: ${ColorConfig.uiWidgetBackground} 1px solid;
+}
+
+.beepboxEditor .effectRow .effectLabel {
+	display: none;
+}
+
+.beepboxEditor .effectExt .effectLabel {
+	display: unset;
+	align-self: center;
+	cursor: pointer;
+}
+
+.effectExt > .effectLabel.hidden {
+	color: ${ColorConfig.uiWidgetBackground};
+}
+
+.effectExt > .effectGroup.hidden {
+	display: none;
+}
+
 .beepboxEditor .selectRow > :last-child {
 	width: 62.5%;
 	flex-shrink: 0;
@@ -26672,6 +27219,32 @@ li.select2-results__option[role=group] > strong:hover {
 	}
 }
 
+	/* Mobile UI */
+
+	.mobileButtonContainer {
+		display: flex;
+		gap: 5px;
+		display: none;
+	}
+
+	.play-pause-area2 {
+		flex-direction:row; 
+		width: 100%; 
+		display: flex; 
+	}
+
+	.playback-bar-controls2 {
+		width: 100%; 
+		display: flex; 
+		background: var(--editor-background); 
+		z-index: 6;
+	}
+
+	.mobileMenu {
+		display:none; 
+		background: var(--editor-background); 
+		z-index: 5;
+	}	
 `));
 
     class BarScrollBar {
@@ -27424,6 +27997,17 @@ li.select2-results__option[role=group] > strong:hover {
                 result += this._bits[this._readIndex++];
                 bitCount--;
             }
+            return result;
+        }
+        readSilent(bitCount) {
+            let result = 0;
+            let startingBitCount = bitCount;
+            while (bitCount > 0) {
+                result = result << 1;
+                result += this._bits[this._readIndex++];
+                bitCount--;
+            }
+            this._readIndex -= startingBitCount;
             return result;
         }
         readLongTail(minValue, minBits) {
@@ -28442,6 +29026,8 @@ li.select2-results__option[role=group] > strong:hover {
             this.grainRange = 40;
             this.chorus = 0;
             this.reverb = 0;
+            this.reverbWet = Config.reverbWetRange - 1;
+            this.reverbDry = Config.reverbDryRange - 1;
             this.echoSustain = 0;
             this.echoDelay = 0;
             this.phaserFreq = 0;
@@ -28510,6 +29096,8 @@ li.select2-results__option[role=group] > strong:hover {
             this.effects = (1 << 2);
             this.chorus = Config.chorusRange - 1;
             this.reverb = 0;
+            this.reverbWet = Config.reverbWetRange - 1;
+            this.reverbDry = Config.reverbDryRange - 1;
             this.echoSustain = Math.floor((Config.echoSustainRange - 1) * 0.5);
             this.echoDelay = Math.floor((Config.echoDelayRange - 1) * 0.5);
             this.eqFilter.reset();
@@ -28880,6 +29468,8 @@ li.select2-results__option[role=group] > strong:hover {
             }
             if (effectsIncludeReverb(this.effects)) {
                 instrumentObject["reverb"] = Math.round(100 * this.reverb / (Config.reverbRange - 1));
+                instrumentObject["reverbDry"] = Math.round(100 * this.reverbDry / (Config.reverbRange - 1));
+                instrumentObject["reverbWet"] = Math.round(100 * this.reverbWet / (Config.reverbRange - 1));
             }
             if (effectsIncludeNoteRange(this.effects)) {
                 instrumentObject["upperNoteLimit"] = this.upperNoteLimit;
@@ -28895,7 +29485,7 @@ li.select2-results__option[role=group] > strong:hover {
                     instrumentObject["harmonics"][i] = Math.round(100 * this.harmonicsWave.harmonics[i] / Config.harmonicsMax);
                 }
             }
-            if (this.type == 0 || this.type == 6 || this.type == 9 || this.type == 2 || this.type == 5 || this.type == 7 || this.type == 3) {
+            if (this.type != 1 && this.type != 11 && this.type != 8) {
                 instrumentObject["unison"] = this.unison == Config.unisons.length ? "custom" : Config.unisons[this.unison].name;
                 if (this.unison == Config.unisons.length) {
                     instrumentObject["unisonVoices"] = this.unisonVoices;
@@ -29307,6 +29897,12 @@ li.select2-results__option[role=group] > strong:hover {
             }
             else {
                 this.reverb = legacyGlobalReverb;
+            }
+            if (instrumentObject["reverbDry"] != undefined) {
+                this.reverbDry = clamp(0, Config.reverbRange, Math.round((Config.reverbRange - 1) * (instrumentObject["reverbDry"] | 0) / 100));
+            }
+            if (instrumentObject["reverbWet"] != undefined) {
+                this.reverbWet = clamp(0, Config.reverbRange, Math.round((Config.reverbRange - 1) * (instrumentObject["reverbWet"] | 0) / 100));
             }
             if (instrumentObject["upperNoteLimit"] != undefined) {
                 this.upperNoteLimit = instrumentObject["upperNoteLimit"];
@@ -29872,7 +30468,7 @@ li.select2-results__option[role=group] > strong:hover {
                     let modulator = Config.modulators[instrument.modulators[modCount]];
                     let cap = modulator.maxRawVol;
                     if (cap != undefined) {
-                        if (modulator.name == "eq filter" || modulator.name == "note filter") {
+                        if (modulator.name == "eq filter" || modulator.name == "note filter" || modulator.name == "song eq") {
                             cap = Config.filterMorphCount - 1;
                             if (instrument.modFilterTypes[modCount] > 0 && instrument.modFilterTypes[modCount] % 2) {
                                 cap = Config.filterFreqRange;
@@ -29893,7 +30489,7 @@ li.select2-results__option[role=group] > strong:hover {
                 else {
                     let cap = Config.modulators[modSetting].maxRawVol;
                     if (cap != undefined) {
-                        if (filterType != undefined && (Config.modulators[modSetting].name == "eq filter" || Config.modulators[modSetting].name == "note filter")) {
+                        if (filterType != undefined && (Config.modulators[modSetting].name == "eq filter" || Config.modulators[modSetting].name == "note filter" || Config.modulators[modSetting].name == "song eq")) {
                             cap = Config.filterMorphCount - 1;
                             if (filterType > 0 && filterType % 2) {
                                 cap = Config.filterFreqRange;
@@ -30049,6 +30645,32 @@ li.select2-results__option[role=group] > strong:hover {
             }
             else {
                 buffer.push(base64IntToCharCode[0x3f]);
+            }
+            buffer.push(99);
+            if (this.eqFilter == null) {
+                buffer.push(base64IntToCharCode[0]);
+                console.log("Null EQ filter settings detected in toBase64String for song");
+            }
+            else {
+                buffer.push(base64IntToCharCode[this.eqFilter.controlPointCount]);
+                for (let j = 0; j < this.eqFilter.controlPointCount; j++) {
+                    const point = this.eqFilter.controlPoints[j];
+                    buffer.push(base64IntToCharCode[point.type], base64IntToCharCode[Math.round(point.freq)], base64IntToCharCode[Math.round(point.gain)]);
+                }
+            }
+            let usingSubFilterBitfield = 0;
+            for (let j = 0; j < Config.filterMorphCount - 1; j++) {
+                usingSubFilterBitfield |= (+(this.eqSubFilters[j + 1] != null) << j);
+            }
+            buffer.push(base64IntToCharCode[usingSubFilterBitfield >> 6], base64IntToCharCode[usingSubFilterBitfield & 63]);
+            for (let j = 0; j < Config.filterMorphCount - 1; j++) {
+                if (usingSubFilterBitfield & (1 << j)) {
+                    buffer.push(base64IntToCharCode[this.eqSubFilters[j + 1].controlPointCount]);
+                    for (let k = 0; k < this.eqSubFilters[j + 1].controlPointCount; k++) {
+                        const point = this.eqSubFilters[j + 1].controlPoints[k];
+                        buffer.push(base64IntToCharCode[point.type], base64IntToCharCode[Math.round(point.freq)], base64IntToCharCode[Math.round(point.gain)]);
+                    }
+                }
             }
             buffer.push(85);
             for (let channel = 0; channel < this.getChannelCount(); channel++) {
@@ -30207,6 +30829,8 @@ li.select2-results__option[role=group] > strong:hover {
                     }
                     if (effectsIncludeReverb(instrument.effects)) {
                         buffer.push(base64IntToCharCode[instrument.reverb]);
+                        buffer.push(base64IntToCharCode[instrument.reverbWet]);
+                        buffer.push(base64IntToCharCode[instrument.reverbDry]);
                     }
                     if (effectsIncludeGranular(instrument.effects)) {
                         buffer.push(base64IntToCharCode[instrument.granular]);
@@ -30417,7 +31041,7 @@ li.select2-results__option[role=group] > strong:hover {
                             if (status != 3) {
                                 bits.write(6, modSetting);
                             }
-                            if (Config.modulators[instrument.modulators[mod]].name == "eq filter" || Config.modulators[instrument.modulators[mod]].name == "note filter") {
+                            if (Config.modulators[instrument.modulators[mod]].name == "eq filter" || Config.modulators[instrument.modulators[mod]].name == "note filter" || Config.modulators[instrument.modulators[mod]].name == "song eq") {
                                 bits.write(6, modFilter);
                             }
                         }
@@ -30459,7 +31083,7 @@ li.select2-results__option[role=group] > strong:hover {
                             }
                             else {
                                 shapeBits.write(1, 1);
-                                shapeBits.write(3, note.pitches.length - 2);
+                                shapeBits.write(7, note.pitches.length - 2);
                             }
                             shapeBits.writePinCount(note.pins.length - 1);
                             if (!isModChannel) {
@@ -30532,11 +31156,11 @@ li.select2-results__option[role=group] > strong:hover {
                                 }
                                 else {
                                     bits.write(1, 1);
-                                    bits.write(4, pitchIndex);
+                                    bits.write(7, pitchIndex);
                                     recentPitches.splice(pitchIndex, 1);
                                 }
                                 recentPitches.unshift(pitch);
-                                if (recentPitches.length > 16)
+                                if (recentPitches.length > 97)
                                     recentPitches.pop();
                                 if (i == note.pitches.length - 1) {
                                     lastPitch = note.pitches[0];
@@ -31539,6 +32163,46 @@ li.select2-results__option[role=group] > strong:hover {
                                     }
                                 }
                             }
+                            else {
+                                if (fromAbyssBox && !beforeFour) {
+                                    const originalControlPointCount = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                                    this.eqFilter.controlPointCount = clamp(0, Config.filterMaxPoints + 1, originalControlPointCount);
+                                    for (let i = this.eqFilter.controlPoints.length; i < this.eqFilter.controlPointCount; i++) {
+                                        this.eqFilter.controlPoints[i] = new FilterControlPoint();
+                                    }
+                                    for (let i = 0; i < this.eqFilter.controlPointCount; i++) {
+                                        const point = this.eqFilter.controlPoints[i];
+                                        point.type = clamp(0, 3, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                                        point.freq = clamp(0, Config.filterFreqRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                                        point.gain = clamp(0, Config.filterGainRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                                    }
+                                    for (let i = this.eqFilter.controlPointCount; i < originalControlPointCount; i++) {
+                                        charIndex += 3;
+                                    }
+                                    this.eqSubFilters[0] = this.eqFilter;
+                                    let usingSubFilterBitfield = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                                    for (let j = 0; j < Config.filterMorphCount - 1; j++) {
+                                        if (usingSubFilterBitfield & (1 << j)) {
+                                            const originalSubfilterControlPointCount = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                                            if (this.eqSubFilters[j + 1] == null)
+                                                this.eqSubFilters[j + 1] = new FilterSettings();
+                                            this.eqSubFilters[j + 1].controlPointCount = clamp(0, Config.filterMaxPoints + 1, originalSubfilterControlPointCount);
+                                            for (let i = this.eqSubFilters[j + 1].controlPoints.length; i < this.eqSubFilters[j + 1].controlPointCount; i++) {
+                                                this.eqSubFilters[j + 1].controlPoints[i] = new FilterControlPoint();
+                                            }
+                                            for (let i = 0; i < this.eqSubFilters[j + 1].controlPointCount; i++) {
+                                                const point = this.eqSubFilters[j + 1].controlPoints[i];
+                                                point.type = clamp(0, 3, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                                                point.freq = clamp(0, Config.filterFreqRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                                                point.gain = clamp(0, Config.filterGainRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                                            }
+                                            for (let i = this.eqSubFilters[j + 1].controlPointCount; i < originalSubfilterControlPointCount; i++) {
+                                                charIndex += 3;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
                         break;
                     case 71:
@@ -31672,6 +32336,8 @@ li.select2-results__option[role=group] > strong:hover {
                                 instrument.convertLegacySettings(legacySettings, forceSimpleFilter);
                             }
                             else {
+                                if (17 > Config.maxEffectCount)
+                                    throw new Error();
                                 if ((fromAbyssBox && !beforeTwo || fromAbyssBox && !beforeThree) || (fromUltraBox && !beforeSix)) {
                                     instrument.effects = ((base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << (6 * 5))
                                         | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << (6 * 4))
@@ -31836,6 +32502,10 @@ li.select2-results__option[role=group] > strong:hover {
                                     }
                                     else {
                                         instrument.reverb = clamp(0, Config.reverbRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                                        if (fromAbyssBox && !beforeFour) {
+                                            instrument.reverbWet = clamp(0, Config.reverbRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                                            instrument.reverbDry = clamp(0, Config.reverbRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                                        }
                                     }
                                 }
                                 if (effectsIncludeGranular(instrument.effects)) {
@@ -32289,9 +32959,10 @@ li.select2-results__option[role=group] > strong:hover {
                         {
                             let bitStringLength = 0;
                             let channelIndex;
-                            let largerChords = !((beforeFour && fromJummBox) || fromBeepBox);
-                            let recentPitchBitLength = (largerChords ? 4 : 3);
-                            let recentPitchLength = (largerChords ? 16 : 8);
+                            let postJB4Chords = !((beforeFour && fromJummBox) || fromBeepBox);
+                            let postAB4Chords = !beforeFour && fromAbyssBox;
+                            let recentPitchBitLength = postAB4Chords ? 7 : (postJB4Chords ? 4 : 3);
+                            let recentPitchLength = postAB4Chords ? 97 : (postJB4Chords ? 16 : 8);
                             if (beforeThree && fromBeepBox) {
                                 channelIndex = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                                 charIndex++;
@@ -32316,6 +32987,7 @@ li.select2-results__option[role=group] > strong:hover {
                             let songReverbIndex = -1;
                             const shouldCorrectTempoMods = fromJummBox;
                             const jummboxTempoMin = 30;
+                            const shouldCorrectPulseWidth = (fromAbyssBox && beforeFour && !beforeThree);
                             while (true) {
                                 const channel = this.channels[channelIndex];
                                 const isNoiseChannel = this.getChannelIsNoise(channelIndex);
@@ -32349,7 +33021,7 @@ li.select2-results__option[role=group] > strong:hover {
                                             if (status != 3) {
                                                 instrument.modulators[mod] = bits.read(6);
                                             }
-                                            if (!jumfive && (Config.modulators[instrument.modulators[mod]].name == "eq filter" || Config.modulators[instrument.modulators[mod]].name == "note filter")) {
+                                            if (!jumfive && (Config.modulators[instrument.modulators[mod]].name == "eq filter" || Config.modulators[instrument.modulators[mod]].name == "note filter" || Config.modulators[instrument.modulators[mod]].name == "song eq")) {
                                                 instrument.modFilterTypes[mod] = bits.read(6);
                                             }
                                             if (jumfive && instrument.modChannels[mod] >= 0) {
@@ -32462,14 +33134,19 @@ li.select2-results__option[role=group] > strong:hover {
                                             }
                                             else {
                                                 shape = {};
-                                                if (!largerChords) {
+                                                if (!postJB4Chords) {
                                                     shape.pitchCount = 1;
                                                     while (shape.pitchCount < 4 && bits.read(1) == 1)
                                                         shape.pitchCount++;
                                                 }
                                                 else {
                                                     if (bits.read(1) == 1) {
-                                                        shape.pitchCount = bits.read(3) + 2;
+                                                        if (!fromAbyssBox || (fromAbyssBox && beforeFour)) {
+                                                            shape.pitchCount = bits.read(3) + 2;
+                                                        }
+                                                        else {
+                                                            shape.pitchCount = bits.read(7) + 2;
+                                                        }
                                                     }
                                                     else {
                                                         shape.pitchCount = 1;
@@ -32571,8 +33248,8 @@ li.select2-results__option[role=group] > strong:hover {
                                             const noteIsForTempoMod = isModChannel && channel.instruments[newPattern.instruments[0]].modulators[Config.modCount - 1 - note.pitches[0]] === Config.modulators.dictionary["tempo"].index;
                                             let tempoOffset = 0;
                                             if (shouldCorrectTempoMods && noteIsForTempoMod) {
-                                                note.pins[0].size += tempoOffset;
                                                 tempoOffset = jummboxTempoMin - Config.tempoMin;
+                                                note.pins[0].size += tempoOffset;
                                             }
                                             if (isModChannel) {
                                                 note.pins[0].size *= detuneScaleNotes[newPattern.instruments[0]][note.pitches[0]];
@@ -32615,6 +33292,11 @@ li.select2-results__option[role=group] > strong:hover {
                                                         note.continuesLastPattern = channel.instruments[newPattern.instruments[0]].legacyTieOver;
                                                     }
                                                 }
+                                            }
+                                            const noteIsForPWMod = isModChannel && channel.instruments[newPattern.instruments[0]].modulators[Config.modCount - 1 - note.pitches[0]] === Config.modulators.dictionary["pulse width"].index;
+                                            if (shouldCorrectPulseWidth && noteIsForPWMod) {
+                                                for (const pin of note.pins)
+                                                    pin.size = pin.size >> 1;
                                             }
                                             curPart = validateRange(0, this.beatsPerBar * Config.partsPerBeat, note.end);
                                         }
@@ -33021,10 +33703,14 @@ li.select2-results__option[role=group] > strong:hover {
                 "limitRise": this.limitRise,
                 "limitRatio": this.limitRatio,
                 "compressionRatio": this.compressionRatio,
+                "songEq": this.eqFilter.toJsonObject(),
                 "layeredInstruments": this.layeredInstruments,
                 "patternInstruments": this.patternInstruments,
                 "channels": channelArray,
             };
+            for (let i = 0; i < Config.filterMorphCount - 1; i++) {
+                result["songEq" + i] = this.eqSubFilters[i];
+            }
             if (EditorConfig.customSamples != null && EditorConfig.customSamples.length > 0) {
                 result["customSamples"] = EditorConfig.customSamples;
             }
@@ -33466,6 +34152,20 @@ li.select2-results__option[role=group] > strong:hover {
             else {
                 this.compressionRatio = 1.0;
             }
+            if (jsonObject["songEq"] != undefined) {
+                this.eqFilter.fromJsonObject(jsonObject["songEq"]);
+            }
+            else {
+                this.eqFilter.reset();
+            }
+            for (let i = 0; i < Config.filterMorphCount - 1; i++) {
+                if (jsonObject["songEq" + i]) {
+                    this.eqSubFilters[i] = jsonObject["songEq" + i];
+                }
+                else {
+                    this.eqSubFilters[i] = null;
+                }
+            }
             let maxInstruments = 1;
             let maxPatterns = 1;
             let maxBars = 1;
@@ -33614,7 +34314,7 @@ li.select2-results__option[role=group] > strong:hover {
     Song._oldestUltraBoxVersion = 1;
     Song._latestUltraBoxVersion = 6;
     Song._oldestAbyssBoxVersion = 1;
-    Song._latestAbyssBoxVersion = 3;
+    Song._latestAbyssBoxVersion = 4;
     Song._variant = 0x61;
     class PickedString {
         constructor() {
@@ -33819,7 +34519,7 @@ li.select2-results__option[role=group] > strong:hover {
             this._modifiedEnvelopeIndices = [];
             this._modifiedEnvelopeCount = 0;
             this.lowpassCutoffDecayVolumeCompensation = 1.0;
-            const length = 60;
+            const length = 62;
             for (let i = 0; i < length; i++) {
                 this.envelopeStarts[i] = 1.0;
                 this.envelopeEnds[i] = 1.0;
@@ -34290,6 +34990,10 @@ li.select2-results__option[role=group] > strong:hover {
             this.reverbDelayPos = 0;
             this.reverbMult = 0.0;
             this.reverbMultDelta = 0.0;
+            this.reverbWetMult = 0.0;
+            this.reverbWetMultDelta = 0.0;
+            this.reverbDryMult = 0.0;
+            this.reverbDryMultDelta = 0.0;
             this.reverbShelfA1 = 0.0;
             this.reverbShelfB0 = 0.0;
             this.reverbShelfB1 = 0.0;
@@ -34720,8 +35424,8 @@ li.select2-results__option[role=group] > strong:hover {
             let delayInputMultStart = 1.0;
             let delayInputMultEnd = 1.0;
             if (usesPanning) {
-                const panEnvelopeStart = envelopeStarts[58] * 2.0 - 1.0;
-                const panEnvelopeEnd = envelopeEnds[58] * 2.0 - 1.0;
+                const panEnvelopeStart = envelopeStarts[60] * 2.0 - 1.0;
+                const panEnvelopeEnd = envelopeEnds[60] * 2.0 - 1.0;
                 let usePanStart = instrument.pan;
                 let usePanEnd = instrument.pan;
                 if (synth.isModActive(Config.modulators.dictionary["pan"].index, channelIndex, instrumentIndex)) {
@@ -34937,6 +35641,30 @@ li.select2-results__option[role=group] > strong:hover {
                 const reverbEnd = Math.min(1.0, Math.pow(reverbEnvelopeEnd * useReverbEnd / Config.reverbRange, 0.667)) * 0.425;
                 this.reverbMult = reverbStart;
                 this.reverbMultDelta = (reverbEnd - reverbStart) / roundedSamplesPerTick;
+                let reverbDrySettingStart = instrument.reverbDry;
+                let reverbDrySettingEnd = instrument.reverbDry;
+                let reverbWetSettingStart = instrument.reverbWet;
+                let reverbWetSettingEnd = instrument.reverbWet;
+                if (synth.isModActive(Config.modulators.dictionary["reverb wet"].index, channelIndex, instrumentIndex)) {
+                    reverbWetSettingStart = synth.getModValue(Config.modulators.dictionary["reverb wet"].index, channelIndex, instrumentIndex, false);
+                    reverbWetSettingEnd = synth.getModValue(Config.modulators.dictionary["reverb wet"].index, channelIndex, instrumentIndex, true);
+                }
+                if (synth.isModActive(Config.modulators.dictionary["reverb dry"].index, channelIndex, instrumentIndex)) {
+                    reverbDrySettingStart = synth.getModValue(Config.modulators.dictionary["reverb dry"].index, channelIndex, instrumentIndex, false);
+                    reverbDrySettingEnd = synth.getModValue(Config.modulators.dictionary["reverb dry"].index, channelIndex, instrumentIndex, true);
+                }
+                const reverbDryEnvelopeStart = envelopeStarts[59];
+                const reverbDryEnvelopeEnd = envelopeEnds[59];
+                const reverbDryStart = ((reverbDrySettingStart * reverbDryEnvelopeStart)) / Config.reverbDryRange;
+                const reverbDryEnd = ((reverbDrySettingEnd * reverbDryEnvelopeEnd)) / Config.reverbDryRange;
+                const reverbWetEnvelopeStart = envelopeStarts[58];
+                const reverbWetEnvelopeEnd = envelopeEnds[58];
+                const reverbWetStart = ((reverbWetSettingStart * reverbWetEnvelopeStart)) / Config.reverbWetRange;
+                const reverbWetEnd = ((reverbWetSettingEnd * reverbWetEnvelopeEnd)) / Config.reverbWetRange;
+                this.reverbWetMult = reverbWetStart;
+                this.reverbWetMultDelta = (reverbWetEnd - reverbWetStart) / roundedSamplesPerTick;
+                this.reverbDryMult = reverbDryStart;
+                this.reverbDryMultDelta = (reverbDryEnd - reverbDryStart) / roundedSamplesPerTick;
                 maxReverbMult = Math.max(reverbStart, reverbEnd);
                 const shelfRadians = 2.0 * Math.PI * Config.reverbShelfHz / synth.samplesPerSecond;
                 Synth.tempFilterStartCoefficients.highShelf1stOrder(shelfRadians, Config.reverbShelfGain);
@@ -35108,6 +35836,8 @@ li.select2-results__option[role=group] > strong:hover {
         }
         initModFilters(song) {
             if (song != null) {
+                song.tmpEqFilterStart = song.eqFilter;
+                song.tmpEqFilterEnd = null;
                 for (let channelIndex = 0; channelIndex < song.getChannelCount(); channelIndex++) {
                     for (let instrumentIndex = 0; instrumentIndex < song.channels[channelIndex].instruments.length; instrumentIndex++) {
                         const instrument = song.channels[channelIndex].instruments[instrumentIndex];
@@ -35202,7 +35932,30 @@ li.select2-results__option[role=group] > strong:hover {
                                 for (let mod = 0; mod < Config.modCount; mod++) {
                                     if (latestPinParts[mod] != null) {
                                         if (Config.modulators[instrument.modulators[mod]].forSong) {
+                                            const songFilterParam = instrument.modulators[mod] == Config.modulators.dictionary["song eq"].index;
                                             if (latestModTimes[instrument.modulators[mod]] == null || currentBar * Config.partsPerBeat * this.song.beatsPerBar + latestPinParts[mod] > latestModTimes[instrument.modulators[mod]]) {
+                                                if (songFilterParam) {
+                                                    let tgtSong = this.song;
+                                                    if (instrument.modFilterTypes[mod] == 0) {
+                                                        tgtSong.tmpEqFilterStart = tgtSong.eqSubFilters[latestPinValues[mod]];
+                                                    }
+                                                    else {
+                                                        for (let i = 0; i < Config.filterMorphCount; i++) {
+                                                            if (tgtSong.tmpEqFilterStart != null && tgtSong.tmpEqFilterStart == tgtSong.eqSubFilters[i]) {
+                                                                tgtSong.tmpEqFilterStart = new FilterSettings();
+                                                                tgtSong.tmpEqFilterStart.fromJsonObject(tgtSong.eqSubFilters[i].toJsonObject());
+                                                                i = Config.filterMorphCount;
+                                                            }
+                                                        }
+                                                        if (tgtSong.tmpEqFilterStart != null && Math.floor((instrument.modFilterTypes[mod] - 1) / 2) < tgtSong.tmpEqFilterStart.controlPointCount) {
+                                                            if (instrument.modFilterTypes[mod] % 2)
+                                                                tgtSong.tmpEqFilterStart.controlPoints[Math.floor((instrument.modFilterTypes[mod] - 1) / 2)].freq = latestPinValues[mod];
+                                                            else
+                                                                tgtSong.tmpEqFilterStart.controlPoints[Math.floor((instrument.modFilterTypes[mod] - 1) / 2)].gain = latestPinValues[mod];
+                                                        }
+                                                    }
+                                                    tgtSong.tmpEqFilterEnd = tgtSong.tmpEqFilterStart;
+                                                }
                                                 this.setModValue(latestPinValues[mod], latestPinValues[mod], instrument.modChannels[mod], instrument.modInstruments[mod], instrument.modulators[mod]);
                                                 latestModTimes[instrument.modulators[mod]] = currentBar * Config.partsPerBeat * this.song.beatsPerBar + latestPinParts[mod];
                                             }
@@ -35596,6 +36349,15 @@ li.select2-results__option[role=group] > strong:hover {
             this.metronomePrevAmplitude = 0.0;
             this.metronomeFilter = 0.0;
             this.limit = 0.0;
+            this.songEqFilterVolume = 1.0;
+            this.songEqFilterVolumeDelta = 0.0;
+            this.songEqFiltersL = [];
+            this.songEqFiltersR = [];
+            this.songEqFilterCount = 0;
+            this.initialSongEqFilterInput1L = 0.0;
+            this.initialSongEqFilterInput2L = 0.0;
+            this.initialSongEqFilterInput1R = 0.0;
+            this.initialSongEqFilterInput2R = 0.0;
             this.tempMonoInstrumentSampleBuffer = null;
             this.audioCtx = null;
             this.scriptNode = null;
@@ -35698,6 +36460,8 @@ li.select2-results__option[role=group] > strong:hover {
             if (this.song != null) {
                 this.song.inVolumeCap = 0.0;
                 this.song.outVolumeCap = 0.0;
+                this.song.tmpEqFilterStart = null;
+                this.song.tmpEqFilterEnd = null;
                 for (let channelIndex = 0; channelIndex < this.song.pitchChannelCount + this.song.noiseChannelCount; channelIndex++) {
                     this.modInsValues[channelIndex] = [];
                     this.nextModInsValues[channelIndex] = [];
@@ -35783,7 +36547,8 @@ li.select2-results__option[role=group] > strong:hover {
                 }
             }
         }
-        isFilterModActive(forNoteFilter, channelIdx, instrumentIdx) {
+        isFilterModActive(forNoteFilter, channelIdx, instrumentIdx, forSong) {
+            var _a;
             const instrument = this.song.channels[channelIdx].instruments[instrumentIdx];
             if (forNoteFilter) {
                 if (instrument.noteFilterType)
@@ -35792,10 +36557,16 @@ li.select2-results__option[role=group] > strong:hover {
                     return true;
             }
             else {
-                if (instrument.eqFilterType)
-                    return false;
-                if (instrument.tmpEqFilterEnd != null)
-                    return true;
+                if (forSong) {
+                    if (((_a = this === null || this === void 0 ? void 0 : this.song) === null || _a === void 0 ? void 0 : _a.tmpEqFilterEnd) != null)
+                        return true;
+                }
+                else {
+                    if (instrument.eqFilterType)
+                        return false;
+                    if (instrument.tmpEqFilterEnd != null)
+                        return true;
+                }
             }
             return false;
         }
@@ -35934,6 +36705,63 @@ li.select2-results__option[role=group] > strong:hover {
                     this.loopRepeatCount--;
             }
         }
+        computeSongState(samplesPerTick) {
+            if (this.song == null)
+                return;
+            const roundedSamplesPerTick = Math.ceil(samplesPerTick);
+            const samplesPerSecond = this.samplesPerSecond;
+            let eqFilterVolume = 1.0;
+            if (this.song.eqFilterType) {
+                const eqFilterSettingsStart = this.song.eqFilter;
+                if (this.song.eqSubFilters[1] == null)
+                    this.song.eqSubFilters[1] = new FilterSettings();
+                this.song.eqSubFilters[1];
+                let startSimpleFreq = this.song.eqFilterSimpleCut;
+                let startSimpleGain = this.song.eqFilterSimplePeak;
+                this.song.eqFilterSimpleCut;
+                this.song.eqFilterSimplePeak;
+                let startPoint;
+                {
+                    eqFilterSettingsStart.convertLegacySettingsForSynth(startSimpleFreq, startSimpleGain, true);
+                    startPoint = eqFilterSettingsStart.controlPoints[0];
+                    startPoint.toCoefficients(Synth.tempFilterStartCoefficients, samplesPerSecond, 1.0, 1.0);
+                    if (this.songEqFiltersL.length < 1)
+                        this.songEqFiltersL[0] = new DynamicBiquadFilter();
+                    this.songEqFiltersL[0].loadCoefficientsWithGradient(Synth.tempFilterStartCoefficients, Synth.tempFilterStartCoefficients, 1.0 / roundedSamplesPerTick, startPoint.type == 0);
+                    if (this.songEqFiltersR.length < 1)
+                        this.songEqFiltersR[0] = new DynamicBiquadFilter();
+                    this.songEqFiltersR[0].loadCoefficientsWithGradient(Synth.tempFilterStartCoefficients, Synth.tempFilterStartCoefficients, 1.0 / roundedSamplesPerTick, startPoint.type == 0);
+                }
+                eqFilterVolume *= startPoint.getVolumeCompensationMult();
+                this.songEqFilterCount = 1;
+                eqFilterVolume = Math.min(3.0, eqFilterVolume);
+            }
+            else {
+                const eqFilterSettings = (this.song.tmpEqFilterStart != null) ? this.song.tmpEqFilterStart : this.song.eqFilter;
+                for (let i = 0; i < eqFilterSettings.controlPointCount; i++) {
+                    let startPoint = eqFilterSettings.controlPoints[i];
+                    let endPoint = (this.song.tmpEqFilterEnd != null && this.song.tmpEqFilterEnd.controlPoints[i] != null) ? this.song.tmpEqFilterEnd.controlPoints[i] : eqFilterSettings.controlPoints[i];
+                    if (startPoint.type != endPoint.type) {
+                        startPoint = endPoint;
+                    }
+                    startPoint.toCoefficients(Synth.tempFilterStartCoefficients, samplesPerSecond, 1.0, 1.0);
+                    endPoint.toCoefficients(Synth.tempFilterEndCoefficients, samplesPerSecond, 1.0, 1.0);
+                    if (this.songEqFiltersL.length <= i)
+                        this.songEqFiltersL[i] = new DynamicBiquadFilter();
+                    this.songEqFiltersL[i].loadCoefficientsWithGradient(Synth.tempFilterStartCoefficients, Synth.tempFilterEndCoefficients, 1.0 / roundedSamplesPerTick, startPoint.type == 0);
+                    if (this.songEqFiltersR.length <= i)
+                        this.songEqFiltersR[i] = new DynamicBiquadFilter();
+                    this.songEqFiltersR[i].loadCoefficientsWithGradient(Synth.tempFilterStartCoefficients, Synth.tempFilterEndCoefficients, 1.0 / roundedSamplesPerTick, startPoint.type == 0);
+                    eqFilterVolume *= startPoint.getVolumeCompensationMult();
+                }
+                this.songEqFilterCount = eqFilterSettings.controlPointCount;
+                eqFilterVolume = Math.min(3.0, eqFilterVolume);
+            }
+            let eqFilterVolumeStart = eqFilterVolume;
+            let eqFilterVolumeEnd = eqFilterVolume;
+            this.songEqFilterVolume = eqFilterVolumeStart;
+            this.songEqFilterVolumeDelta = (eqFilterVolumeEnd - eqFilterVolumeStart) / roundedSamplesPerTick;
+        }
         synthesize(outputDataL, outputDataR, outputBufferLength, playSong = true) {
             if (this.song == null) {
                 for (let i = 0; i < outputBufferLength; i++) {
@@ -36004,7 +36832,8 @@ li.select2-results__option[role=group] > strong:hover {
                                 const instrument = channel.instruments[tone.instrumentIndex];
                                 let mod = Config.modCount - 1 - tone.pitches[0];
                                 if ((instrument.modulators[mod] == Config.modulators.dictionary["note filter"].index
-                                    || instrument.modulators[mod] == Config.modulators.dictionary["eq filter"].index)
+                                    || instrument.modulators[mod] == Config.modulators.dictionary["eq filter"].index
+                                    || instrument.modulators[mod] == Config.modulators.dictionary["song eq"].index)
                                     && instrument.modFilterTypes[mod] != null && instrument.modFilterTypes[mod] > 0) {
                                     continue;
                                 }
@@ -36023,7 +36852,8 @@ li.select2-results__option[role=group] > strong:hover {
                                 const instrument = channel.instruments[tone.instrumentIndex];
                                 let mod = Config.modCount - 1 - tone.pitches[0];
                                 if ((instrument.modulators[mod] == Config.modulators.dictionary["note filter"].index
-                                    || instrument.modulators[mod] == Config.modulators.dictionary["eq filter"].index)
+                                    || instrument.modulators[mod] == Config.modulators.dictionary["eq filter"].index
+                                    || instrument.modulators[mod] == Config.modulators.dictionary["song eq"].index)
                                     && instrument.modFilterTypes[mod] != null && instrument.modFilterTypes[mod] > 0) {
                                     this.playModTone(song, channelIndex, samplesPerTick, bufferIndex, runLength, tone, false, false);
                                 }
@@ -36046,6 +36876,7 @@ li.select2-results__option[role=group] > strong:hover {
                     this.skipBar();
                     continue;
                 }
+                this.computeSongState(samplesPerTick);
                 for (let channelIndex = 0; channelIndex < song.pitchChannelCount + song.noiseChannelCount; channelIndex++) {
                     const channel = song.channels[channelIndex];
                     const channelState = this.channels[channelIndex];
@@ -36146,6 +36977,55 @@ li.select2-results__option[role=group] > strong:hover {
                     }
                 }
                 for (let i = bufferIndex; i < runEnd; i++) {
+                    {
+                        let filtersL = this.songEqFiltersL;
+                        let filtersR = this.songEqFiltersR;
+                        const filterCount = this.songEqFilterCount | 0;
+                        let initialFilterInput1L = +this.initialSongEqFilterInput1L;
+                        let initialFilterInput2L = +this.initialSongEqFilterInput2L;
+                        let initialFilterInput1R = +this.initialSongEqFilterInput1R;
+                        let initialFilterInput2R = +this.initialSongEqFilterInput2R;
+                        const applyFilters = Synth.applyFilters;
+                        let eqFilterVolume = +this.songEqFilterVolume;
+                        const eqFilterVolumeDelta = +this.songEqFilterVolumeDelta;
+                        const inputSampleL = outputDataL[i];
+                        let sampleL = inputSampleL;
+                        sampleL = applyFilters(sampleL, initialFilterInput1L, initialFilterInput2L, filterCount, filtersL);
+                        initialFilterInput2L = initialFilterInput1L;
+                        initialFilterInput1L = inputSampleL;
+                        sampleL *= eqFilterVolume;
+                        outputDataL[i] = sampleL;
+                        const inputSampleR = outputDataR[i];
+                        let sampleR = inputSampleR;
+                        sampleR = applyFilters(sampleR, initialFilterInput1R, initialFilterInput2R, filterCount, filtersR);
+                        initialFilterInput2R = initialFilterInput1R;
+                        initialFilterInput1R = inputSampleR;
+                        sampleR *= eqFilterVolume;
+                        outputDataR[i] = sampleR;
+                        eqFilterVolume += eqFilterVolumeDelta;
+                        this.sanitizeFilters(filtersL);
+                        if (!(initialFilterInput1L < 100) || !(initialFilterInput2L < 100)) {
+                            initialFilterInput1L = 0.0;
+                            initialFilterInput2L = 0.0;
+                        }
+                        if (Math.abs(initialFilterInput1L) < epsilon)
+                            initialFilterInput1L = 0.0;
+                        if (Math.abs(initialFilterInput2L) < epsilon)
+                            initialFilterInput2L = 0.0;
+                        this.initialSongEqFilterInput1L = initialFilterInput1L;
+                        this.initialSongEqFilterInput2L = initialFilterInput2L;
+                        this.sanitizeFilters(filtersR);
+                        if (!(initialFilterInput1R < 100) || !(initialFilterInput2R < 100)) {
+                            initialFilterInput1R = 0.0;
+                            initialFilterInput2R = 0.0;
+                        }
+                        if (Math.abs(initialFilterInput1R) < epsilon)
+                            initialFilterInput1R = 0.0;
+                        if (Math.abs(initialFilterInput2R) < epsilon)
+                            initialFilterInput2R = 0.0;
+                        this.initialSongEqFilterInput1R = initialFilterInput1R;
+                        this.initialSongEqFilterInput2R = initialFilterInput2R;
+                    }
                     const sampleL = outputDataL[i] * song.masterGain * song.masterGain;
                     const sampleR = outputDataR[i] * song.masterGain * song.masterGain;
                     const absL = sampleL < 0.0 ? -sampleL : sampleL;
@@ -36233,6 +37113,12 @@ li.select2-results__option[role=group] > strong:hover {
                                 instrument.tmpNoteFilterStart = instrument.noteFilter;
                             }
                         }
+                    }
+                    if (song.tmpEqFilterEnd != null) {
+                        song.tmpEqFilterStart = song.tmpEqFilterEnd;
+                    }
+                    else {
+                        song.tmpEqFilterStart = song.eqFilter;
                     }
                     this.tick++;
                     this.tickSampleCountdown += samplesPerTick;
@@ -37525,8 +38411,8 @@ li.select2-results__option[role=group] > strong:hover {
                     let pulseWidthModStart = basePulseWidth;
                     let pulseWidthModEnd = basePulseWidth;
                     if (this.isModActive(Config.modulators.dictionary["pulse width"].index, channelIndex, tone.instrumentIndex)) {
-                        pulseWidthModStart = (this.getModValue(Config.modulators.dictionary["pulse width"].index, channelIndex, tone.instrumentIndex, false)) / (Config.pulseWidthRange * 2);
-                        pulseWidthModEnd = (this.getModValue(Config.modulators.dictionary["pulse width"].index, channelIndex, tone.instrumentIndex, true)) / (Config.pulseWidthRange * 2);
+                        pulseWidthModStart = (this.getModValue(Config.modulators.dictionary["pulse width"].index, channelIndex, tone.instrumentIndex, false)) / (Config.pulseWidthRange);
+                        pulseWidthModEnd = (this.getModValue(Config.modulators.dictionary["pulse width"].index, channelIndex, tone.instrumentIndex, true)) / (Config.pulseWidthRange);
                     }
                     const pulseWidthStart = pulseWidthModStart * envelopeStarts[2];
                     const pulseWidthEnd = pulseWidthModEnd * envelopeEnds[2];
@@ -37670,8 +38556,8 @@ li.select2-results__option[role=group] > strong:hover {
                     let pulseWidthModStart = basePulseWidth;
                     let pulseWidthModEnd = basePulseWidth;
                     if (this.isModActive(Config.modulators.dictionary["pulse width"].index, channelIndex, tone.instrumentIndex)) {
-                        pulseWidthModStart = (this.getModValue(Config.modulators.dictionary["pulse width"].index, channelIndex, tone.instrumentIndex, false)) / (Config.pulseWidthRange * 2);
-                        pulseWidthModEnd = (this.getModValue(Config.modulators.dictionary["pulse width"].index, channelIndex, tone.instrumentIndex, true)) / (Config.pulseWidthRange * 2);
+                        pulseWidthModStart = (this.getModValue(Config.modulators.dictionary["pulse width"].index, channelIndex, tone.instrumentIndex, false)) / (Config.pulseWidthRange);
+                        pulseWidthModEnd = (this.getModValue(Config.modulators.dictionary["pulse width"].index, channelIndex, tone.instrumentIndex, true)) / (Config.pulseWidthRange);
                     }
                     let pulseWidthStart = pulseWidthModStart * envelopeStarts[2];
                     let pulseWidthEnd = pulseWidthModEnd * envelopeEnds[2];
@@ -38760,6 +39646,10 @@ li.select2-results__option[role=group] > strong:hover {
 				
 				let reverb = +instrumentState.reverbMult;
 				const reverbDelta = +instrumentState.reverbMultDelta;
+                let reverbWet = +instrumentState.reverbWetMult;
+                const reverbWetDelta = +instrumentState.reverbWetMultDelta;
+                let reverbDry = +instrumentState.reverbDryMult;
+                const reverbDryDelta = +instrumentState.reverbDryMultDelta;
 				
 				const reverbShelfA1 = +instrumentState.reverbShelfA1;
 				const reverbShelfB0 = +instrumentState.reverbShelfB0;
@@ -39055,34 +39945,59 @@ li.select2-results__option[role=group] > strong:hover {
 					const reverbDelayPos1 = (reverbDelayPos +  3041) & reverbMask;
 					const reverbDelayPos2 = (reverbDelayPos +  6426) & reverbMask;
 					const reverbDelayPos3 = (reverbDelayPos + 10907) & reverbMask;
+
+                    let drySampleL = sampleL;
+                    let drySampleR = sampleR;
+
+                    let originalSampleL = sampleL;
+                    let originalSampleR = sampleR;
+
 					const reverbSample0 = (reverbDelayLine[reverbDelayPos]);
 					const reverbSample1 = reverbDelayLine[reverbDelayPos1];
 					const reverbSample2 = reverbDelayLine[reverbDelayPos2];
 					const reverbSample3 = reverbDelayLine[reverbDelayPos3];
+
 					const reverbTemp0 = -(reverbSample0 + sampleL) + reverbSample1;
 					const reverbTemp1 = -(reverbSample0 + sampleR) - reverbSample1;
+
 					const reverbTemp2 = -reverbSample2 + reverbSample3;
 					const reverbTemp3 = -reverbSample2 - reverbSample3;
+
 					const reverbShelfInput0 = (reverbTemp0 + reverbTemp2) * reverb;
 					const reverbShelfInput1 = (reverbTemp1 + reverbTemp3) * reverb;
 					const reverbShelfInput2 = (reverbTemp0 - reverbTemp2) * reverb;
 					const reverbShelfInput3 = (reverbTemp1 - reverbTemp3) * reverb;
+
 					reverbShelfSample0 = reverbShelfB0 * reverbShelfInput0 + reverbShelfB1 * reverbShelfPrevInput0 - reverbShelfA1 * reverbShelfSample0;
 					reverbShelfSample1 = reverbShelfB0 * reverbShelfInput1 + reverbShelfB1 * reverbShelfPrevInput1 - reverbShelfA1 * reverbShelfSample1;
 					reverbShelfSample2 = reverbShelfB0 * reverbShelfInput2 + reverbShelfB1 * reverbShelfPrevInput2 - reverbShelfA1 * reverbShelfSample2;
 					reverbShelfSample3 = reverbShelfB0 * reverbShelfInput3 + reverbShelfB1 * reverbShelfPrevInput3 - reverbShelfA1 * reverbShelfSample3;
+
 					reverbShelfPrevInput0 = reverbShelfInput0;
 					reverbShelfPrevInput1 = reverbShelfInput1;
 					reverbShelfPrevInput2 = reverbShelfInput2;
 					reverbShelfPrevInput3 = reverbShelfInput3;
+
 					reverbDelayLine[reverbDelayPos1] = reverbShelfSample0 * delayInputMult;
 					reverbDelayLine[reverbDelayPos2] = reverbShelfSample1 * delayInputMult;
 					reverbDelayLine[reverbDelayPos3] = reverbShelfSample2 * delayInputMult;
 					reverbDelayLine[reverbDelayPos ] = reverbShelfSample3 * delayInputMult;
+
+                    let wetSampleL = (sampleL + (reverbSample1 + reverbSample2 + reverbSample3)) - drySampleL;
+                    let wetSampleR = (sampleR + (reverbSample0 + reverbSample2 - reverbSample3)) - drySampleR;
+
+                    wetSampleL *= reverbWet;
+                    wetSampleR *= reverbWet;
+                    drySampleL *= reverbDry;
+                    drySampleR *= reverbDry;
+
 					reverbDelayPos = (reverbDelayPos + 1) & reverbMask;
-					sampleL += reverbSample1 + reverbSample2 + reverbSample3;
-					sampleR += reverbSample0 + reverbSample2 - reverbSample3;
-					reverb += reverbDelta;`;
+					sampleL = (drySampleL + wetSampleL);
+					sampleR = (drySampleR + wetSampleR);
+					reverb += reverbDelta;
+                    reverbWet += reverbWetDelta;
+                    reverbDry += reverbDryDelta;
+                    `;
                 }
                 effectsSource += `
 					
@@ -39231,6 +40146,8 @@ li.select2-results__option[role=group] > strong:hover {
 				Synth.sanitizeDelayLine(reverbDelayLine, reverbDelayPos + 10907, reverbMask);
 				instrumentState.reverbDelayPos = reverbDelayPos;
 				instrumentState.reverbMult = reverb;
+                instrumentState.reverbWetMult = reverbWet;
+                instrumentState.reverbDryMult = reverbDry;
 				
 				if (!Number.isFinite(reverbShelfSample0) || Math.abs(reverbShelfSample0) < epsilon) reverbShelfSample0 = 0.0;
 				if (!Number.isFinite(reverbShelfSample1) || Math.abs(reverbShelfSample1) < epsilon) reverbShelfSample1 = 0.0;
@@ -39639,6 +40556,43 @@ li.select2-results__option[role=group] > strong:hover {
                 }
                 else if (setting == Config.modulators.dictionary["next bar"].index) {
                     synth.wantToSkip = true;
+                }
+                else if (setting == Config.modulators.dictionary["song eq"].index) {
+                    const tgtSong = synth.song;
+                    let dotTarget = instrument.modFilterTypes[mod] | 0;
+                    if (dotTarget == 0) {
+                        let pinIdx = 0;
+                        const currentPart = synth.getTicksIntoBar() / Config.ticksPerPart;
+                        while (tone.note.start + tone.note.pins[pinIdx].time <= currentPart)
+                            pinIdx++;
+                        let lerpEndRatio = ((currentPart - tone.note.start + (roundedSamplesPerTick / (synth.getSamplesPerTick() * Config.ticksPerPart)) * Config.ticksPerPart) - tone.note.pins[pinIdx - 1].time) / (tone.note.pins[pinIdx].time - tone.note.pins[pinIdx - 1].time);
+                        if (tgtSong.eqSubFilters[tone.note.pins[pinIdx - 1].size] != null || tgtSong.eqSubFilters[tone.note.pins[pinIdx].size] != null) {
+                            tgtSong.tmpEqFilterEnd = FilterSettings.lerpFilters(tgtSong.eqSubFilters[tone.note.pins[pinIdx - 1].size], tgtSong.eqSubFilters[tone.note.pins[pinIdx].size], lerpEndRatio);
+                        }
+                        else {
+                            tgtSong.tmpEqFilterEnd = tgtSong.eqFilter;
+                        }
+                    }
+                    else {
+                        for (let i = 0; i < Config.filterMorphCount; i++) {
+                            if (tgtSong.tmpEqFilterEnd == tgtSong.eqSubFilters[i] && tgtSong.tmpEqFilterEnd != null) {
+                                tgtSong.tmpEqFilterEnd = new FilterSettings();
+                                tgtSong.tmpEqFilterEnd.fromJsonObject(tgtSong.eqSubFilters[i].toJsonObject());
+                            }
+                        }
+                        if (tgtSong.tmpEqFilterEnd == null) {
+                            tgtSong.tmpEqFilterEnd = new FilterSettings();
+                            tgtSong.tmpEqFilterEnd.fromJsonObject(tgtSong.eqFilter.toJsonObject());
+                        }
+                        if (tgtSong.tmpEqFilterEnd.controlPointCount > Math.floor((dotTarget - 1) / 2)) {
+                            if (dotTarget % 2) {
+                                tgtSong.tmpEqFilterEnd.controlPoints[Math.floor((dotTarget - 1) / 2)].freq = tone.expression + tone.expressionDelta;
+                            }
+                            else {
+                                tgtSong.tmpEqFilterEnd.controlPoints[Math.floor((dotTarget - 1) / 2)].gain = tone.expression + tone.expressionDelta;
+                            }
+                        }
+                    }
                 }
                 else if (setting == Config.modulators.dictionary["eq filter"].index) {
                     const tgtInstrument = synth.song.channels[instrument.modChannels[mod]].instruments[usedInstruments[instrumentIndex]];
@@ -42430,6 +43384,33 @@ li.select2-results__option[role=group] > strong:hover {
                 this._didSomething();
         }
     }
+    class ChangeSongFilterAddPoint extends UndoableChange {
+        constructor(doc, filterSettings, point, index, deletion = false) {
+            super(deletion);
+            this._doc = doc;
+            this._filterSettings = filterSettings;
+            this._point = point;
+            this._index = index;
+            this._didSomething();
+            this.redo();
+        }
+        _doForwards() {
+            this._filterSettings.controlPoints.splice(this._index, 0, this._point);
+            this._filterSettings.controlPointCount++;
+            this._filterSettings.controlPoints.length = this._filterSettings.controlPointCount;
+            this._doc.song.tmpEqFilterStart = this._doc.song.eqFilter;
+            this._doc.song.tmpEqFilterEnd = null;
+            this._doc.notifier.changed();
+        }
+        _doBackwards() {
+            this._filterSettings.controlPoints.splice(this._index, 1);
+            this._filterSettings.controlPointCount--;
+            this._filterSettings.controlPoints.length = this._filterSettings.controlPointCount;
+            this._doc.song.tmpEqFilterStart = this._doc.song.eqFilter;
+            this._doc.song.tmpEqFilterEnd = null;
+            this._doc.notifier.changed();
+        }
+    }
     class ChangeFilterAddPoint extends UndoableChange {
         constructor(doc, filterSettings, point, index, isNoteFilter, deletion = false) {
             super(deletion);
@@ -42513,6 +43494,37 @@ li.select2-results__option[role=group] > strong:hover {
             this.gain = useGain;
         }
     }
+    class ChangeSongFilterMovePoint extends UndoableChange {
+        constructor(doc, point, oldFreq, newFreq, oldGain, newGain, pointIndex) {
+            super(false);
+            this._doc = doc;
+            this._point = point;
+            this._oldFreq = oldFreq;
+            this._newFreq = newFreq;
+            this._oldGain = oldGain;
+            this._newGain = newGain;
+            this.pointIndex = pointIndex;
+            this.pointType = point.type;
+            this._didSomething();
+            this.redo();
+        }
+        getMoveData(beforeChange) {
+            if (beforeChange) {
+                return new FilterMoveData(this._point, this._oldFreq, this._oldGain);
+            }
+            return new FilterMoveData(this._point, this._newFreq, this._newGain);
+        }
+        _doForwards() {
+            this._point.freq = this._newFreq;
+            this._point.gain = this._newGain;
+            this._doc.notifier.changed();
+        }
+        _doBackwards() {
+            this._point.freq = this._oldFreq;
+            this._point.gain = this._oldGain;
+            this._doc.notifier.changed();
+        }
+    }
     class ChangeFilterMovePoint extends UndoableChange {
         constructor(doc, point, oldFreq, newFreq, oldGain, newGain, useNoteFilter, pointIndex) {
             super(false);
@@ -42547,6 +43559,36 @@ li.select2-results__option[role=group] > strong:hover {
             this._point.freq = this._oldFreq;
             this._point.gain = this._oldGain;
             this._instrument.preset = this._instrumentPrevPreset;
+            this._doc.notifier.changed();
+        }
+    }
+    class ChangeSongFilterSettings extends UndoableChange {
+        constructor(doc, settings, oldSettings, subFilters = null, oldSubFilters = null) {
+            super(false);
+            this._doc = doc;
+            this._oldSettings = oldSettings;
+            this._filterSettings = settings;
+            if (subFilters != null && oldSubFilters != null) {
+                this._subFilters = subFilters;
+                this._oldSubFilters = oldSubFilters;
+            }
+            this._didSomething();
+            this.redo();
+        }
+        _doForwards() {
+            this._doc.song.eqFilter = this._filterSettings;
+            if (this._subFilters != null)
+                this._doc.song.eqSubFilters = this._subFilters;
+            this._doc.song.tmpEqFilterStart = this._doc.song.eqFilter;
+            this._doc.song.tmpEqFilterEnd = null;
+            this._doc.notifier.changed();
+        }
+        _doBackwards() {
+            this._doc.song.eqFilter = this._oldSettings;
+            if (this._oldSubFilters != null)
+                this._doc.song.eqSubFilters = this._oldSubFilters;
+            this._doc.song.tmpEqFilterStart = this._doc.song.eqFilter;
+            this._doc.song.tmpEqFilterEnd = null;
             this._doc.notifier.changed();
         }
     }
@@ -43838,6 +44880,26 @@ li.select2-results__option[role=group] > strong:hover {
                 this._didSomething();
         }
     }
+    class ChangeReverbWet extends ChangeInstrumentSlider {
+        constructor(doc, oldValue, newValue) {
+            super(doc);
+            this._instrument.reverbWet = newValue;
+            doc.synth.unsetMod(Config.modulators.dictionary["reverb wet"].index, doc.channel, doc.getCurrentInstrument());
+            doc.notifier.changed();
+            if (oldValue != newValue)
+                this._didSomething();
+        }
+    }
+    class ChangeReverbDry extends ChangeInstrumentSlider {
+        constructor(doc, oldValue, newValue) {
+            super(doc);
+            this._instrument.reverbDry = newValue;
+            doc.synth.unsetMod(Config.modulators.dictionary["reverb dry"].index, doc.channel, doc.getCurrentInstrument());
+            doc.notifier.changed();
+            if (oldValue != newValue)
+                this._didSomething();
+        }
+    }
     class ChangeRingMod extends ChangeInstrumentSlider {
         constructor(doc, oldValue, newValue) {
             super(doc);
@@ -44692,12 +45754,12 @@ li.select2-results__option[role=group] > strong:hover {
         }
     }
 
-    const { button: button$t, div: div$t, span: span$6, h2: h2$s, input: input$j, br: br$5, select: select$h, option: option$h } = HTML;
+    const { button: button$t, div: div$t, span: span$6, h2: h2$s, input: input$j, br: br$5, select: select$i, option: option$i } = HTML;
     class BeatsPerBarPrompt {
         constructor(_doc) {
             this._doc = _doc;
             this._beatsStepper = input$j({ style: "width: 3em; margin-left: 1em;", type: "number", step: "1" });
-            this._conversionStrategySelect = select$h({ style: "width: 100%;" }, option$h({ value: "splice" }, "Splice beats at end of bars."), option$h({ value: "stretch" }, "Stretch notes to fit in bars."), option$h({ value: "overflow" }, "Overflow notes across bars."));
+            this._conversionStrategySelect = select$i({ style: "width: 100%;" }, option$i({ value: "splice" }, "Splice beats at end of bars."), option$i({ value: "stretch" }, "Stretch notes to fit in bars."), option$i({ value: "overflow" }, "Overflow notes across bars."));
             this._cancelButton = button$t({ class: "cancelButton" });
             this._okayButton = button$t({ class: "okayButton", style: "width:45%;" }, "Okay");
             this.container = div$t({ class: "prompt noSelection", style: "width: 250px;" }, div$t({ class: "promptTitle" }, h2$s({ class: "bpmExt", style: "text-align: inherit;" }, ""), h2$s({ class: "bpmTitle" }, "Beats Per Bar")), div$t({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" }, div$t({ style: "text-align: right;" }, "Beats per bar:", br$5(), span$6({ style: "font-size: smaller; color: ${ColorConfig.secondaryText};" }, "(Multiples of 3 or 4 are recommended)")), this._beatsStepper), div$t({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" }, div$t({ class: "selectContainer", style: "width: 100%;" }, this._conversionStrategySelect)), div$t({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" }, this._okayButton), this._cancelButton);
@@ -44761,8 +45823,8 @@ li.select2-results__option[role=group] > strong:hover {
             this._pitchChannelStepper = input$i({ style: "width: 3em; margin-left: 1em;", type: "number", step: "1" });
             this._drumChannelStepper = input$i({ style: "width: 3em; margin-left: 1em;", type: "number", step: "1" });
             this._modChannelStepper = input$i({ style: "width: 3em; margin-left: 1em;", type: "number", step: "1" });
-            this._layeredInstrumentsBox = input$i({ style: "width: 3em; margin-left: 1em;", type: "checkbox" });
-            this._patternInstrumentsBox = input$i({ style: "width: 3em; margin-left: 1em;", type: "checkbox" });
+            this._layeredInstrumentsBox = input$i({ style: "margin-left: 1.8em; margin-right: 1.5em;", type: "checkbox" });
+            this._patternInstrumentsBox = input$i({ style: "margin-left: 1.8em; margin-right: 1.5em;", type: "checkbox" });
             this._cancelButton = button$s({ class: "cancelButton" });
             this._okayButton = button$s({ class: "okayButton", style: "width:45%;" }, "Okay");
             this.container = div$s({ class: "prompt noSelection", style: "width: 250px; text-align: right;" }, div$s({ class: "promptTitle" }, h2$r({ class: "channelExt", style: "text-align: inherit;" }, ""), h2$r({ class: "channelTitle" }, "Channel Settings")), label$3({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" }, "Pitch channels:", this._pitchChannelStepper), label$3({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" }, "Drum channels:", this._drumChannelStepper), div$s({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" }, "Mod channels:", this._modChannelStepper), label$3({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" }, "Available patterns per channel:", this._patternsStepper), label$3({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" }, "Simultaneous instruments", br$4(), "per channel:", this._layeredInstrumentsBox), label$3({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" }, "Different instruments", br$4(), "per pattern:", this._patternInstrumentsBox), div$s({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" }, this._okayButton), this._cancelButton);
@@ -45104,7 +46166,7 @@ li.select2-results__option[role=group] > strong:hover {
     }
 
     class FilterEditor {
-        constructor(_doc, useNoteFilter = false, larger = false) {
+        constructor(_doc, useNoteFilter = false, larger = false, forSong = false) {
             this._doc = _doc;
             this._editorWidth = 120;
             this._editorHeight = 26;
@@ -45143,6 +46205,7 @@ li.select2-results__option[role=group] > strong:hover {
             this._renderedPointTypes = -1;
             this._renderedPointFreqs = -1;
             this._renderedPointGains = -1;
+            this._forSong = false;
             this._whenKeyPressed = (event) => {
                 if (event.keyCode == 90) {
                     this.undo();
@@ -45221,8 +46284,13 @@ li.select2-results__option[role=group] > strong:hover {
             };
             this._whenCursorReleased = (event) => {
                 if (this._writingMods) {
-                    const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
-                    this._useFilterSettings = this._getTargetFilterSettings(instrument);
+                    if (this._forSong) {
+                        this._useFilterSettings = this._getTargetFilterSettingsForSong(this._doc.song);
+                    }
+                    else {
+                        const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
+                        this._useFilterSettings = this._getTargetFilterSettings(instrument);
+                    }
                 }
                 if (this.container.offsetParent == null)
                     return;
@@ -45230,9 +46298,17 @@ li.select2-results__option[role=group] > strong:hover {
                     if (!this._addingPoint && !this._mouseDragging && !this._touchMode) {
                         if (this._selectedIndex < this._useFilterSettings.controlPointCount && this._selectedIndex != -1) {
                             const point = this._useFilterSettings.controlPoints[this._selectedIndex];
-                            let change = new ChangeFilterAddPoint(this._doc, this._useFilterSettings, point, this._selectedIndex, this._useNoteFilter, true);
-                            if (!this._larger) {
-                                this._doc.record(change);
+                            if (this._forSong) {
+                                let change = new ChangeSongFilterAddPoint(this._doc, this._useFilterSettings, point, this._selectedIndex, true);
+                                if (!this._larger) {
+                                    this._doc.record(change);
+                                }
+                            }
+                            else {
+                                let change = new ChangeFilterAddPoint(this._doc, this._useFilterSettings, point, this._selectedIndex, this._useNoteFilter, true);
+                                if (!this._larger) {
+                                    this._doc.record(change);
+                                }
                             }
                         }
                     }
@@ -45255,6 +46331,7 @@ li.select2-results__option[role=group] > strong:hover {
             };
             this._useNoteFilter = useNoteFilter;
             this._larger = larger;
+            this._forSong = forSong;
             if (this._larger) {
                 this.container.addEventListener("keydown", this._whenKeyPressed);
                 this._editorWidth = 1200;
@@ -45283,16 +46360,32 @@ li.select2-results__option[role=group] > strong:hover {
                     this._indicators[i].style.setProperty("font-size", "24px");
                     this._svg.appendChild(this._indicators[i]);
                 }
+                let filterSettings;
                 const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
-                const filterSettings = this._useNoteFilter ? instrument.noteFilter : instrument.eqFilter;
+                if (this._forSong) {
+                    filterSettings = this._doc.song.eqFilter;
+                }
+                else {
+                    filterSettings = this._useNoteFilter ? instrument.noteFilter : instrument.eqFilter;
+                }
                 this.selfUndoSettings.push(JSON.stringify(filterSettings.toJsonObject()));
                 this._subFilters[0] = filterSettings;
                 for (let i = 1; i < Config.filterMorphCount; i++) {
-                    const subFilter = this._useNoteFilter ? instrument.noteSubFilters[i] : instrument.eqSubFilters[i];
-                    if (subFilter != null) {
-                        let parsedFilter = new FilterSettings();
-                        parsedFilter.fromJsonObject(subFilter.toJsonObject());
-                        this._subFilters[i] = parsedFilter;
+                    if (this._forSong) {
+                        const subFilter = this._doc.song.eqSubFilters[i];
+                        if (subFilter != null) {
+                            let parsedFilter = new FilterSettings();
+                            parsedFilter.fromJsonObject(subFilter.toJsonObject());
+                            this._subFilters[i] = parsedFilter;
+                        }
+                    }
+                    else {
+                        const subFilter = this._useNoteFilter ? instrument.noteSubFilters[i] : instrument.eqSubFilters[i];
+                        if (subFilter != null) {
+                            let parsedFilter = new FilterSettings();
+                            parsedFilter.fromJsonObject(subFilter.toJsonObject());
+                            this._subFilters[i] = parsedFilter;
+                        }
                     }
                 }
             }
@@ -45356,10 +46449,28 @@ li.select2-results__option[role=group] > strong:hover {
         }
         _whenCursorMoved() {
             if (this._writingMods) {
-                const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
-                this._useFilterSettings = this._getTargetFilterSettings(instrument);
+                if (this._forSong) {
+                    this._useFilterSettings = this._getTargetFilterSettingsForSong(this._doc.song);
+                }
+                else {
+                    const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
+                    this._useFilterSettings = this._getTargetFilterSettings(instrument);
+                }
                 if (this._dragChange != null) {
                     if (this._dragChange instanceof ChangeSequence && this._dragChange.checkFirst() instanceof ChangeFilterMovePoint) {
+                        const data = this._dragChange.checkFirst().getMoveData(true);
+                        const newPoint = this._useFilterSettings.controlPoints[this._selectedIndex];
+                        if (newPoint == null || newPoint.type != data.point.type) {
+                            this._dragChange = null;
+                            this._writingMods = false;
+                            this._mouseDown = false;
+                        }
+                        else {
+                            newPoint.freq = data.freq;
+                            newPoint.gain = data.gain;
+                        }
+                    }
+                    else if (this._forSong && this._dragChange instanceof ChangeSequence && this._dragChange.checkFirst() instanceof ChangeSongFilterMovePoint) {
                         const data = this._dragChange.checkFirst().getMoveData(true);
                         const newPoint = this._useFilterSettings.controlPoints[this._selectedIndex];
                         if (newPoint == null || newPoint.type != data.point.type) {
@@ -45407,7 +46518,12 @@ li.select2-results__option[role=group] > strong:hover {
                         point.type = this._addedType;
                         point.freq = freq;
                         point.gain = gain;
-                        sequence.append(new ChangeFilterAddPoint(this._doc, this._useFilterSettings, point, this._useFilterSettings.controlPointCount, this._useNoteFilter));
+                        if (this._forSong) {
+                            sequence.append(new ChangeSongFilterAddPoint(this._doc, this._useFilterSettings, point, this._useFilterSettings.controlPointCount));
+                        }
+                        else {
+                            sequence.append(new ChangeFilterAddPoint(this._doc, this._useFilterSettings, point, this._useFilterSettings.controlPointCount, this._useNoteFilter));
+                        }
                         if (this.coordText != null) {
                             this.coordText.innerText = "(" + freq + ", " + gain + ")";
                         }
@@ -45430,20 +46546,36 @@ li.select2-results__option[role=group] > strong:hover {
                         this._mouseDragging = true;
                     }
                     if (freq >= 0 && freq < Config.filterFreqRange) {
-                        sequence.append(new ChangeFilterMovePoint(this._doc, point, point.freq, freq, point.gain, gain, this._useNoteFilter, this._selectedIndex));
+                        if (this._forSong) {
+                            sequence.append(new ChangeSongFilterMovePoint(this._doc, point, point.freq, freq, point.gain, gain, this._selectedIndex));
+                        }
+                        else {
+                            sequence.append(new ChangeFilterMovePoint(this._doc, point, point.freq, freq, point.gain, gain, this._useNoteFilter, this._selectedIndex));
+                        }
                         if (this.coordText != null) {
                             this.coordText.innerText = "(" + freq + ", " + gain + ")";
                             if (!this._writingMods) {
-                                const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
-                                instrument.tmpEqFilterStart = instrument.eqFilter;
-                                instrument.tmpEqFilterEnd = null;
-                                instrument.tmpNoteFilterStart = instrument.noteFilter;
-                                instrument.tmpNoteFilterEnd = null;
+                                if (this._forSong) {
+                                    this._doc.song.tmpEqFilterStart = this._doc.song.eqFilter;
+                                    this._doc.song.tmpEqFilterEnd = null;
+                                }
+                                else {
+                                    const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
+                                    instrument.tmpEqFilterStart = instrument.eqFilter;
+                                    instrument.tmpEqFilterEnd = null;
+                                    instrument.tmpNoteFilterStart = instrument.noteFilter;
+                                    instrument.tmpNoteFilterEnd = null;
+                                }
                             }
                         }
                     }
                     else {
-                        sequence.append(new ChangeFilterAddPoint(this._doc, this._useFilterSettings, point, this._selectedIndex, this._useNoteFilter, true));
+                        if (this._forSong) {
+                            sequence.append(new ChangeSongFilterAddPoint(this._doc, this._useFilterSettings, point, this._selectedIndex, true));
+                        }
+                        else {
+                            sequence.append(new ChangeFilterAddPoint(this._doc, this._useFilterSettings, point, this._selectedIndex, this._useNoteFilter, true));
+                        }
                         this._deletingPoint = true;
                     }
                 }
@@ -45554,8 +46686,13 @@ li.select2-results__option[role=group] > strong:hover {
             this._responsePath.setAttribute("d", responsePath);
         }
         swapToSettings(settings, useHistory = false) {
-            const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
-            new ChangeFilterSettings(this._doc, settings, this._filterSettings, this._useNoteFilter, this._subFilters, this._useNoteFilter ? instrument.noteSubFilters : instrument.eqSubFilters);
+            if (this._forSong) {
+                new ChangeSongFilterSettings(this._doc, settings, this._filterSettings, this._subFilters, this._doc.song.eqSubFilters);
+            }
+            else {
+                const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
+                new ChangeFilterSettings(this._doc, settings, this._filterSettings, this._useNoteFilter, this._subFilters, this._useNoteFilter ? instrument.noteSubFilters : instrument.eqSubFilters);
+            }
             this._filterSettings = settings;
             this._subFilters[this._subfilterIndex] = settings;
             if (useHistory && this._larger) {
@@ -45570,7 +46707,12 @@ li.select2-results__option[role=group] > strong:hover {
             let firstFilter = new FilterSettings;
             const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
             firstFilter.fromJsonObject(JSON.parse(String(this.selfUndoSettings[0])));
-            this._doc.record(new ChangeFilterSettings(this._doc, this._subFilters[0], firstFilter, this._useNoteFilter, this._subFilters, this._useNoteFilter ? instrument.noteSubFilters : instrument.eqSubFilters), true);
+            if (this._forSong) {
+                this._doc.record(new ChangeSongFilterSettings(this._doc, this._subFilters[0], firstFilter, this._subFilters, this._doc.song.eqSubFilters), true);
+            }
+            else {
+                this._doc.record(new ChangeFilterSettings(this._doc, this._subFilters[0], firstFilter, this._useNoteFilter, this._subFilters, this._useNoteFilter ? instrument.noteSubFilters : instrument.eqSubFilters), true);
+            }
         }
         undo() {
             if (this.selfUndoHistoryPos > 0) {
@@ -45645,6 +46787,12 @@ li.select2-results__option[role=group] > strong:hover {
                 this.swapToSettings(this._subFilters[newIndex], false);
             }
         }
+        _getTargetFilterSettingsForSong(song) {
+            let targetSettings = song.tmpEqFilterStart;
+            if (targetSettings == null)
+                targetSettings = song.eqFilter;
+            return targetSettings;
+        }
         _getTargetFilterSettings(instrument) {
             let targetSettings = (this._useNoteFilter) ? instrument.tmpNoteFilterStart : instrument.tmpEqFilterStart;
             if (targetSettings == null)
@@ -45654,7 +46802,7 @@ li.select2-results__option[role=group] > strong:hover {
         render(activeMods = false, forceModRender = false) {
             this._writingMods = forceModRender && this._mouseDown;
             const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
-            const filterSettings = this._useNoteFilter ? instrument.noteFilter : instrument.eqFilter;
+            const filterSettings = this._forSong ? this._doc.song.eqFilter : (this._useNoteFilter ? instrument.noteFilter : instrument.eqFilter);
             let displayMods = (activeMods && !this._larger && (forceModRender || (!this._mouseOver && !this._mouseDragging && !this._mouseDown)) && this._doc.synth.playing);
             if (displayMods)
                 this._controlPointPath.style.setProperty("fill", `${ColorConfig.overwritingModSlider}`);
@@ -45666,7 +46814,7 @@ li.select2-results__option[role=group] > strong:hover {
             }
             this._filterSettings = filterSettings;
             if (displayMods) {
-                this._useFilterSettings = this._getTargetFilterSettings(instrument);
+                this._useFilterSettings = this._forSong ? this._getTargetFilterSettingsForSong(this._doc.song) : this._getTargetFilterSettings(instrument);
                 if (this._writingMods)
                     this._whenCursorMoved();
             }
@@ -45701,10 +46849,11 @@ li.select2-results__option[role=group] > strong:hover {
 
     const { button: button$q, div: div$q, h2: h2$p, p: p$9 } = HTML;
     class CustomFilterPrompt {
-        constructor(_doc, _songEditor, _useNoteFilter) {
+        constructor(_doc, _songEditor, _useNoteFilter, forSong = false) {
             this._doc = _doc;
             this._songEditor = _songEditor;
             this._useNoteFilter = _useNoteFilter;
+            this.forSong = forSong;
             this.filterData = new FilterSettings;
             this.startingFilterData = new FilterSettings;
             this._subfilterIndex = 0;
@@ -45739,9 +46888,11 @@ li.select2-results__option[role=group] > strong:hover {
                 this._filterButtons[index].classList.add("selected-instrument");
             };
             this._copyFilterSettings = () => {
-                const filterCopy = this._useNoteFilter
-                    ? this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()].noteFilter.toJsonObject()
-                    : this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()].eqFilter.toJsonObject();
+                const filterCopy = this.forSong
+                    ? this._doc.song.eqFilter.toJsonObject()
+                    : this._useNoteFilter
+                        ? this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()].noteFilter.toJsonObject()
+                        : this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()].eqFilter.toJsonObject();
                 window.localStorage.setItem("filterCopy", JSON.stringify(filterCopy));
             };
             this._pasteFilterSettings = () => {
@@ -45827,11 +46978,11 @@ li.select2-results__option[role=group] > strong:hover {
             this._filterPasteButton.addEventListener("click", this._pasteFilterSettings);
             this.updatePlayButton();
             let colors = ColorConfig.getChannelColor(this._doc.song, this._doc.channel);
-            this.filterEditor = new FilterEditor(_doc, _useNoteFilter, true);
+            this.filterEditor = new FilterEditor(_doc, _useNoteFilter, true, this.forSong);
             this._filterContainer.appendChild(this.filterEditor.container);
             this.filterEditor.container.insertBefore(this._filterCoordinateText, this.filterEditor.container.firstChild);
             this.filterEditor.coordText = this._filterCoordinateText;
-            this._editorTitle.children[0].innerHTML = (_useNoteFilter) ? "Edit Note Filter" : "Edit EQ Filter";
+            this._editorTitle.children[0].innerHTML = forSong ? "Edit Song EQ Filter" : (_useNoteFilter) ? "Edit Note Filter" : "Edit EQ Filter";
             let newButton = button$q({ class: "no-underline", style: "max-width: 5em;" }, "Main");
             this._filterButtonContainer.appendChild(newButton);
             this._filterButtons.push(newButton);
@@ -45946,12 +47097,12 @@ li.select2-results__option[role=group] > strong:hover {
         }
     }
 
-    const { button: button$o, div: div$o, h2: h2$n, input: input$g, select: select$g, option: option$g, code: code$1 } = HTML;
+    const { button: button$o, div: div$o, h2: h2$n, input: input$g, select: select$h, option: option$h, code: code$1 } = HTML;
     class InstrumentImportPrompt {
         constructor(_doc) {
             this._doc = _doc;
             this._cancelButton = button$o({ class: "cancelButton" });
-            this._importStrategySelect = select$g({ style: "width: 100%;" }, option$g({ value: "append" }, "Append instruments to the end of the list."), option$g({ value: "replace" }, "Replace only the selected instrument."), option$g({ value: "all" }, "Replace all instruments in the channel."));
+            this._importStrategySelect = select$h({ style: "width: 100%;" }, option$h({ value: "append" }, "Append instruments to the end of the list."), option$h({ value: "replace" }, "Replace only the selected instrument."), option$h({ value: "all" }, "Replace all instruments in the channel."));
             this._fileInput = input$g({ type: "file", accept: ".json,application/json" });
             this.importStratSelectDiv = div$o({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" }, div$o({ class: "selectContainer", style: "width: 100%;" }, this._importStrategySelect));
             this.warningText = div$o({}, div$o({ style: "text-align: left;" }, "You must enable either ", code$1("Simultaneous instruments per channel"), " or ", code$1("Different instruments per pattern"), " to change the import strategy."));
@@ -48767,11 +49918,11 @@ button.playButton::before {
     CustomThemeBases._iconStyleElement = document.head.appendChild(HTML.style({ type: "text/css" }));
     CustomThemeBases._cursorStyleElement = document.head.appendChild(HTML.style({ type: "text/css" }));
 
-    const { button: button$n, div: div$n, h2: h2$m, option: option$f, select: select$f, optgroup: optgroup$2 } = HTML;
+    const { button: button$n, div: div$n, h2: h2$m, option: option$g, select: select$g, optgroup: optgroup$2 } = HTML;
     class SetThemePrompt {
         constructor(_doc) {
             this._doc = _doc;
-            this._themeSelect = select$f({ style: "width: 100%;", id: "themeSelect" }, option$f({ value: "none" }, "None"), optgroup$2({ label: "AbyssBox Themes" }, option$f({ value: "AbyssBox Classic" }, "AbyssBox Classic"), option$f({ value: "AbyssBox Competitive" }, "AbyssBox Competitive"), option$f({ value: "AbyssBox Light" }, "AbyssBox Light"), option$f({ value: "AbyssBox 0.8" }, "AbyssBox 0.8"), option$f({ value: "AbyssBox Piano" }, "AbyssBox Piano [!]"), option$f({ value: "Half-Life" }, "Half-Life"), option$f({ value: "Half-Life: Source" }, "Half-Life: Source"), option$f({ value: "Doom 1993" }, "Doom 1993"), option$f({ value: "Undertale" }, "Undertale"), option$f({ value: "Yume Nikki" }, "Yume Nikki [!]"), option$f({ value: "Scratch" }, "Scratch"), option$f({ value: "Scratch Addons" }, "Scratch Addons"), option$f({ value: "Windows Xp" }, "Windows Xp"), option$f({ value: "Frutiger Aero" }, "Frutiger Aero"), option$f({ value: "Frutiger Aero Night" }, "Frutiger Aero Night"), option$f({ value: "Skeuomorphic" }, "Skeuomorphic/Early 2000's (LeoV)"), option$f({ value: "woodland" }, "Woodland"), option$f({ value: "corporate dark" }, "Corporate Dark"), option$f({ value: "corporate light" }, "Corporate Light"), option$f({ value: "Glyde" }, "Glyde"), option$f({ value: "starry studio" }, "Starry Studio"), option$f({ value: "Terminal 2.0 (AB)" }, "Terminal 2.0 (AB)"), option$f({ value: "Slushie" }, "Slushie"), option$f({ value: "Slushie Pixel" }, "Slushie 2"), option$f({ value: "BeepBox Pixel" }, "BeepBox Pixel"), option$f({ value: "forest 2" }, "Forest 2"), option$f({ value: "canyon 2" }, "Canyon 2"), option$f({ value: "Nebula 2" }, "Nebula 2"), option$f({ value: "Ghost House" }, "Ghost House"), option$f({ value: "Ghost House 2" }, "Ghost House 2")), optgroup$2({ label: "BeepBox Themes" }, option$f({ value: "dark classic" }, "BeepBox Dark"), option$f({ value: "light classic" }, "BeepBox Light"), option$f({ value: "dark competition" }, "BeepBox Competition Dark")), optgroup$2({ label: "JummBox Themes" }, option$f({ value: "jummbox classic" }, "JummBox Dark"), option$f({ value: "jummbox light" }, "JummBox Light"), option$f({ value: "forest" }, "Forest"), option$f({ value: "canyon" }, "Canyon"), option$f({ value: "midnight" }, "Midnight"), option$f({ value: "beachcombing" }, "Beachcombing"), option$f({ value: "violet verdant" }, "Violet Verdant"), option$f({ value: "sunset" }, "Sunset"), option$f({ value: "autumn" }, "Autumn"), option$f({ value: "fruit" }, "Shadowfruit"), option$f({ value: "toxic" }, "Toxic"), option$f({ value: "roe" }, "Roe"), option$f({ value: "moonlight" }, "Moonlight"), option$f({ value: "portal" }, "Portal"), option$f({ value: "fusion" }, "Fusion"), option$f({ value: "inverse" }, "Inverse"), option$f({ value: "nebula" }, "Nebula"), option$f({ value: "roe light" }, "Roe Light"), option$f({ value: "amoled dark" }, "High Contrast Dark"), option$f({ value: "energized" }, "Energized"), option$f({ value: "neapolitan" }, "Neapolitan"), option$f({ value: "mono" }, "Poly"), option$f({ value: "blutonium" }, "Blutonium")), optgroup$2({ label: "ModBox Themes" }, option$f({ value: "modbox classic" }, "Modbox"), option$f({ value: "modbox 2" }, "Modbox 2.0"), option$f({ value: "modbox artic" }, "Artic"), option$f({ value: "modbox cinnamon" }, "Cinnamon Roll [!]"), option$f({ value: "modbox ocean" }, "Ocean"), option$f({ value: "modbox rainbow" }, "Rainbow [!]"), option$f({ value: "modbox float" }, "Float [!]"), option$f({ value: "modbox windows" }, "Windows"), option$f({ value: "modbox grassland" }, "Grassland"), option$f({ value: "modbox dessert" }, "Dessert"), option$f({ value: "modbox kahoot" }, "Kahootiest"), option$f({ value: "modbox bitbeam" }, "Beam to the Bit [!]"), option$f({ value: "modbox egg" }, "Pretty Egg"), option$f({ value: "modbox pony" }, "Poniryoshka"), option$f({ value: "modbox gameboy" }, "Gameboy [!]"), option$f({ value: "modbox woodkid" }, "Woodkid [!]"), option$f({ value: "modbox midnight" }, "Midnight [!]"), option$f({ value: "modbox snedbox" }, "Snedbox"), option$f({ value: "modbox unnamed" }, "unnamed [!]"), option$f({ value: "modbox piano" }, "Piano [!]"), option$f({ value: "modbox halloween" }, "Halloween [!]"), option$f({ value: "modbox frozen" }, "FrozenOver❄️ [!]")), optgroup$2({ label: "ShitBox Themes" }, option$f({ value: "shitbox 1.0" }, "Shitbox 1.0"), option$f({ value: "shitbox 2.0" }, "Shitbox 2.0"), option$f({ value: "shitbox 3.0" }, "Shitbox 3.0/shitbox4"), option$f({ value: "shitbox ModBox 2.0" }, "Shitbox ModBox 2.0"), option$f({ value: "shitbox Realm" }, "Shitbox Realm [!]")), optgroup$2({ label: "Nepbox Themes" }, option$f({ value: "nepbox" }, "Nepbox"), option$f({ value: "nepbox laffey" }, "Laffey"), option$f({ value: "nepbox snedbox" }, "Snedbox (Nb) [!]"), option$f({ value: "nepbox piano" }, "Piano (Nb) [!]")), optgroup$2({ label: "Mod Default Themes" }, option$f({ value: "sandbox classic" }, "Sandbox"), option$f({ value: "harrybox" }, "Haileybox"), option$f({ value: "brucebox" }, "Brucebox"), option$f({ value: "nerdbox" }, "NerdBox"), option$f({ value: "zefbox" }, "Zefbox"), option$f({ value: "cardboardbox classic" }, "Cardboardbox"), option$f({ value: "blubox classic" }, "Blubox"), option$f({ value: "dogebox classic" }, "Dogebox"), option$f({ value: "dogebox dark" }, "Way too Dark (DB)/TOO DARK(BluB)"), option$f({ value: "wackybox" }, "Wackybox"), option$f({ value: "todbox dark mode" }, "Todbox Dark Mode"), option$f({ value: "mainbox 1.0" }, "Mainbox"), option$f({ value: "microbox" }, "MicroBox"), option$f({ value: "paandorasbox" }, "PaandorasBox"), option$f({ value: "foxbox" }, "FoxBox"), option$f({ value: "midbox" }, "Midbox"), option$f({ value: "gold light" }, "Gold Light"), option$f({ value: "dogebox2" }, "Dogebox2"), option$f({ value: "WeebBox" }, "WeebBox"), option$f({ value: "BoxBeep Dark" }, "BoxBeep Dark"), option$f({ value: "BoxBeep light" }, "BoxBeep Light"), option$f({ value: "birdbox dark" }, "BirdBox Dark"), option$f({ value: "birdbox light" }, "BirdBox Light"), option$f({ value: "ultrabox dark" }, "UltraBox"), option$f({ value: "slarmoosbox" }, "Slarmoo's Box"), option$f({ value: "lemmbox dark" }, "LemmBox Dark")), optgroup$2({ label: "Miscellaneous Themes" }, option$f({ value: "azur lane" }, "Azur Lane"), option$f({ value: "AWeebyssBox" }, "AWeebyssBox"), option$f({ value: "Deuteranopia" }, "Deuteranopia"), option$f({ value: "Protanopia" }, "Protanopia"), option$f({ value: "Tritanopia" }, "Tritanopia"), option$f({ value: "2012 Video Tutorial" }, "2012 Video Tutorial"), option$f({ value: "I am on fire" }, "I am on fire")));
+            this._themeSelect = select$g({ style: "width: 100%;", id: "themeSelect" }, option$g({ value: "none" }, "None"), optgroup$2({ label: "AbyssBox Themes" }, option$g({ value: "AbyssBox Classic" }, "AbyssBox Classic"), option$g({ value: "AbyssBox Competitive" }, "AbyssBox Competitive"), option$g({ value: "AbyssBox Light" }, "AbyssBox Light"), option$g({ value: "AbyssBox Piano" }, "AbyssBox Piano [!]"), option$g({ value: "AbyssBox 0.8" }, "AbyssBox 0.8"), option$g({ value: "AbyssBox Comp simple" }, "AbyssBox Competitive (simple)"), option$g({ value: "AbyssBox Light simple" }, "AbyssBox Light (simple)"), option$g({ value: "AbyssBox Piano simple" }, "AbyssBox Piano (simple) [!]"), option$g({ value: "Half-Life" }, "Half-Life"), option$g({ value: "Half-Life: Source" }, "Half-Life: Source"), option$g({ value: "Doom 1993" }, "Doom 1993"), option$g({ value: "Undertale" }, "Undertale"), option$g({ value: "Yume Nikki" }, "Yume Nikki [!]"), option$g({ value: "Scratch" }, "Scratch"), option$g({ value: "Scratch Addons" }, "Scratch Addons"), option$g({ value: "Windows Xp" }, "Windows Xp"), option$g({ value: "Frutiger Aero" }, "Frutiger Aero"), option$g({ value: "Frutiger Aero Night" }, "Frutiger Aero Night"), option$g({ value: "Skeuomorphic" }, "Skeuomorphic/Early 2000's (LeoV)"), option$g({ value: "woodland" }, "Woodland"), option$g({ value: "corporate dark" }, "Corporate Dark"), option$g({ value: "corporate light" }, "Corporate Light"), option$g({ value: "Glyde" }, "Glyde"), option$g({ value: "starry studio" }, "Starry Studio"), option$g({ value: "Terminal 2.0 (AB)" }, "Terminal 2.0 (AB)"), option$g({ value: "Slushie" }, "Slushie"), option$g({ value: "Slushie Pixel" }, "Slushie 2"), option$g({ value: "BeepBox Pixel" }, "BeepBox Pixel"), option$g({ value: "forest 2" }, "Forest 2"), option$g({ value: "canyon 2" }, "Canyon 2"), option$g({ value: "Nebula 2" }, "Nebula 2"), option$g({ value: "Ghost House" }, "Ghost House"), option$g({ value: "Ghost House 2" }, "Ghost House 2")), optgroup$2({ label: "BeepBox Themes" }, option$g({ value: "dark classic" }, "BeepBox Dark"), option$g({ value: "light classic" }, "BeepBox Light"), option$g({ value: "dark competition" }, "BeepBox Competition Dark")), optgroup$2({ label: "JummBox Themes" }, option$g({ value: "jummbox classic" }, "JummBox Dark"), option$g({ value: "jummbox light" }, "JummBox Light"), option$g({ value: "forest" }, "Forest"), option$g({ value: "canyon" }, "Canyon"), option$g({ value: "midnight" }, "Midnight"), option$g({ value: "beachcombing" }, "Beachcombing"), option$g({ value: "violet verdant" }, "Violet Verdant"), option$g({ value: "sunset" }, "Sunset"), option$g({ value: "autumn" }, "Autumn"), option$g({ value: "fruit" }, "Shadowfruit"), option$g({ value: "toxic" }, "Toxic"), option$g({ value: "roe" }, "Roe"), option$g({ value: "moonlight" }, "Moonlight"), option$g({ value: "portal" }, "Portal"), option$g({ value: "fusion" }, "Fusion"), option$g({ value: "inverse" }, "Inverse"), option$g({ value: "nebula" }, "Nebula"), option$g({ value: "roe light" }, "Roe Light"), option$g({ value: "amoled dark" }, "High Contrast Dark"), option$g({ value: "energized" }, "Energized"), option$g({ value: "neapolitan" }, "Neapolitan"), option$g({ value: "mono" }, "Poly"), option$g({ value: "blutonium" }, "Blutonium")), optgroup$2({ label: "ModBox Themes" }, option$g({ value: "modbox classic" }, "Modbox"), option$g({ value: "modbox 2" }, "Modbox 2.0"), option$g({ value: "modbox artic" }, "Artic"), option$g({ value: "modbox cinnamon" }, "Cinnamon Roll [!]"), option$g({ value: "modbox ocean" }, "Ocean"), option$g({ value: "modbox rainbow" }, "Rainbow [!]"), option$g({ value: "modbox float" }, "Float [!]"), option$g({ value: "modbox windows" }, "Windows"), option$g({ value: "modbox grassland" }, "Grassland"), option$g({ value: "modbox dessert" }, "Dessert"), option$g({ value: "modbox kahoot" }, "Kahootiest"), option$g({ value: "modbox bitbeam" }, "Beam to the Bit [!]"), option$g({ value: "modbox egg" }, "Pretty Egg"), option$g({ value: "modbox pony" }, "Poniryoshka"), option$g({ value: "modbox gameboy" }, "Gameboy [!]"), option$g({ value: "modbox woodkid" }, "Woodkid [!]"), option$g({ value: "modbox midnight" }, "Midnight [!]"), option$g({ value: "modbox snedbox" }, "Snedbox"), option$g({ value: "modbox unnamed" }, "unnamed [!]"), option$g({ value: "modbox piano" }, "Piano [!]"), option$g({ value: "modbox halloween" }, "Halloween [!]"), option$g({ value: "modbox frozen" }, "FrozenOver❄️ [!]")), optgroup$2({ label: "ShitBox Themes" }, option$g({ value: "shitbox 1.0" }, "Shitbox 1.0"), option$g({ value: "shitbox 2.0" }, "Shitbox 2.0"), option$g({ value: "shitbox 3.0" }, "Shitbox 3.0/shitbox4"), option$g({ value: "shitbox ModBox 2.0" }, "Shitbox ModBox 2.0"), option$g({ value: "shitbox Realm" }, "Shitbox Realm [!]")), optgroup$2({ label: "Nepbox Themes" }, option$g({ value: "nepbox" }, "Nepbox"), option$g({ value: "nepbox laffey" }, "Laffey"), option$g({ value: "nepbox snedbox" }, "Snedbox (Nb) [!]"), option$g({ value: "nepbox piano" }, "Piano (Nb) [!]")), optgroup$2({ label: "Mod Default Themes" }, option$g({ value: "sandbox classic" }, "Sandbox"), option$g({ value: "harrybox" }, "Haileybox"), option$g({ value: "brucebox" }, "Brucebox"), option$g({ value: "nerdbox" }, "NerdBox"), option$g({ value: "zefbox" }, "Zefbox"), option$g({ value: "cardboardbox classic" }, "Cardboardbox"), option$g({ value: "blubox classic" }, "Blubox"), option$g({ value: "dogebox classic" }, "Dogebox"), option$g({ value: "dogebox dark" }, "Way too Dark (DB)/TOO DARK(BluB)"), option$g({ value: "wackybox" }, "Wackybox"), option$g({ value: "todbox dark mode" }, "Todbox Dark Mode"), option$g({ value: "mainbox 1.0" }, "Mainbox"), option$g({ value: "microbox" }, "MicroBox"), option$g({ value: "paandorasbox" }, "PaandorasBox"), option$g({ value: "foxbox" }, "FoxBox"), option$g({ value: "midbox" }, "Midbox"), option$g({ value: "gold light" }, "Gold Light"), option$g({ value: "dogebox2" }, "Dogebox2"), option$g({ value: "WeebBox" }, "WeebBox"), option$g({ value: "BoxBeep Dark" }, "BoxBeep Dark"), option$g({ value: "BoxBeep light" }, "BoxBeep Light"), option$g({ value: "birdbox dark" }, "BirdBox Dark"), option$g({ value: "birdbox light" }, "BirdBox Light"), option$g({ value: "ultrabox dark" }, "UltraBox"), option$g({ value: "slarmoosbox" }, "Slarmoo's Box"), option$g({ value: "lemmbox dark" }, "LemmBox Dark")), optgroup$2({ label: "Miscellaneous Themes" }, option$g({ value: "azur lane" }, "Azur Lane"), option$g({ value: "AWeebyssBox" }, "AWeebyssBox"), option$g({ value: "Deuteranopia" }, "Deuteranopia"), option$g({ value: "Protanopia" }, "Protanopia"), option$g({ value: "Tritanopia" }, "Tritanopia"), option$g({ value: "2012 Video Tutorial" }, "2012 Video Tutorial"), option$g({ value: "I am on fire" }, "I am on fire")));
             this._cancelButton = button$n({ class: "cancelButton" });
             this._okayButton = button$n({ class: "okayButton", style: "width:45%;" }, "Okay");
             this.lastTheme = this._doc.song.setSongTheme;
@@ -51263,7 +52414,7 @@ button.playButton::before {
         }
     }
 
-    const { button: button$l, div: div$l, h2: h2$k, input: input$e, select: select$e, option: option$e } = HTML;
+    const { button: button$l, div: div$l, h2: h2$k, input: input$e, select: select$f, option: option$f } = HTML;
     function lerp(low, high, t) {
         return low + t * (high - low);
     }
@@ -51296,7 +52447,7 @@ button.playButton::before {
             this._enableIntro = input$e({ type: "checkbox" });
             this._loopDropDown = input$e({ style: "width: 3em;", type: "number", min: "1", max: "16", step: "1" });
             this._enableOutro = input$e({ type: "checkbox" });
-            this._formatSelect = select$e({ style: "width: 100%;" }, option$e({ value: "wav" }, "Export to .wav file."), option$e({ value: "mp3" }, "Export to .mp3 file."), option$e({ value: "ogg" }, "Export to .ogg file."), option$e({ value: "opus" }, "Export to .opus file."), option$e({ value: "midi" }, "Export to .mid file."), option$e({ value: "json" }, "Export to .json file."), option$e({ value: "html" }, "Export to .html file."));
+            this._formatSelect = select$f({ style: "width: 100%;" }, option$f({ value: "wav" }, "Export to .wav file."), option$f({ value: "mp3" }, "Export to .mp3 file."), option$f({ value: "ogg" }, "Export to .ogg file."), option$f({ value: "opus" }, "Export to .opus file."), option$f({ value: "midi" }, "Export to .mid file."), option$f({ value: "json" }, "Export to .json file."), option$f({ value: "html" }, "Export to .html file."));
             this._removeWhitespace = input$e({ type: "checkbox" });
             this._removeWhitespaceDiv = div$l({ style: "vertical-align: middle; align-items: center; justify-content: space-between; margin-bottom: 14px;" }, "Remove Whitespace: ", this._removeWhitespace);
             this._oggWarning = div$l({ style: "vertical-align: middle; align-items: center; justify-content: space-between; margin-bottom: 14px;" }, "Warning: .ogg files aren't supported on as many devices as mp3 or wav. So Playback might not be possible on specific devices.");
@@ -52219,7 +53370,7 @@ You should be redirected to the song at:<br /><br />
         0x51,
     ];
 
-    const { button: button$k, p: p$8, div: div$k, h2: h2$j, input: input$d, select: select$d, option: option$d } = HTML;
+    const { button: button$k, p: p$8, div: div$k, h2: h2$j, input: input$d, select: select$e, option: option$e } = HTML;
     class ImportPrompt {
         constructor(_doc) {
             this._doc = _doc;
@@ -52228,7 +53379,7 @@ You should be redirected to the song at:<br /><br />
             this._exportButton = button$k({ style: "border-image-source: none !important; height: auto; min-height: var(--button-size); margin: 0.5em; width:50%; color: var(--secondary-text);" }, "Export");
             this._fileInput = input$d({ type: "file", accept: ".json,application/json,.mid,.midi,audio/midi,audio/x-midi" });
             this._cancelButton = button$k({ class: "cancelButton" });
-            this._modeImportSelect = select$d({ style: "width: 100%;" }, option$d({ value: "auto" }, "Auto-detect mode (for json)"), option$d({ value: "BeepBox" }, "BeepBox"), option$d({ value: "ModBox" }, "ModBox"), option$d({ value: "JummBox" }, "JummBox"), option$d({ value: "SynthBox" }, "SynthBox"), option$d({ value: "GoldBox" }, "GoldBox"), option$d({ value: "PaandorasBox" }, "PaandorasBox"), option$d({ value: "UltraBox" }, "UltraBox"));
+            this._modeImportSelect = select$e({ style: "width: 100%;" }, option$e({ value: "auto" }, "Auto-detect mode (for json)"), option$e({ value: "BeepBox" }, "BeepBox"), option$e({ value: "ModBox" }, "ModBox"), option$e({ value: "JummBox" }, "JummBox"), option$e({ value: "SynthBox" }, "SynthBox"), option$e({ value: "GoldBox" }, "GoldBox"), option$e({ value: "PaandorasBox" }, "PaandorasBox"), option$e({ value: "UltraBox" }, "UltraBox"));
             this._importPrompt = div$k({}, div$k({ class: "promptTitle" }, h2$j({ class: "importExt", style: "text-align: inherit;" }, ""), h2$j({ class: "importTitle" }, "Import")), p$8({ style: "text-align: left; margin: 0.5em 0;" }, "BeepBox songs can be exported and re-imported as .json files. You could also use other means to make .json files for BeepBox as long as they follow the same structure."), p$8({ style: "text-align: left; margin: 0.5em 0;" }, "BeepBox can also (crudely) import .mid files. There are many tools available for creating .mid files. Shorter and simpler songs are more likely to work well."), this._modeImportSelect, this._fileInput, this._cancelButton);
             this._exportPrompt = div$k({ style: "display:none;" }, this.exportStuff._exportPrompt);
             this.customContainer = div$k({ class: "customContainer", id: "customContainer", style: "width: 100%;" }, p$8({ style: "text-align: center; margin: 1em 0; display:flex; flex-direction: row;" }, this._importButton, this._exportButton), this._importPrompt, this._exportPrompt);
@@ -54189,12 +55340,12 @@ You should be redirected to the song at:<br /><br />
         }
     }
 
-    const { button: button$g, div: div$g, span: span$4, h2: h2$f, input: input$9, br: br$2, select: select$c, option: option$c } = HTML;
+    const { button: button$g, div: div$g, span: span$4, h2: h2$f, input: input$9, br: br$2, select: select$d, option: option$d } = HTML;
     class MoveNotesSidewaysPrompt {
         constructor(_doc) {
             this._doc = _doc;
             this._beatsStepper = input$9({ style: "width: 3em; margin-left: 1em;", type: "number", step: "0.01", value: "0" });
-            this._conversionStrategySelect = select$c({ style: "width: 100%;" }, option$c({ value: "overflow" }, "Overflow notes across bars."), option$c({ value: "wrapAround" }, "Wrap notes around within bars."));
+            this._conversionStrategySelect = select$d({ style: "width: 100%;" }, option$d({ value: "overflow" }, "Overflow notes across bars."), option$d({ value: "wrapAround" }, "Wrap notes around within bars."));
             this._cancelButton = button$g({ class: "cancelButton" });
             this._okayButton = button$g({ class: "okayButton", style: "width:45%;" }, "Okay");
             this.container = div$g({ class: "prompt noSelection", style: "width: 250px;" }, div$g({ class: "promptTitle" }, h2$f({ class: "mnsExt", style: "text-align: inherit;" }, ""), h2$f({ class: "mnsTitle" }, "Move Notes Sideways")), div$g({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" }, div$g({ style: "text-align: right;" }, "Beats to move:", br$2(), span$4({ style: `font-size: smaller; color: ${ColorConfig.secondaryText};` }, "(Negative is left, positive is right)")), this._beatsStepper), div$g({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" }, div$g({ class: "selectContainer", style: "width: 100%;" }, this._conversionStrategySelect)), div$g({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" }, this._okayButton), this._cancelButton);
@@ -58413,12 +59564,12 @@ You should be redirected to the song at:<br /><br />
         }
     }
 
-    const { button: button$f, div: div$f, span: span$3, h2: h2$e, input: input$8, br: br$1, select: select$b, option: option$b } = HTML;
+    const { button: button$f, div: div$f, span: span$3, h2: h2$e, input: input$8, br: br$1, select: select$c, option: option$c } = HTML;
     class SongDurationPrompt {
         constructor(_doc) {
             this._doc = _doc;
             this._barsStepper = input$8({ style: "width: 3em; margin-left: 1em;", type: "number", step: "1" });
-            this._positionSelect = select$b({ style: "width: 100%;" }, option$b({ value: "end" }, "Apply change at end of song."), option$b({ value: "beginning" }, "Apply change at beginning of song."));
+            this._positionSelect = select$c({ style: "width: 100%;" }, option$c({ value: "end" }, "Apply change at end of song."), option$c({ value: "beginning" }, "Apply change at beginning of song."));
             this._cancelButton = button$f({ class: "cancelButton" });
             this._okayButton = button$f({ class: "okayButton", style: "width:45%;" }, "Okay");
             this.container = div$f({ class: "prompt noSelection", style: "width: 250px;" }, div$f({ class: "promptTitle" }, h2$e({ class: "song-lengthExt", style: "text-align: inherit;" }, ""), h2$e({ class: "song-lengthTitle" }, "Song Length")), div$f({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" }, div$f({ style: "display: inline-block; text-align: right;" }, "Bars per song:", br$1(), span$3({ style: `font-size: smaller; color: ${ColorConfig.secondaryText};` }, "(Multiples of 4 are recommended)")), this._barsStepper), div$f({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" }, div$f({ class: "selectContainer", style: "width: 100%;" }, this._positionSelect)), div$f({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" }, this._okayButton), this._cancelButton);
@@ -58476,11 +59627,11 @@ You should be redirected to the song at:<br /><br />
         }
     }
 
-    const { button: button$e, div: div$e, h2: h2$d, p: p$7, select: select$a, option: option$a } = HTML;
+    const { button: button$e, div: div$e, h2: h2$d, p: p$7, select: select$b, option: option$b } = HTML;
     class SustainPrompt {
         constructor(_doc) {
             this._doc = _doc;
-            this._typeSelect = select$a({ style: "width: 100%;" }, option$a({ value: "acoustic" }, "(A) Acoustic"), option$a({ value: "bright" }, "(B) Bright"));
+            this._typeSelect = select$b({ style: "width: 100%;" }, option$b({ value: "acoustic" }, "(A) Acoustic"), option$b({ value: "bright" }, "(B) Bright"));
             this._cancelButton = button$e({ class: "cancelButton" });
             this._okayButton = button$e({ class: "okayButton", style: "width:45%;" }, "Okay");
             this.container = div$e({ class: "prompt", style: "width: 300px;" }, div$e(h2$d("String Sustain"), p$7("This setting controls how quickly the picked string vibration decays."), p$7("Unlike most of BeepBox's instrument synthesizer features, a picked string cannot change frequency suddenly while maintaining its decay. If a tone's pitch changes suddenly (e.g. if the chord type is set to \"arpeggio\" or the transition type is set to \"continues\") then the string will be re-picked and start decaying from the beginning again, even if the envelopes don't otherwise restart.")), div$e({ style: { display: Config.enableAcousticSustain ? undefined : "none" } }, p$7("BeepBox comes with two slightly different sustain designs. You can select one here and press \"Okay\" to confirm it."), div$e({ class: "selectContainer", style: "width: 100%;" }, this._typeSelect)), div$e({ style: { display: Config.enableAcousticSustain ? "flex" : "none", "flex-direction": "row-reverse", "justify-content": "space-between" } }, this._okayButton), this._cancelButton);
@@ -58646,7 +59797,7 @@ You should be redirected to the song at:<br /><br />
         }
     }
 
-    const { button: button$d, div: div$d, h2: h2$c, p: p$6, select: select$9, option: option$9, iframe } = HTML;
+    const { button: button$d, div: div$d, h2: h2$c, p: p$6, select: select$a, option: option$a, iframe } = HTML;
     class SongRecoveryPrompt {
         constructor(_doc) {
             this._doc = _doc;
@@ -58665,30 +59816,31 @@ You should be redirected to the song at:<br /><br />
                 this._songContainer.appendChild(p$6("There are no recovered songs available yet. Try making a song!"));
             }
             for (const song of songs) {
-                const versionMenu = select$9({ style: "width: 100%;" });
+                const versionMenu = select$a({ style: "width: 100%;" });
                 for (const version of song.versions) {
-                    versionMenu.appendChild(option$9({ value: version.time }, version.name + ": " + new Date(version.time).toLocaleString()));
+                    versionMenu.appendChild(option$a({ value: version.time }, version.name + ": " + new Date(version.time).toLocaleString()));
                 }
                 const player = iframe({ style: "width: 100%; height: 60px; border: none; display: block;" });
-                player.src = "sr-player/#song=" + window.localStorage.getItem(versionToKey(song.versions[0]));
+                const isIndexHmtl = location.pathname.includes("index.html") ? "index.html" : "";
+                player.src = `player/${isIndexHmtl}#song=` + window.localStorage.getItem(versionToKey(song.versions[0]));
                 const container = div$d({ style: "margin: 4px 0;" }, div$d({ class: "selectContainer", style: "width: 100%; margin: 2px 0;" }, versionMenu), player);
                 this._songContainer.appendChild(container);
                 versionMenu.addEventListener("change", () => {
                     const version = song.versions[versionMenu.selectedIndex];
-                    player.contentWindow.location.replace("sr-player/#song=" + window.localStorage.getItem(versionToKey(version)));
+                    player.contentWindow.location.replace(`player/${isIndexHmtl}#song=` + window.localStorage.getItem(versionToKey(version)));
                     player.contentWindow.dispatchEvent(new Event("hashchange"));
                 });
             }
         }
     }
 
-    const { button: button$c, label, div: div$c, p: p$5, a: a$2, h2: h2$b, input: input$7, select: select$8, option: option$8 } = HTML;
+    const { button: button$c, label, div: div$c, p: p$5, a: a$2, h2: h2$b, input: input$7, select: select$9, option: option$9 } = HTML;
     class RecordingSetupPrompt {
         constructor(_doc) {
             this._doc = _doc;
-            this._keyboardMode = select$8({ style: "width: 100%;" }, option$8({ value: "useCapsLockForNotes" }, "simple shortcuts, use caps lock to play notes"), option$8({ value: "pressControlForShortcuts" }, "simple notes, press " + EditorConfig.ctrlName + " for shortcuts"));
-            this._keyboardLayout = select$8({ style: "width: 100%;" }, option$8({ value: "wickiHayden" }, "Wicki-Hayden"), option$8({ value: "songScale" }, "selected song scale"), option$8({ value: "pianoAtC" }, "piano starting at C :)"), option$8({ value: "pianoAtA" }, "piano starting at A :("), option$8({ value: "pianoTransposingC" }, "piano transposing C :) to song key"), option$8({ value: "pianoTransposingA" }, "piano transposing A :( to song key"));
-            this._bassOffset = select$8({ style: "width: 100%;" }, option$8({ value: "0" }, "disabled"), option$8({ value: "-1" }, "before"), option$8({ value: "1" }, "after"));
+            this._keyboardMode = select$9({ style: "width: 100%;" }, option$9({ value: "useCapsLockForNotes" }, "simple shortcuts, use caps lock to play notes"), option$9({ value: "pressControlForShortcuts" }, "simple notes, press " + EditorConfig.ctrlName + " for shortcuts"));
+            this._keyboardLayout = select$9({ style: "width: 100%;" }, option$9({ value: "wickiHayden" }, "Wicki-Hayden"), option$9({ value: "songScale" }, "selected song scale"), option$9({ value: "pianoAtC" }, "piano starting at C :)"), option$9({ value: "pianoAtA" }, "piano starting at A :("), option$9({ value: "pianoTransposingC" }, "piano transposing C :) to song key"), option$9({ value: "pianoTransposingA" }, "piano transposing A :( to song key"));
+            this._bassOffset = select$9({ style: "width: 100%;" }, option$9({ value: "0" }, "disabled"), option$9({ value: "-1" }, "before"), option$9({ value: "1" }, "after"));
             this._keyboardLayoutPreview = div$c({ style: "display: grid; row-gap: 4px; margin: 4px auto; font-size: 10px;" });
             this._enableMidi = input$7({ style: "width: 2em; margin-left: 1em;", type: "checkbox" });
             this._showRecordButton = input$7({ style: "width: 2em; margin-left: 1em;", type: "checkbox" });
@@ -59209,11 +60361,11 @@ You should be redirected to the song at:<br /><br />
         }
     }
 
-    const { button: button$b, div: div$b, h2: h2$a, option: option$7, select: select$7, optgroup: optgroup$1 } = HTML;
+    const { button: button$b, div: div$b, h2: h2$a, option: option$8, select: select$8, optgroup: optgroup$1 } = HTML;
     class ThemePrompt {
         constructor(_doc) {
             this._doc = _doc;
-            this._themeSelect = select$7({ style: "width: 100%;", id: "themeSelect" }, optgroup$1({ label: "AbyssBox Themes" }, option$7({ value: "AbyssBox Classic" }, "AbyssBox Classic"), option$7({ value: "AbyssBox Competitive" }, "AbyssBox Competitive"), option$7({ value: "AbyssBox Light" }, "AbyssBox Light"), option$7({ value: "AbyssBox 0.8" }, "AbyssBox 0.8"), option$7({ value: "AbyssBox Piano" }, "AbyssBox Piano [!]"), option$7({ value: "Half-Life" }, "Half-Life"), option$7({ value: "Half-Life: Source" }, "Half-Life: Source"), option$7({ value: "Doom 1993" }, "Doom 1993"), option$7({ value: "Undertale" }, "Undertale"), option$7({ value: "Yume Nikki" }, "Yume Nikki [!]"), option$7({ value: "Scratch" }, "Scratch"), option$7({ value: "Scratch Addons" }, "Scratch Addons"), option$7({ value: "Windows Xp" }, "Windows Xp"), option$7({ value: "Frutiger Aero" }, "Frutiger Aero"), option$7({ value: "Frutiger Aero Night" }, "Frutiger Aero Night"), option$7({ value: "Skeuomorphic" }, "Skeuomorphic/Early 2000's (LeoV)"), option$7({ value: "woodland" }, "Woodland"), option$7({ value: "corporate dark" }, "Corporate Dark"), option$7({ value: "corporate light" }, "Corporate Light"), option$7({ value: "Glyde" }, "Glyde"), option$7({ value: "starry studio" }, "Starry Studio"), option$7({ value: "Terminal 2.0 (AB)" }, "Terminal 2.0 (AB)"), option$7({ value: "Slushie" }, "Slushie"), option$7({ value: "Slushie Pixel" }, "Slushie 2"), option$7({ value: "BeepBox Pixel" }, "BeepBox Pixel"), option$7({ value: "forest 2" }, "Forest 2"), option$7({ value: "canyon 2" }, "Canyon 2"), option$7({ value: "Nebula 2" }, "Nebula 2"), option$7({ value: "Ghost House" }, "Ghost House"), option$7({ value: "Ghost House 2" }, "Ghost House 2")), optgroup$1({ label: "BeepBox Themes" }, option$7({ value: "dark classic" }, "BeepBox Dark"), option$7({ value: "light classic" }, "BeepBox Light"), option$7({ value: "dark competition" }, "BeepBox Competition Dark")), optgroup$1({ label: "JummBox Themes" }, option$7({ value: "jummbox classic" }, "JummBox Dark"), option$7({ value: "jummbox light" }, "JummBox Light"), option$7({ value: "forest" }, "Forest"), option$7({ value: "canyon" }, "Canyon"), option$7({ value: "midnight" }, "Midnight"), option$7({ value: "beachcombing" }, "Beachcombing"), option$7({ value: "violet verdant" }, "Violet Verdant"), option$7({ value: "sunset" }, "Sunset"), option$7({ value: "autumn" }, "Autumn"), option$7({ value: "fruit" }, "Shadowfruit"), option$7({ value: "toxic" }, "Toxic"), option$7({ value: "roe" }, "Roe"), option$7({ value: "moonlight" }, "Moonlight"), option$7({ value: "portal" }, "Portal"), option$7({ value: "fusion" }, "Fusion"), option$7({ value: "inverse" }, "Inverse"), option$7({ value: "nebula" }, "Nebula"), option$7({ value: "roe light" }, "Roe Light"), option$7({ value: "amoled dark" }, "High Contrast Dark"), option$7({ value: "energized" }, "Energized"), option$7({ value: "neapolitan" }, "Neapolitan"), option$7({ value: "mono" }, "Poly"), option$7({ value: "blutonium" }, "Blutonium")), optgroup$1({ label: "ModBox Themes" }, option$7({ value: "modbox classic" }, "Modbox"), option$7({ value: "modbox 2" }, "Modbox 2.0"), option$7({ value: "modbox artic" }, "Artic"), option$7({ value: "modbox cinnamon" }, "Cinnamon Roll [!]"), option$7({ value: "modbox ocean" }, "Ocean"), option$7({ value: "modbox rainbow" }, "Rainbow [!]"), option$7({ value: "modbox float" }, "Float [!]"), option$7({ value: "modbox windows" }, "Windows"), option$7({ value: "modbox grassland" }, "Grassland"), option$7({ value: "modbox dessert" }, "Dessert"), option$7({ value: "modbox kahoot" }, "Kahootiest"), option$7({ value: "modbox bitbeam" }, "Beam to the Bit [!]"), option$7({ value: "modbox egg" }, "Pretty Egg"), option$7({ value: "modbox pony" }, "Poniryoshka"), option$7({ value: "modbox gameboy" }, "Gameboy [!]"), option$7({ value: "modbox woodkid" }, "Woodkid [!]"), option$7({ value: "modbox midnight" }, "Midnight [!]"), option$7({ value: "modbox snedbox" }, "Snedbox"), option$7({ value: "modbox unnamed" }, "unnamed [!]"), option$7({ value: "modbox piano" }, "Piano [!]"), option$7({ value: "modbox halloween" }, "Halloween [!]"), option$7({ value: "modbox frozen" }, "FrozenOver❄️ [!]")), optgroup$1({ label: "ShitBox Themes" }, option$7({ value: "shitbox 1.0" }, "Shitbox 1.0"), option$7({ value: "shitbox 2.0" }, "Shitbox 2.0"), option$7({ value: "shitbox 3.0" }, "Shitbox 3.0/shitbox4"), option$7({ value: "shitbox ModBox 2.0" }, "Shitbox ModBox 2.0"), option$7({ value: "shitbox Realm" }, "Shitbox Realm [!]")), optgroup$1({ label: "Nepbox Themes" }, option$7({ value: "nepbox" }, "Nepbox"), option$7({ value: "nepbox laffey" }, "Laffey"), option$7({ value: "nepbox snedbox" }, "Snedbox (Nb) [!]"), option$7({ value: "nepbox piano" }, "Piano (Nb) [!]")), optgroup$1({ label: "Mod Default Themes" }, option$7({ value: "sandbox classic" }, "Sandbox"), option$7({ value: "harrybox" }, "Haileybox"), option$7({ value: "brucebox" }, "Brucebox"), option$7({ value: "nerdbox" }, "NerdBox"), option$7({ value: "zefbox" }, "Zefbox"), option$7({ value: "cardboardbox classic" }, "Cardboardbox"), option$7({ value: "blubox classic" }, "Blubox"), option$7({ value: "dogebox classic" }, "Dogebox"), option$7({ value: "dogebox dark" }, "Way too Dark (DB)/TOO DARK(BluB)"), option$7({ value: "wackybox" }, "Wackybox"), option$7({ value: "todbox dark mode" }, "Todbox Dark Mode"), option$7({ value: "mainbox 1.0" }, "Mainbox"), option$7({ value: "microbox" }, "MicroBox"), option$7({ value: "paandorasbox" }, "PaandorasBox"), option$7({ value: "foxbox" }, "FoxBox"), option$7({ value: "midbox" }, "Midbox"), option$7({ value: "gold light" }, "Gold Light"), option$7({ value: "dogebox2" }, "Dogebox2"), option$7({ value: "WeebBox" }, "WeebBox"), option$7({ value: "BoxBeep Dark" }, "BoxBeep Dark"), option$7({ value: "BoxBeep light" }, "BoxBeep Light"), option$7({ value: "birdbox dark" }, "BirdBox Dark"), option$7({ value: "birdbox light" }, "BirdBox Light"), option$7({ value: "ultrabox dark" }, "UltraBox"), option$7({ value: "slarmoosbox" }, "Slarmoo's Box"), option$7({ value: "lemmbox dark" }, "LemmBox Dark")), optgroup$1({ label: "Miscellaneous Themes" }, option$7({ value: "azur lane" }, "Azur Lane"), option$7({ value: "AWeebyssBox" }, "AWeebyssBox"), option$7({ value: "Deuteranopia" }, "Deuteranopia"), option$7({ value: "Protanopia" }, "Protanopia"), option$7({ value: "Tritanopia" }, "Tritanopia"), option$7({ value: "2012 Video Tutorial" }, "2012 Video Tutorial"), option$7({ value: "I am on fire" }, "I am on fire"), option$7({ value: "custom" }, "Custom")));
+            this._themeSelect = select$8({ style: "width: 100%;", id: "themeSelect" }, optgroup$1({ label: "AbyssBox Themes" }, option$8({ value: "AbyssBox Classic" }, "AbyssBox Classic"), option$8({ value: "AbyssBox Competitive" }, "AbyssBox Competitive"), option$8({ value: "AbyssBox Light" }, "AbyssBox Light"), option$8({ value: "AbyssBox Piano" }, "AbyssBox Piano [!]"), option$8({ value: "AbyssBox 0.8" }, "AbyssBox 0.8"), option$8({ value: "AbyssBox Comp simple" }, "AbyssBox Competitive (simple)"), option$8({ value: "AbyssBox Light simple" }, "AbyssBox Light (simple)"), option$8({ value: "AbyssBox Piano simple" }, "AbyssBox Piano (simple)"), option$8({ value: "Half-Life" }, "Half-Life"), option$8({ value: "Half-Life: Source" }, "Half-Life: Source"), option$8({ value: "Doom 1993" }, "Doom 1993"), option$8({ value: "Undertale" }, "Undertale"), option$8({ value: "Yume Nikki" }, "Yume Nikki [!]"), option$8({ value: "Scratch" }, "Scratch"), option$8({ value: "Scratch Addons" }, "Scratch Addons"), option$8({ value: "Windows Xp" }, "Windows Xp"), option$8({ value: "Frutiger Aero" }, "Frutiger Aero"), option$8({ value: "Frutiger Aero Night" }, "Frutiger Aero Night"), option$8({ value: "Skeuomorphic" }, "Skeuomorphic/Early 2000's (LeoV)"), option$8({ value: "woodland" }, "Woodland"), option$8({ value: "corporate dark" }, "Corporate Dark"), option$8({ value: "corporate light" }, "Corporate Light"), option$8({ value: "Glyde" }, "Glyde"), option$8({ value: "starry studio" }, "Starry Studio"), option$8({ value: "Terminal 2.0 (AB)" }, "Terminal 2.0 (AB)"), option$8({ value: "Slushie" }, "Slushie"), option$8({ value: "Slushie Pixel" }, "Slushie 2"), option$8({ value: "BeepBox Pixel" }, "BeepBox Pixel"), option$8({ value: "forest 2" }, "Forest 2"), option$8({ value: "canyon 2" }, "Canyon 2"), option$8({ value: "Nebula 2" }, "Nebula 2"), option$8({ value: "Ghost House" }, "Ghost House"), option$8({ value: "Ghost House 2" }, "Ghost House 2")), optgroup$1({ label: "BeepBox Themes" }, option$8({ value: "dark classic" }, "BeepBox Dark"), option$8({ value: "light classic" }, "BeepBox Light"), option$8({ value: "dark competition" }, "BeepBox Competition Dark")), optgroup$1({ label: "JummBox Themes" }, option$8({ value: "jummbox classic" }, "JummBox Dark"), option$8({ value: "jummbox light" }, "JummBox Light"), option$8({ value: "forest" }, "Forest"), option$8({ value: "canyon" }, "Canyon"), option$8({ value: "midnight" }, "Midnight"), option$8({ value: "beachcombing" }, "Beachcombing"), option$8({ value: "violet verdant" }, "Violet Verdant"), option$8({ value: "sunset" }, "Sunset"), option$8({ value: "autumn" }, "Autumn"), option$8({ value: "fruit" }, "Shadowfruit"), option$8({ value: "toxic" }, "Toxic"), option$8({ value: "roe" }, "Roe"), option$8({ value: "moonlight" }, "Moonlight"), option$8({ value: "portal" }, "Portal"), option$8({ value: "fusion" }, "Fusion"), option$8({ value: "inverse" }, "Inverse"), option$8({ value: "nebula" }, "Nebula"), option$8({ value: "roe light" }, "Roe Light"), option$8({ value: "amoled dark" }, "High Contrast Dark"), option$8({ value: "energized" }, "Energized"), option$8({ value: "neapolitan" }, "Neapolitan"), option$8({ value: "mono" }, "Poly"), option$8({ value: "blutonium" }, "Blutonium")), optgroup$1({ label: "ModBox Themes" }, option$8({ value: "modbox classic" }, "Modbox"), option$8({ value: "modbox 2" }, "Modbox 2.0"), option$8({ value: "modbox artic" }, "Artic"), option$8({ value: "modbox cinnamon" }, "Cinnamon Roll [!]"), option$8({ value: "modbox ocean" }, "Ocean"), option$8({ value: "modbox rainbow" }, "Rainbow [!]"), option$8({ value: "modbox float" }, "Float [!]"), option$8({ value: "modbox windows" }, "Windows"), option$8({ value: "modbox grassland" }, "Grassland"), option$8({ value: "modbox dessert" }, "Dessert"), option$8({ value: "modbox kahoot" }, "Kahootiest"), option$8({ value: "modbox bitbeam" }, "Beam to the Bit [!]"), option$8({ value: "modbox egg" }, "Pretty Egg"), option$8({ value: "modbox pony" }, "Poniryoshka"), option$8({ value: "modbox gameboy" }, "Gameboy [!]"), option$8({ value: "modbox woodkid" }, "Woodkid [!]"), option$8({ value: "modbox midnight" }, "Midnight [!]"), option$8({ value: "modbox snedbox" }, "Snedbox"), option$8({ value: "modbox unnamed" }, "unnamed [!]"), option$8({ value: "modbox piano" }, "Piano [!]"), option$8({ value: "modbox halloween" }, "Halloween [!]"), option$8({ value: "modbox frozen" }, "FrozenOver❄️ [!]")), optgroup$1({ label: "ShitBox Themes" }, option$8({ value: "shitbox 1.0" }, "Shitbox 1.0"), option$8({ value: "shitbox 2.0" }, "Shitbox 2.0"), option$8({ value: "shitbox 3.0" }, "Shitbox 3.0/shitbox4"), option$8({ value: "shitbox ModBox 2.0" }, "Shitbox ModBox 2.0"), option$8({ value: "shitbox Realm" }, "Shitbox Realm [!]")), optgroup$1({ label: "Nepbox Themes" }, option$8({ value: "nepbox" }, "Nepbox"), option$8({ value: "nepbox laffey" }, "Laffey"), option$8({ value: "nepbox snedbox" }, "Snedbox (Nb) [!]"), option$8({ value: "nepbox piano" }, "Piano (Nb) [!]")), optgroup$1({ label: "Mod Default Themes" }, option$8({ value: "sandbox classic" }, "Sandbox"), option$8({ value: "harrybox" }, "Haileybox"), option$8({ value: "brucebox" }, "Brucebox"), option$8({ value: "nerdbox" }, "NerdBox"), option$8({ value: "zefbox" }, "Zefbox"), option$8({ value: "cardboardbox classic" }, "Cardboardbox"), option$8({ value: "blubox classic" }, "Blubox"), option$8({ value: "dogebox classic" }, "Dogebox"), option$8({ value: "dogebox dark" }, "Way too Dark (DB)/TOO DARK(BluB)"), option$8({ value: "wackybox" }, "Wackybox"), option$8({ value: "todbox dark mode" }, "Todbox Dark Mode"), option$8({ value: "mainbox 1.0" }, "Mainbox"), option$8({ value: "microbox" }, "MicroBox"), option$8({ value: "paandorasbox" }, "PaandorasBox"), option$8({ value: "foxbox" }, "FoxBox"), option$8({ value: "midbox" }, "Midbox"), option$8({ value: "gold light" }, "Gold Light"), option$8({ value: "dogebox2" }, "Dogebox2"), option$8({ value: "WeebBox" }, "WeebBox"), option$8({ value: "BoxBeep Dark" }, "BoxBeep Dark"), option$8({ value: "BoxBeep light" }, "BoxBeep Light"), option$8({ value: "birdbox dark" }, "BirdBox Dark"), option$8({ value: "birdbox light" }, "BirdBox Light"), option$8({ value: "ultrabox dark" }, "UltraBox"), option$8({ value: "slarmoosbox" }, "Slarmoo's Box"), option$8({ value: "lemmbox dark" }, "LemmBox Dark")), optgroup$1({ label: "Miscellaneous Themes" }, option$8({ value: "azur lane" }, "Azur Lane"), option$8({ value: "AWeebyssBox" }, "AWeebyssBox"), option$8({ value: "Deuteranopia" }, "Deuteranopia"), option$8({ value: "Protanopia" }, "Protanopia"), option$8({ value: "Tritanopia" }, "Tritanopia"), option$8({ value: "2012 Video Tutorial" }, "2012 Video Tutorial"), option$8({ value: "I am on fire" }, "I am on fire"), option$8({ value: "custom" }, "Custom")));
             this._cancelButton = button$b({ class: "cancelButton" });
             this._okayButton = button$b({ class: "okayButton", style: "width:45%;" }, "Okay");
             this.lastTheme = window.localStorage.getItem("colorTheme");
@@ -59276,7 +60428,7 @@ You should be redirected to the song at:<br /><br />
 
     const t={id:"",classname:"",theme:"light",parent:"",toggle:!0,popover:!0,position:"bottom-start",margin:4,preset:!0,color:"#000",default:"#000",target:"",disabled:!1,format:"rgb",singleInput:!1,inputs:!0,opacity:!0,preview:!0,copy:!0,swatches:[],toggleSwatches:!1,closeOnScroll:!1,i18n:{picker:"Color picker",buttons:{copy:"Copy color to clipboard",changeFormat:"Change color format",swatch:"Color swatch: %label%",toggleSwatches:"Toggle Swatches"},sliders:{hue:"Change hue",alpha:"Change opacity"}}},e=document,s=e.documentElement,r="#000000",o="button",a$1="open",n="close",l="color",i="click",h="pointerdown",c="pointermove",p$4="pointerup",g="scroll",u="keydown",d="input",_="change",w="rgb",b="hsl",v={capture:!0},f=["hex",w,b],y=t=>"string"==typeof t,m=t=>t instanceof Element,$$1=t=>Number.isFinite(y(t)&&""!==t.trim()?+t:t),{keys:x,assign:A,setPrototypeOf:S,prototype:k}=Object,{isArray:C}=Array,H=t=>null!=t&&"object"==typeof t&&!C(t)&&!m(t),O=(t,e)=>x(t).forEach((s=>e(s,t[s]))),V=(t,e)=>(O(e,((e,s)=>{A(t,{[e]:H(s)?V(t[e]||{},s):s});})),t),L=()=>e.body,M=(t,e=s)=>y(t)&&t.trim()?[...e.querySelectorAll(t)]:m(t)?[t]:[],z=t=>M(`${d},${o},[tabindex]`,t),B=(t,s,r,o={},a)=>{const n=e.createElement(t);return s&&(n.className=s.trim()),r&&(y(r)?n.innerHTML=r:n.append(...(C(r)?r:[r]).filter((t=>!!t)))),O(y(a)?{...o,"aria-label":a}:o,((t,e)=>n.setAttribute(t,e+""))),n},E=(t,e,s)=>B("div",e,t,{},s),I=(t,e)=>(t&&t!==e&&t.replaceWith(e),e),j=(t="",e="",s,r=t)=>B(o,"alwan__button "+e,s,{type:o,title:r},t),D=(t,e,s,r=1)=>B(d,"alwan__slider alwan__"+e,"",{type:"range",max:s,step:r},t),F=(t,e)=>t.style.setProperty("--color",e),N=(t,e,s)=>t.classList.toggle("alwan--"+e,s),P=(t,e,s)=>{t.style.transform=`translate(${e}px,${s}px)`;},R=t=>{const{x:e,y:s,width:r,height:o}=t.getBoundingClientRect();return [e,s,r,o,r+e,o+s]},T=t=>E(t,"alwan__container"),Z=(t,e)=>t.style.display=e?"none":"",K=(t,e,s,r)=>t.addEventListener(e,s,r),U=(t,e,s)=>t.removeEventListener(e,s),q=(t,e=w)=>e?e+(e===w?`(${t.r}, ${t.g}, ${t.b}`:`(${t.h}, ${t.s}%, ${t.l}%`)+(t.a<1?`, ${t.a})`:")"):r,{min:G,max:J,abs:Q,round:W,PI:X}=Math,Y=(t,e=100,s=0)=>t>e?e:t<s?s:t,tt=t=>W((t%=360)<0?t+360:t),et=t=>parseInt(t,16),st=t=>{let e,s,{config:r,s:o}=t,a=!1;const n=()=>{const t={};a||(o.t(),a=!0),O(e,((e,s)=>t[e]=s.value)),o.o(t[s]||q(t,s),!0);},l=()=>{e={};const t="hex"===s||r.singleInput?[s]:[...s+(r.opacity?"a":"")];return E(t.map((t=>B("label","",[e[t]=B(d,"alwan__input",[],{type:"text",value:o.i[t]}),B("span","",t)]))),"alwan__inputs")};return {p({inputs:e,format:r,i18n:h}){let c,p,g,w,b=f;return !0!==e&&(e=e||{},b=b.filter((t=>e[t]))),w=b.length,b=w?b:f,s=b[J(b.indexOf(r),0)],o.u(s),w?(w>1&&(g=j(h.buttons.changeFormat,"",'<svg width="15" height="15" viewBox="0 0 20 20" aria-role="none"><path d="M10 1L5 8h10l-5-7zm0 18l5-7H5l5 7z"></path></svg>'),K(g,i,(()=>{s=b[(b.indexOf(s)+1)%w],o.u(s),c=I(c,l());}))),c=l(),p=E(c),K(p,d,n),K(p,_,(()=>{o._(),a=!1;})),K(p,"focusin",(t=>t.target.select())),K(p,u,(e=>"Enter"===e.key&&t.c.v(!1))),T([p,g])):null},m(t){a||O(e||{},((e,s)=>s.value=t[e]+""));}}},rt={ArrowLeft:-1,ArrowRight:1},ot={ArrowUp:-1,ArrowDown:1},at=({s:t})=>{let s,r,o,a,n;const l={s:0,l:0},i=(e,s)=>{let i,h,[,,c,p]=n;o=e=Y(e,c),a=s=Y(s,p),P(r,e,s),i=1-s/p,h=i*(1-e/(2*c)),l.s=1===h||0===h?0:(i-h)/G(h,1-h)*100,l.l=100*h,t.$(l);},g=({x:t,y:e,buttons:s})=>{s?i(t-n[0],e-n[1]):d();},d=()=>{t._(),U(e,c,g),U(e,p$4,d);},_=r=>{s.setPointerCapture(r.pointerId),t.t(),n=R(s),i(r.x-n[0],r.y-n[1]),K(e,c,g),K(e,p$4,d);},w=e=>{const r=e.key,l=rt[r]||0,h=ot[r]||0;(l||h)&&(e.preventDefault(),n=R(s),t.t(),i(o+l*n[2]/100,a+h*n[3]/100),t._());};return {p:({i18n:t,disabled:e})=>(r=E("","alwan__cursor"),s=E(r,"alwan__selector",t.picker||t.palette),e||(s.tabIndex=0,K(s,h,_),K(s,u,w)),s),A(t,e){t=(e/=100)+t/100*G(e,1-e),n=R(s),o=(t?2*(1-e/t):0)*n[2],a=(1-t)*n[3],P(r,o,a);}}},nt=({s:t,e:e})=>{let s,r,o;return {p:({opacity:a,i18n:{sliders:n}})=>(s=D(n.hue,"hue",360),r=a?D(n.alpha,"alpha",1,.01):null,o=E([s,r]),K(o,_,(()=>e.S(_))),K(o,d,(({target:e})=>t.$({[e===s?"h":"a"]:e.value}))),o),m(t,e){s.value=t+"",r&&(r.value=e+"");}}},lt=t=>(t<16?"0":"")+t.toString(16),it=(t,e,s)=>(t%=12,W(255*(s-e*G(s,1-s)*J(-1,G(t-3,9-t,1))))),ht=B("canvas").getContext("2d"),ct={turn:360,rad:180/X,grad:.9},pt=/a?\(\s*([+-]?\d*\.?\d+)(\w*)?\s*[\s,]\s*([+-]?\d*\.?\d+)%?\s*,?\s*([+-]?\d*\.?\d+)%?(?:\s*[\/,]\s*([+-]?\d*\.?\d+)(%)?)?\s*\)?$/,gt=t=>y(t)?t:q(t,(t=>H(t)&&[b,w].find((e=>[...e].every((e=>$$1(t[e])))))||"")(t)),ut=t=>(ht.fillStyle=r,ht.fillStyle=t,ht.fillStyle),dt=(t,e)=>{let s,r,o=gt(t).trim();if(/^hsl/.test(o)){const[t,e,s,a,n,l="1",i]=pt.exec(o)||[];t&&(r={h:tt(+e*(ct[s]||1)),s:Y(+a),l:Y(+n),a:Y(+l/(i?100:1),1)});}if(!r){if(/^[\da-f]+$/i.test(o)&&(o="#"+o),o=ut(o),"#"===o[0])s={r:et(o[1]+o[2]),g:et(o[3]+o[4]),b:et(o[5]+o[6]),a:1};else {const[t,e,r,a]=o.match(/[\d\.]+/g).map(Number);s={r:t,g:e,b:r,a:a};}r=(({r:t,g:e,b:s,a:r})=>{const o=J(t/=255,e/=255,s/=255),a=G(t,e,s),n=o-a,l=(o+a)/2;return {h:tt(60*(0===n?0:o===t?(e-s)/n%6:o===e?(s-t)/n+2:o===s?(t-e)/n+4:0)),s:n?n/(1-Q(2*l-1))*100:0,l:100*l,a:r}})(s);}return r.a=e?W(100*r.a)/100:1,s&&(s.a=r.a),[r,s]},_t=t=>{let e=!1;const s=(e,s)=>{let o,a,n,l;var h;return H(h=e)&&"color"in h?({color:a,label:l}=e):a=e,n=gt(a),n=ut(n)===r?r:n,l=y(l)?l:n,o=j(s.replace("%label%",l),"alwan__swatch","",l),F(o,n),K(o,i,(()=>t.s.o(n,!0,!0))),o};return {p({swatches:r,toggleSwatches:o,i18n:{buttons:a}}){let n,l,h;return C(r)&&r.length?(n=E(r.map((t=>s(t,a.swatch))),"alwan__swatches"),o?(h=(s=!e)=>{e=s,N(n,"collapse",e),t.c.k();},l=j(a.toggleSwatches,"alwan__toggle-button",'<svg width="20" height="20" viewBox="0 0 24 24" aria-role="none"><path d="M6.984 14.016l5.016-5.016 5.016 5.016h-10.031z"></path></svg>'),K(l,i,(()=>h())),h(e),E([n,l])):n):n}}},wt=t=>({p({preview:e,copy:s,i18n:r}){let o,a,n,l,h;return s&&(o=j(r.buttons.copy,"alwan__cp",'<svg width="18" height="18" viewBox="0 0 24 24" aria-role="none"><path d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg width="18" height="18" viewBox="0 0 24 24" aria-role="none"><path d="M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z"></path></svg>'),[n,l]=o.children,a=t=>{Z(n,t),Z(l,!t);},a(!1),h=navigator.clipboard,h&&(K(o,i,(()=>h.writeText(t.s.C()).then((()=>a(!0))))),K(o,"blur",(()=>a())),K(o,"mouseleave",(()=>o.blur())))),e?E(o,"alwan__preview"):o}}),bt=(t,e)=>t.map((t=>C(t)?T(bt(t,e)):t.p(e))),vt={top:[1,5,4,0],bottom:[5,1,4,0],right:[4,0,1,5],left:[0,4,1,5]},ft={start:[0,1,2],center:[1,0,2],end:[2,1,0]},yt=(t,r)=>{let o,l,c=E(),p=!1,d=null;const{config:_,s:w}=t,b=((t,e)=>{const s=j(),r=s.className+" alwan__ref ";let o;return t&&t.id&&(s.id=t.id),{H:a=>(o=I(o||t,a.preset||!t?s:t),o===s&&(o.className=(r+a.classname).trim(),o.parentNode||L().append(o)),K(o,i,e),o),O(){t?(U(t,i,e),I(o,t)):o.remove();}}})(r,(()=>t.toggle())),f=E(c,"alwan"),[m,x,A,S,k]=(t=>[at,wt,nt,st,_t].map((e=>e(t))))(t);return w.V((t=>{F(o,t.rgb),c.style.cssText=`--rgb:${t.r},${t.g},${t.b};--a:${t.a};--h:${t.h}`,S.m(t);}),(({a:t,h:e,s:s,l:r})=>{A.m(e,t),m.A(s,r);})),{L(t){const r=this,{id:a,color:n=w.i.hsl}=t,{theme:i,parent:C,toggle:H,popover:O,target:B,disabled:j}=V(_,t);o=b.H(_);let D=M(C)[0],F=M(B)[0]||o;a&&(f.id=a),N(f,"dark","dark"===i),c=I(c,E(bt([m,[x,A],S,k],_))),Z(o,!O&&!H),d&&(d.M(),d=null),O?(D=D||H&&L(),l=E(f,"alwan__popover-container"),d=((t,r,o,a,{margin:n,position:l,closeOnScroll:i,toggle:c,disabled:p},{v:d,B:_})=>{let w;n=$$1(n)?+n:0;let b=_();const[f,m]=y(l)?l.split("-"):[],x=r.style,A=t.getRootNode(),S=z(r),k=S[0],C=S.pop(),H=()=>{const e=[s.clientWidth,s.clientHeight],a=R(t),l=R(r),i=R(o),h=[-1,-1];x.height="",!b||!w||a[4]<0||a[5]<0||a[0]>e[0]||a[1]>e[1]||((vt[f]||vt.bottom).some((t=>{let s=t%2,r=a[t]+(t<=1?-l[s+2]-n:n);return !(r<0||r+l[s+2]+n>e[s])&&(h[s]=r,s=+!s,(ft[m]||ft.center).some((t=>(r=0===t?a[s]:a[s+4]-(2===t?l[s+2]:(l[s+2]+a[s+2])/2),!(r<0||r+l[s+2]>e[s]||(h[s]=r,0))))))})),P(r,...h.map(((t,s)=>(s&&-1===t&&l[3]>e[s]&&(x.height=e[s]-6+"px",l[3]=e[s]-3),W((t>=0?t:(e[s]-l[s+2])/2)-i[s]))))));};c&&K(r,u,(t=>{let e,{key:s,target:r,shiftKey:o}=t;"Escape"===s?d(!1):"Tab"===s&&(r===k&&o?e=C:r!==C||o||(e=k),e&&(e.focus(),t.preventDefault()));}));const O=[r,a,...a.labels||[]],V=t=>{const e=t.composedPath();b&&!O.some((t=>e.includes(t)))&&d(!1);},L=new IntersectionObserver((([t])=>{w=t.isIntersecting,d(!p&&w&&(!c||b),!0);})),M=({target:e})=>{(A instanceof ShadowRoot&&e.contains(A.host)||e.contains(t))&&(H(),i&&d(!1));},B=t=>{t(window,"resize",H),t(e,g,M,v),t(A,g,M,v),t(e,h,V);};return L.observe(t),B(K),{I:()=>w,k(t,e){b=t,w&&(H(),c&&e!==t&&(t?k:a).focus());},M(){x.cssText="",L.unobserve(t),B(U),o.remove();}}})(F,f,l,o,_,r)):(l=f,r.v(!H||!j&&p,!0)),D?D.append(l):F.after(l),j&&[o,...z(f)].forEach((t=>{t.disabled=!0;})),w.o(n);},v(e=!p,s=!1){(e!==p&&(!d||d.I())&&!_.disabled&&_.toggle||s)&&(N(f,a$1,e),d&&d.k(e,p),p=e,t.e.S(p?a$1:n));},B:()=>p,k(){d&&d.k(p,p);},M(){f.remove(),d&&d.M(),b.O();}}},mt=t=>{const e={h:0,s:0,l:0,r:0,g:0,b:0,a:1,rgb:"",hsl:"",hex:""},s=t.config,r=t.e.S;let o,a,n,i;return {i:e,C:()=>e[n],V(t,e){o=t,a=e;},u(t){n=s.format=t;},$(t,s,a=!0,n){const i=e.hex;A(e,t),A(e,s||(({h:t,s:e,l:s,a:r})=>({r:it(t/=30,e/=100,s/=100),g:it(t+8,e,s),b:it(t+4,e,s),a:r}))(e)),e.s=W(e.s),e.l=W(e.l),e.rgb=q(e),e.hsl=q(e,b),e.hex=(({r:t,g:e,b:s,a:r})=>"#"+lt(t)+lt(e)+lt(s)+(r<1?lt(W(255*r)):""))(e),o(e),i!==e.hex&&(a&&r(l,e),n&&r(_,e));},o(t,r=!1,o){this.$(...dt(t,s.opacity),r,o),a(e);},t(){i=e[n];},_(){i!==e[n]&&r(_,e);}}};class $t{static version(){return "2.3.0"}static setDefaults(e){V(t,e);}constructor(e,s){this.config=V({},t),this.e=(t=>{const e={[a$1]:[],[n]:[],[_]:[],[l]:[]};return {S(s,r=t.s.i){(e[s]||[]).forEach((e=>e(A({type:s,source:t},r))));},j(t,s){s&&!(e[t]||[]).includes(s)&&e[t].push(s);},D(t,s){t?e[t]&&(e[t]=s?e[t].filter((t=>t!==s)):[]):O(e,(t=>{e[t]=[];}));}}})(this),this.s=mt(this),this.c=yt(this,M(e)[0]),this.c.L(s||{});}setOptions(t){t&&this.c.L(t);}setColor(t){return this.s.o(t),this}getColor(){return {...this.s.i}}isOpen(){return this.c.B()}open(){this.c.v(!0);}close(){this.c.v(!1);}toggle(){this.c.v();}on(t,e){this.e.j(t,e);}off(t,e){this.e.D(t,e);}addSwatches(...t){this.c.L({swatches:this.config.swatches.concat(t)});}removeSwatches(...t){this.c.L({swatches:this.config.swatches.filter(((e,s)=>!t.some((t=>$$1(t)?+t===s:t===e))))});}enable(){this.c.L({disabled:!1});}disable(){this.c.L({disabled:!0});}reset(){this.s.o(this.config.default);}reposition(){this.c.k();}trigger(t){this.e.S(t);}destroy(){this.c.M(),O(this,(t=>{this[t]=null;})),S(this,k);}}
 
-    const { button: button$a, div: div$a, h2: h2$9, input: input$6, p: p$3, option: option$6, select: select$6 } = HTML;
+    const { button: button$a, div: div$a, h2: h2$9, input: input$6, p: p$3, option: option$7, select: select$7 } = HTML;
     const opacityValue = "1";
     const longText = `:root {
 	--page-margin: black;
@@ -59431,18 +60583,18 @@ You should be redirected to the song at:<br /><br />
             this._currentThemeProperty = "--page-margin";
             this._fileInput = input$6({ type: "file", accept: ".png,.jpg,.jpeg,.gif", text: "choose editor background image" });
             this._fileInput2 = input$6({ type: "file", accept: ".png,.jpg,.jpeg,.gif", text: "choose website background image" });
-            this._advancedSettings = select$6({ style: "width: 100%; margin-top: 1.5em; margin-bottom: 1.5em;" }, option$6({ value: "basic" }, "Templates"), option$6({ value: "editor" }, "Editor"), option$6({ value: "css" }, "Import/Export"));
+            this._advancedSettings = select$7({ style: "width: 100%; margin-top: 1.5em; margin-bottom: 1.5em;" }, option$7({ value: "basic" }, "Templates"), option$7({ value: "editor" }, "Editor"), option$7({ value: "css" }, "Import/Export"));
             this._basicCatagoryButton = button$a({ style: "border-image-source: none !important; height: auto; min-height: var(--button-size); margin: 0.5em; width: 34%; border-bottom: solid; border-bottom-color: var(--link-accent);" }, "Templates");
             this._editorCatagoryButton = button$a({ style: "border-image-source: none !important; height: auto; min-height: var(--button-size); margin: 0.5em; width:34%; color: var(--secondary-text);" }, "Editor");
             this._cssCatagoryButton = button$a({ style: "border-image-source: none !important; height: auto; min-height: var(--button-size); margin: 0.5em; width:34%; color: var(--secondary-text);" }, "Import/Export");
-            this._fullThemeSelect = select$6({ style: "width: 100%;", id: "themeSelect" }, option$6({ selected: true, disabled: true, hidden: false }, "Pick a Base Theme"), option$6({ value: "AbyssBox Classic" }, "AbyssBox Classic"), option$6({ value: "AbyssBox Competitive" }, "AbyssBox Competitive"), option$6({ value: "AbyssBox Light" }, "AbyssBox Light"), option$6({ value: "AbyssBox 0.8" }, "AbyssBox 0.8"), option$6({ value: "AbyssBox Piano" }, "AbyssBox Piano"), option$6({ value: "Half-Life" }, "Half-Life"), option$6({ value: "Half-Life: Source" }, "Half-Life: Source"), option$6({ value: "Doom 1993" }, "Doom 1993"), option$6({ value: "Undertale" }, "Undertale"), option$6({ value: "Yume Nikki" }, "Yume Nikki [!]"), option$6({ value: "Scratch" }, "Scratch"), option$6({ value: "Scratch Addons" }, "Scratch Addons"), option$6({ value: "Windows Xp" }, "Windows Xp"), option$6({ value: "Frutiger Aero" }, "Frutiger Aero"), option$6({ value: "Frutiger Aero Night" }, "Frutiger Aero Night"), option$6({ value: "Skeuomorphic" }, "Skeuomorphic/Early 2000's (LeoV)"), option$6({ value: "woodland" }, "Woodland"), option$6({ value: "corporate dark" }, "Corporate Dark"), option$6({ value: "corporate light" }, "Corporate Light"), option$6({ value: "Glyde" }, "Glyde"), option$6({ value: "starry studio" }, "Starry Studio"), option$6({ value: "Terminal 2.0 (AB)" }, "Terminal 2.0 (AB)"), option$6({ value: "Slushie" }, "Slushie"), option$6({ value: "Slushie Pixel" }, "Slushie 2"), option$6({ value: "dark classic" }, "BeepBox Dark"), option$6({ value: "light classic" }, "BeepBox Light"), option$6({ value: "dark competition" }, "BeepBox Competition Dark"), option$6({ value: "BeepBox Pixel" }, "BeepBox Pixel"), option$6({ value: "jummbox classic" }, "JummBox Dark"), option$6({ value: "jummbox light" }, "JummBox Light"), option$6({ value: "gold light" }, "Gold Light"), option$6({ value: "forest" }, "Forest"), option$6({ value: "forest 2" }, "Forest 2"), option$6({ value: "canyon" }, "Canyon"), option$6({ value: "canyon 2" }, "Canyon 2"), option$6({ value: "midnight" }, "Midnight"), option$6({ value: "beachcombing" }, "Beachcombing"), option$6({ value: "violet verdant" }, "Violet Verdant"), option$6({ value: "sunset" }, "Sunset"), option$6({ value: "autumn" }, "Autumn"), option$6({ value: "fruit" }, "Shadowfruit"), option$6({ value: "toxic" }, "Toxic"), option$6({ value: "roe" }, "Roe"), option$6({ value: "moonlight" }, "Moonlight"), option$6({ value: "portal" }, "Portal"), option$6({ value: "fusion" }, "Fusion"), option$6({ value: "inverse" }, "Inverse"), option$6({ value: "nebula" }, "Nebula"), option$6({ value: "Nebula 2" }, "Nebula 2"), option$6({ value: "roe light" }, "Roe Light"), option$6({ value: "amoled dark" }, "High Contrast Dark"), option$6({ value: "energized" }, "Energized"), option$6({ value: "neapolitan" }, "Neapolitan"), option$6({ value: "mono" }, "Poly"), option$6({ value: "blutonium" }, "Blutonium"), option$6({ value: "modbox classic" }, "Modbox"), option$6({ value: "modbox 2" }, "Modbox 2.0"), option$6({ value: "modbox artic" }, "Artic"), option$6({ value: "modbox cinnamon" }, "Cinnamon Roll [!]"), option$6({ value: "modbox ocean" }, "Ocean"), option$6({ value: "modbox rainbow" }, "Rainbow [!]"), option$6({ value: "modbox float" }, "Float [!]"), option$6({ value: "modbox windows" }, "Windows"), option$6({ value: "modbox grassland" }, "Grassland"), option$6({ value: "modbox dessert" }, "Dessert"), option$6({ value: "modbox kahoot" }, "Kahootiest"), option$6({ value: "modbox bitbeam" }, "Beam to the Bit [!]"), option$6({ value: "modbox egg" }, "Pretty Egg"), option$6({ value: "modbox pony" }, "Poniryoshka"), option$6({ value: "modbox gameboy" }, "Gameboy [!]"), option$6({ value: "modbox woodkid" }, "Woodkid [!]"), option$6({ value: "modbox midnight" }, "Midnight [!]"), option$6({ value: "modbox snedbox" }, "Snedbox"), option$6({ value: "modbox unnamed" }, "unnamed [!]"), option$6({ value: "modbox piano" }, "Piano [!]"), option$6({ value: "modbox halloween" }, "Halloween [!]"), option$6({ value: "modbox frozen" }, "FrozenOver❄️ [!]"), option$6({ value: "Ghost House" }, "Ghost House"), option$6({ value: "Ghost House 2" }, "Ghost House 2"), option$6({ value: "azur lane" }, "Azur Lane"), option$6({ value: "sandbox classic" }, "Sandbox"), option$6({ value: "harrybox" }, "Haileybox"), option$6({ value: "brucebox" }, "Brucebox"), option$6({ value: "shitbox 1.0" }, "Shitbox 1.0"), option$6({ value: "shitbox 2.0" }, "Shitbox 2.0"), option$6({ value: "shitbox 3.0" }, "Shitbox 3.0/shitbox4"), option$6({ value: "shitbox ModBox 2.0" }, "Shitbox ModBox 2.0"), option$6({ value: "shitbox Realm" }, "Shitbox Realm [!]"), option$6({ value: "nerdbox" }, "NerdBox"), option$6({ value: "zefbox" }, "Zefbox"), option$6({ value: "cardboardbox classic" }, "Cardboardbox"), option$6({ value: "blubox classic" }, "Blubox"), option$6({ value: "dogebox classic" }, "Dogebox"), option$6({ value: "wackybox" }, "Wackybox"), option$6({ value: "todbox dark mode" }, "Todbox Dark Mode"), option$6({ value: "mainbox 1.0" }, "Mainbox"), option$6({ value: "microbox" }, "MicroBox"), option$6({ value: "paandorasbox" }, "PaandorasBox"), option$6({ value: "foxbox" }, "FoxBox"), option$6({ value: "midbox" }, "Midbox"), option$6({ value: "dogebox2" }, "Dogebox2"), option$6({ value: "nepbox" }, "Nepbox"), option$6({ value: "nepbox laffey" }, "Laffey"), option$6({ value: "nepbox snedbox" }, "Snedbox (Nb) [!]"), option$6({ value: "nepbox piano" }, "Piano (Nb) [!]"), option$6({ value: "WeebBox" }, "WeebBox"), option$6({ value: "BoxBeep Dark" }, "BoxBeep Dark"), option$6({ value: "BoxBeep light" }, "BoxBeep Light"), option$6({ value: "AWeebyssBox" }, "AWeebyssBox"), option$6({ value: "Deuteranopia" }, "Deuteranopia"), option$6({ value: "Protanopia" }, "Protanopia"), option$6({ value: "Tritanopia" }, "Tritanopia"), option$6({ value: "2012 Video Tutorial" }, "2012 Video Tutorial"), option$6({ value: "I am on fire" }, "I am on fire"), option$6({ value: "custom" }, "Custom"));
-            this._baseColorSelect = select$6({ style: "width: 100%; display:none; margin: 0.5em 0;", id: "baseColorSelect" }, option$6({ selected: true, disabled: true, hidden: false }, "Pick a Base Color Palette"), option$6({ value: "AbyssBox Classic" }, "AbyssBox Classic"), option$6({ value: "AbyssBox Competitive" }, "AbyssBox Competitive"), option$6({ value: "AbyssBox Light" }, "AbyssBox Light"), option$6({ value: "Half-Life" }, "Half-Life"), option$6({ value: "Doom 1993" }, "Doom 1993"), option$6({ value: "Undertale" }, "Undertale"), option$6({ value: "Yume Nikki" }, "Yume Nikki [!]"), option$6({ value: "Scratch" }, "Scratch"), option$6({ value: "Scratch Addons" }, "Scratch Addons"), option$6({ value: "Windows Xp" }, "Windows Xp"), option$6({ value: "Frutiger Aero" }, "Frutiger Aero"), option$6({ value: "Skeuomorphic" }, "Skeuomorphic/Early 2000's (LeoV)"), option$6({ value: "corporate dark" }, "Corporate Dark"), option$6({ value: "corporate light" }, "Corporate Light"), option$6({ value: "Glyde" }, "Glyde"), option$6({ value: "starry studio" }, "Starry Studio"), option$6({ value: "Terminal 2.0 (AB)" }, "Terminal 2.0 (AB)"), option$6({ value: "Slushie" }, "Slushie"), option$6({ value: "dark classic" }, "BeepBox Dark"), option$6({ value: "light classic" }, "BeepBox Light"), option$6({ value: "dark competition" }, "BeepBox Competition Dark"), option$6({ value: "jummbox classic" }, "JummBox Dark"), option$6({ value: "jummbox light" }, "JummBox Light"), option$6({ value: "gold light" }, "Gold Light"), option$6({ value: "forest" }, "Forest"), option$6({ value: "forest 2" }, "Forest 2"), option$6({ value: "canyon" }, "Canyon"), option$6({ value: "canyon 2" }, "Canyon 2"), option$6({ value: "midnight" }, "Midnight"), option$6({ value: "beachcombing" }, "Beachcombing"), option$6({ value: "violet verdant" }, "Violet Verdant"), option$6({ value: "sunset" }, "Sunset"), option$6({ value: "autumn" }, "Autumn"), option$6({ value: "fruit" }, "Shadowfruit"), option$6({ value: "toxic" }, "Toxic"), option$6({ value: "roe" }, "Roe"), option$6({ value: "moonlight" }, "Moonlight"), option$6({ value: "portal" }, "Portal"), option$6({ value: "fusion" }, "Fusion"), option$6({ value: "inverse" }, "Inverse"), option$6({ value: "nebula" }, "Nebula"), option$6({ value: "Nebula 2" }, "Nebula 2"), option$6({ value: "roe light" }, "Roe Light"), option$6({ value: "amoled dark" }, "High Contrast Dark"), option$6({ value: "energized" }, "Energized"), option$6({ value: "neapolitan" }, "Neapolitan"), option$6({ value: "mono" }, "Poly"), option$6({ value: "blutonium" }, "Blutonium"), option$6({ value: "modbox classic" }, "Modbox"), option$6({ value: "modbox 2" }, "Modbox 2.0"), option$6({ value: "modbox artic" }, "Artic"), option$6({ value: "modbox cinnamon" }, "Cinnamon Roll [!]"), option$6({ value: "modbox ocean" }, "Ocean"), option$6({ value: "modbox rainbow" }, "Rainbow [!]"), option$6({ value: "modbox float" }, "Float [!]"), option$6({ value: "modbox windows" }, "Windows"), option$6({ value: "modbox grassland" }, "Grassland"), option$6({ value: "modbox dessert" }, "Dessert"), option$6({ value: "modbox kahoot" }, "Kahootiest"), option$6({ value: "modbox bitbeam" }, "Beam to the Bit [!]"), option$6({ value: "modbox egg" }, "Pretty Egg"), option$6({ value: "modbox pony" }, "Poniryoshka"), option$6({ value: "modbox gameboy" }, "Gameboy [!]"), option$6({ value: "modbox woodkid" }, "Woodkid [!]"), option$6({ value: "modbox midnight" }, "Midnight [!]"), option$6({ value: "modbox snedbox" }, "Snedbox"), option$6({ value: "modbox unnamed" }, "unnamed [!]"), option$6({ value: "modbox piano" }, "Piano [!]"), option$6({ value: "modbox halloween" }, "Halloween [!]"), option$6({ value: "modbox frozen" }, "FrozenOver❄️ [!]"), option$6({ value: "Ghost House" }, "Ghost House"), option$6({ value: "azur lane" }, "Azur Lane"), option$6({ value: "modbox classic" }, "Modbox"), option$6({ value: "sandbox classic" }, "Sandbox"), option$6({ value: "harrybox" }, "Haileybox"), option$6({ value: "brucebox" }, "Brucebox"), option$6({ value: "shitbox 3.0" }, "Shitbox 1.0/3.0"), option$6({ value: "shitbox 2.0" }, "Shitbox 2.0"), option$6({ value: "nerdbox" }, "NerdBox"), option$6({ value: "zefbox" }, "Zefbox"), option$6({ value: "cardboardbox classic" }, "Cardboardbox"), option$6({ value: "blubox classic" }, "Blubox"), option$6({ value: "dogebox classic" }, "Dogebox"), option$6({ value: "wackybox" }, "Wackybox"), option$6({ value: "todbox dark mode" }, "Todbox Dark Mode"), option$6({ value: "mainbox 1.0" }, "Mainbox"), option$6({ value: "microbox" }, "MicroBox"), option$6({ value: "paandorasbox" }, "PaandorasBox"), option$6({ value: "foxbox" }, "FoxBox"), option$6({ value: "midbox" }, "Midbox"), option$6({ value: "dogebox2" }, "Dogebox2"), option$6({ value: "nepbox" }, "Nepbox"), option$6({ value: "BoxBeep Dark" }, "BoxBeep Dark"), option$6({ value: "BoxBeep light" }, "BoxBeep Light"), option$6({ value: "birdbox dark" }, "BirdBox Dark"), option$6({ value: "birdbox light" }, "BirdBox Light"), option$6({ value: "ultrabox dark" }, "UltraBox"), option$6({ value: "slarmoosbox" }, "Slarmoo's Box"), option$6({ value: "lemmbox dark" }, "LemmBox Dark"), option$6({ value: "Deuteranopia" }, "Deuteranopia"), option$6({ value: "Protanopia" }, "Protanopia"), option$6({ value: "Tritanopia" }, "Tritanopia"), option$6({ value: "custom" }, "Custom"));
-            this._backgroundSelect = select$6({ style: "width: 100%; display:none; margin: 0.5em 0;", id: "backgroundSelect" }, option$6({ selected: true, disabled: true, hidden: false }, "Pick a Background"), option$6({ value: "none" }, "None"), option$6({ value: "AbyssBox Classic" }, "AbyssBox Classic"), option$6({ value: "AbyssBox Light" }, "AbyssBox Light"), option$6({ value: "Undertale" }, "Undertale"), option$6({ value: "Windows Xp" }, "Windows Xp"), option$6({ value: "Frutiger Aero" }, "Frutiger Aero"), option$6({ value: "Skeuomorphic" }, "Skeuomorphic/Early 2000's (LeoV)"), option$6({ value: "Glyde" }, "Glyde"), option$6({ value: "starry studio" }, "Starry Studio"), option$6({ value: "Slushie 2" }, "Slushie 2"), option$6({ value: "BeepBox Pixel" }, "BeepBox Pixel"), option$6({ value: "Forest 2" }, "Forest 2"), option$6({ value: "Canyon 2" }, "Canyon 2"), option$6({ value: "Nebula 2" }, "Nebula 2"), option$6({ value: "Ghost House 2" }, "Ghost House 2"), option$6({ value: "azur lane" }, "Azur Lane"));
-            this._borderSelect = select$6({ style: "width: 100%; display:none; margin: 0.5em 0;", id: "borderSelect" }, option$6({ selected: true, disabled: true, hidden: false }, "Pick a Border"), option$6({ value: "none" }, "None"), option$6({ value: "AbyssBox Classic" }, "AbyssBox Classic"), option$6({ value: "AbyssBox Competitive" }, "AbyssBox Competitive"), option$6({ value: "AbyssBox Light" }, "AbyssBox Light"), option$6({ value: "Scratch" }, "Scratch"), option$6({ value: "Scratch Addons" }, "Scratch Addons"), option$6({ value: "Undertale" }, "Undertale"), option$6({ value: "Windows Xp" }, "Windows Xp"), option$6({ value: "Frutiger Aero" }, "Frutiger Aero"), option$6({ value: "Skeuomorphic" }, "Skeuomorphic/Early 2000's (LeoV)"), option$6({ value: "Glyde" }, "Glyde"), option$6({ value: "Slushie 2" }, "Slushie 2"), option$6({ value: "BeepBox Pixel" }, "BeepBox Pixel"), option$6({ value: "Forest 2" }, "Forest 2"), option$6({ value: "Canyon 2" }, "Canyon 2"), option$6({ value: "Nebula 2" }, "Nebula 2"), option$6({ value: "Ghost House 2" }, "Ghost House 2"));
-            this._overlaySelect = select$6({ style: "width: 100%; display:none; margin: 0.5em 0;", id: "overlaySelect" }, option$6({ selected: true, disabled: true, hidden: false }, "Pick an Overlay"), option$6({ value: "none" }, "None"), option$6({ value: "scanlines" }, "Scanlines"), option$6({ value: "bandicam" }, "Bandicam"), option$6({ value: "fire" }, "Fire"), option$6({ value: "invert" }, "Screen Color Inversion"), option$6({ value: "480p" }, '"Low Quality" Blur (Mimics 480p)'), option$6({ value: "contrast" }, 'High Contrast'), option$6({ value: "Sepia" }, 'Sepia'), option$6({ value: "grayscale" }, 'Grayscale/Black and White'));
-            this._iconSelect = select$6({ style: "width: 100%; display:none; margin: 0.5em 0;", id: "iconSelect" }, option$6({ selected: true, disabled: true, hidden: false }, "Pick icons"), option$6({ value: "none" }, "Default"), option$6({ value: "AbyssBox Classic" }, "AbyssBox"), option$6({ value: "Scratch" }, "Scratch"), option$6({ value: "Windows Xp" }, "Windows Xp"), option$6({ value: "Frutiger Aero" }, "Frutiger Aero"));
-            this._cursorSelect = select$6({ style: "width: 100%; margin: 1em 0;", id: "cursorSelect" }, option$6({ selected: true, disabled: true, hidden: false }, "Pick a Cursor"), option$6({ value: "none" }, "Default"), option$6({ value: "My Abyss" }, "My Abyss"), option$6({ value: "Retro" }, "Retro"), option$6({ value: "Ghost House 2" }, "Ghost House"), option$6({ value: "Slushie 2" }, "Slushie 2"), option$6({ value: "Windows Xp" }, "Windows Xp"), option$6({ value: "WackyBox" }, "WackyBox"), option$6({ value: "Azur Lane" }, "Azur Lane"));
-            this._colorMenu = select$6({ style: "width: 100%;" }, option$6({ selected: true, disabled: true, hidden: false }, "Select an asset to change"), option$6({ selected: false, disabled: true, hidden: false }, "General Items"), option$6({ value: "--page-margin" }, "Page Margin"), option$6({ value: "--editor-background" }, "Editor Background"), option$6({ value: "--primary-text" }, "Primary Text"), option$6({ value: "--secondary-text" }, "Secondary Text"), option$6({ value: "--inverted-text" }, "Inverted Text"), option$6({ value: "--loop-accent" }, "Loop Accent"), option$6({ value: "--link-accent" }, "Link Accent"), option$6({ value: "--ui-widget-background" }, "UI Widget Background"), option$6({ value: "--ui-widget-focus" }, "UI Widget Focus"), option$6({ value: "--white-piano-key" }, "White Piano Key"), option$6({ value: "--black-piano-key" }, "Black Piano Key"), option$6({ value: "--white-piano-key-text" }, "White Piano Key Text"), option$6({ value: "--black-piano-key-text" }, "Black Piano Key Text"), option$6({ selected: false, disabled: true, hidden: false }, "Pitch Backgrounds"), option$6({ value: "--pitch-background" }, "Pitch Background"), option$6({ value: "--tonic" }, "Tonic"), option$6({ value: "--pitch1-background" }, "1st Pitch Background [!]"), option$6({ value: "--pitch2-background" }, "2nd Pitch Background [!]"), option$6({ value: "--pitch3-background" }, "3rd Pitch Background [!]"), option$6({ value: "--third-note" }, "Third note"), option$6({ value: "--pitch5-background" }, "5th Pitch Background [!]"), option$6({ value: "--pitch6-background" }, "6th Pitch Background [!]"), option$6({ value: "--fifth-note" }, "Fifth note"), option$6({ value: "--pitch8-background" }, "8th Pitch Background [!]"), option$6({ value: "--pitch9-background" }, "9th Pitch Background [!]"), option$6({ value: "--pitch10-background" }, "10th Pitch Background [!]"), option$6({ value: "--pitch11-background" }, "11th Pitch Background [!]"), option$6({ selected: false, disabled: true, hidden: false }, "Track Editor Backgrounds"), option$6({ value: "--track-editor-bg-pitch" }, "Track Editor Pitch BG"), option$6({ value: "--track-editor-bg-pitch-dim" }, "Empty Track Editor Pitch BG"), option$6({ value: "--track-editor-bg-noise" }, "Track Editor Noise BG"), option$6({ value: "--track-editor-bg-noise-dim" }, "Empty Track Editor Noise BG"), option$6({ value: "--track-editor-bg-mod" }, "Track Editor Mod BG"), option$6({ value: "--track-editor-bg-mod-dim" }, "Empty Track Editor Mod BG"), option$6({ selected: false, disabled: true, hidden: false }, "Extras"), option$6({ value: "--multiplicative-mod-slider" }, "Multiplicative Mod Slider"), option$6({ value: "--overwriting-mod-slider" }, "Overwriting Mod Slider"), option$6({ value: "--indicator-primary" }, "Primary Indicator"), option$6({ value: "--indicator-secondary" }, "Secondary Indicator"), option$6({ value: "--select2-opt-group" }, "Preset Catagory Background"), option$6({ value: "--input-box-outline" }, "Input Box Outline"), option$6({ value: "--mute-button-normal" }, "Mute Button (Normal)"), option$6({ value: "--mute-button-mod" }, "Mute Button (Mod)"), option$6({ value: "--mod-label-primary" }, "Mod Label Primary"), option$6({ value: "--mod-label-secondary-text" }, "Mod Label Secondary"), option$6({ value: "--mod-label-primary-text" }, "Mod Label Primary Text"), option$6({ value: "--note-flash" }, "Note Flash"), option$6({ value: "--note-flash-secondary" }, "Note Flash Secondary"), option$6({ value: "--song-player-margin" }, "Song Player Background"), option$6({ value: "--progress-bar" }, "Song Player Progress Bar"), option$6({ value: "--empty-sample-bar" }, "Empty Sample Bar"), option$6({ value: "--octave-scrollbar" }, "Octave Scrollbar"), option$6({ value: "--scrollbar-color" }, "Primary Scrollbar Color"), option$6({ value: "--scrollbar-background" }, "Secondary Scrollbar Color"));
+            this._fullThemeSelect = select$7({ style: "width: 100%;", id: "themeSelect" }, option$7({ selected: true, disabled: true, hidden: false }, "Pick a Base Theme"), option$7({ value: "AbyssBox Classic" }, "AbyssBox Classic"), option$7({ value: "AbyssBox Competitive" }, "AbyssBox Competitive"), option$7({ value: "AbyssBox Light" }, "AbyssBox Light"), option$7({ value: "AbyssBox Piano" }, "AbyssBox Piano [!]"), option$7({ value: "AbyssBox 0.8" }, "AbyssBox 0.8"), option$7({ value: "AbyssBox Comp simple" }, "AbyssBox Competitive (simple)"), option$7({ value: "AbyssBox Light simple" }, "AbyssBox Light (simple)"), option$7({ value: "AbyssBox Piano simple" }, "AbyssBox Piano (simple) [!]"), option$7({ value: "Half-Life" }, "Half-Life"), option$7({ value: "Half-Life: Source" }, "Half-Life: Source"), option$7({ value: "Doom 1993" }, "Doom 1993"), option$7({ value: "Undertale" }, "Undertale"), option$7({ value: "Yume Nikki" }, "Yume Nikki [!]"), option$7({ value: "Scratch" }, "Scratch"), option$7({ value: "Scratch Addons" }, "Scratch Addons"), option$7({ value: "Windows Xp" }, "Windows Xp"), option$7({ value: "Frutiger Aero" }, "Frutiger Aero"), option$7({ value: "Frutiger Aero Night" }, "Frutiger Aero Night"), option$7({ value: "Skeuomorphic" }, "Skeuomorphic/Early 2000's (LeoV)"), option$7({ value: "woodland" }, "Woodland"), option$7({ value: "corporate dark" }, "Corporate Dark"), option$7({ value: "corporate light" }, "Corporate Light"), option$7({ value: "Glyde" }, "Glyde"), option$7({ value: "starry studio" }, "Starry Studio"), option$7({ value: "Terminal 2.0 (AB)" }, "Terminal 2.0 (AB)"), option$7({ value: "Slushie" }, "Slushie"), option$7({ value: "Slushie Pixel" }, "Slushie 2"), option$7({ value: "dark classic" }, "BeepBox Dark"), option$7({ value: "light classic" }, "BeepBox Light"), option$7({ value: "dark competition" }, "BeepBox Competition Dark"), option$7({ value: "BeepBox Pixel" }, "BeepBox Pixel"), option$7({ value: "jummbox classic" }, "JummBox Dark"), option$7({ value: "jummbox light" }, "JummBox Light"), option$7({ value: "gold light" }, "Gold Light"), option$7({ value: "forest" }, "Forest"), option$7({ value: "forest 2" }, "Forest 2"), option$7({ value: "canyon" }, "Canyon"), option$7({ value: "canyon 2" }, "Canyon 2"), option$7({ value: "midnight" }, "Midnight"), option$7({ value: "beachcombing" }, "Beachcombing"), option$7({ value: "violet verdant" }, "Violet Verdant"), option$7({ value: "sunset" }, "Sunset"), option$7({ value: "autumn" }, "Autumn"), option$7({ value: "fruit" }, "Shadowfruit"), option$7({ value: "toxic" }, "Toxic"), option$7({ value: "roe" }, "Roe"), option$7({ value: "moonlight" }, "Moonlight"), option$7({ value: "portal" }, "Portal"), option$7({ value: "fusion" }, "Fusion"), option$7({ value: "inverse" }, "Inverse"), option$7({ value: "nebula" }, "Nebula"), option$7({ value: "Nebula 2" }, "Nebula 2"), option$7({ value: "roe light" }, "Roe Light"), option$7({ value: "amoled dark" }, "High Contrast Dark"), option$7({ value: "energized" }, "Energized"), option$7({ value: "neapolitan" }, "Neapolitan"), option$7({ value: "mono" }, "Poly"), option$7({ value: "blutonium" }, "Blutonium"), option$7({ value: "modbox classic" }, "Modbox"), option$7({ value: "modbox 2" }, "Modbox 2.0"), option$7({ value: "modbox artic" }, "Artic"), option$7({ value: "modbox cinnamon" }, "Cinnamon Roll [!]"), option$7({ value: "modbox ocean" }, "Ocean"), option$7({ value: "modbox rainbow" }, "Rainbow [!]"), option$7({ value: "modbox float" }, "Float [!]"), option$7({ value: "modbox windows" }, "Windows"), option$7({ value: "modbox grassland" }, "Grassland"), option$7({ value: "modbox dessert" }, "Dessert"), option$7({ value: "modbox kahoot" }, "Kahootiest"), option$7({ value: "modbox bitbeam" }, "Beam to the Bit [!]"), option$7({ value: "modbox egg" }, "Pretty Egg"), option$7({ value: "modbox pony" }, "Poniryoshka"), option$7({ value: "modbox gameboy" }, "Gameboy [!]"), option$7({ value: "modbox woodkid" }, "Woodkid [!]"), option$7({ value: "modbox midnight" }, "Midnight [!]"), option$7({ value: "modbox snedbox" }, "Snedbox"), option$7({ value: "modbox unnamed" }, "unnamed [!]"), option$7({ value: "modbox piano" }, "Piano [!]"), option$7({ value: "modbox halloween" }, "Halloween [!]"), option$7({ value: "modbox frozen" }, "FrozenOver❄️ [!]"), option$7({ value: "Ghost House" }, "Ghost House"), option$7({ value: "Ghost House 2" }, "Ghost House 2"), option$7({ value: "azur lane" }, "Azur Lane"), option$7({ value: "sandbox classic" }, "Sandbox"), option$7({ value: "harrybox" }, "Haileybox"), option$7({ value: "brucebox" }, "Brucebox"), option$7({ value: "shitbox 1.0" }, "Shitbox 1.0"), option$7({ value: "shitbox 2.0" }, "Shitbox 2.0"), option$7({ value: "shitbox 3.0" }, "Shitbox 3.0/shitbox4"), option$7({ value: "shitbox ModBox 2.0" }, "Shitbox ModBox 2.0"), option$7({ value: "shitbox Realm" }, "Shitbox Realm [!]"), option$7({ value: "nerdbox" }, "NerdBox"), option$7({ value: "zefbox" }, "Zefbox"), option$7({ value: "cardboardbox classic" }, "Cardboardbox"), option$7({ value: "blubox classic" }, "Blubox"), option$7({ value: "dogebox classic" }, "Dogebox"), option$7({ value: "wackybox" }, "Wackybox"), option$7({ value: "todbox dark mode" }, "Todbox Dark Mode"), option$7({ value: "mainbox 1.0" }, "Mainbox"), option$7({ value: "microbox" }, "MicroBox"), option$7({ value: "paandorasbox" }, "PaandorasBox"), option$7({ value: "foxbox" }, "FoxBox"), option$7({ value: "midbox" }, "Midbox"), option$7({ value: "dogebox2" }, "Dogebox2"), option$7({ value: "nepbox" }, "Nepbox"), option$7({ value: "nepbox laffey" }, "Laffey"), option$7({ value: "nepbox snedbox" }, "Snedbox (Nb) [!]"), option$7({ value: "nepbox piano" }, "Piano (Nb) [!]"), option$7({ value: "WeebBox" }, "WeebBox"), option$7({ value: "BoxBeep Dark" }, "BoxBeep Dark"), option$7({ value: "BoxBeep light" }, "BoxBeep Light"), option$7({ value: "AWeebyssBox" }, "AWeebyssBox"), option$7({ value: "Deuteranopia" }, "Deuteranopia"), option$7({ value: "Protanopia" }, "Protanopia"), option$7({ value: "Tritanopia" }, "Tritanopia"), option$7({ value: "2012 Video Tutorial" }, "2012 Video Tutorial"), option$7({ value: "I am on fire" }, "I am on fire"), option$7({ value: "custom" }, "Custom"));
+            this._baseColorSelect = select$7({ style: "width: 100%; display:none; margin: 0.5em 0;", id: "baseColorSelect" }, option$7({ selected: true, disabled: true, hidden: false }, "Pick a Base Color Palette"), option$7({ value: "AbyssBox Classic" }, "AbyssBox Classic"), option$7({ value: "AbyssBox Competitive" }, "AbyssBox Competitive"), option$7({ value: "AbyssBox Light" }, "AbyssBox Light"), option$7({ value: "Half-Life" }, "Half-Life"), option$7({ value: "Doom 1993" }, "Doom 1993"), option$7({ value: "Undertale" }, "Undertale"), option$7({ value: "Yume Nikki" }, "Yume Nikki [!]"), option$7({ value: "Scratch" }, "Scratch"), option$7({ value: "Scratch Addons" }, "Scratch Addons"), option$7({ value: "Windows Xp" }, "Windows Xp"), option$7({ value: "Frutiger Aero" }, "Frutiger Aero"), option$7({ value: "Skeuomorphic" }, "Skeuomorphic/Early 2000's (LeoV)"), option$7({ value: "corporate dark" }, "Corporate Dark"), option$7({ value: "corporate light" }, "Corporate Light"), option$7({ value: "Glyde" }, "Glyde"), option$7({ value: "starry studio" }, "Starry Studio"), option$7({ value: "Terminal 2.0 (AB)" }, "Terminal 2.0 (AB)"), option$7({ value: "Slushie" }, "Slushie"), option$7({ value: "dark classic" }, "BeepBox Dark"), option$7({ value: "light classic" }, "BeepBox Light"), option$7({ value: "dark competition" }, "BeepBox Competition Dark"), option$7({ value: "jummbox classic" }, "JummBox Dark"), option$7({ value: "jummbox light" }, "JummBox Light"), option$7({ value: "gold light" }, "Gold Light"), option$7({ value: "forest" }, "Forest"), option$7({ value: "forest 2" }, "Forest 2"), option$7({ value: "canyon" }, "Canyon"), option$7({ value: "canyon 2" }, "Canyon 2"), option$7({ value: "midnight" }, "Midnight"), option$7({ value: "beachcombing" }, "Beachcombing"), option$7({ value: "violet verdant" }, "Violet Verdant"), option$7({ value: "sunset" }, "Sunset"), option$7({ value: "autumn" }, "Autumn"), option$7({ value: "fruit" }, "Shadowfruit"), option$7({ value: "toxic" }, "Toxic"), option$7({ value: "roe" }, "Roe"), option$7({ value: "moonlight" }, "Moonlight"), option$7({ value: "portal" }, "Portal"), option$7({ value: "fusion" }, "Fusion"), option$7({ value: "inverse" }, "Inverse"), option$7({ value: "nebula" }, "Nebula"), option$7({ value: "Nebula 2" }, "Nebula 2"), option$7({ value: "roe light" }, "Roe Light"), option$7({ value: "amoled dark" }, "High Contrast Dark"), option$7({ value: "energized" }, "Energized"), option$7({ value: "neapolitan" }, "Neapolitan"), option$7({ value: "mono" }, "Poly"), option$7({ value: "blutonium" }, "Blutonium"), option$7({ value: "modbox classic" }, "Modbox"), option$7({ value: "modbox 2" }, "Modbox 2.0"), option$7({ value: "modbox artic" }, "Artic"), option$7({ value: "modbox cinnamon" }, "Cinnamon Roll [!]"), option$7({ value: "modbox ocean" }, "Ocean"), option$7({ value: "modbox rainbow" }, "Rainbow [!]"), option$7({ value: "modbox float" }, "Float [!]"), option$7({ value: "modbox windows" }, "Windows"), option$7({ value: "modbox grassland" }, "Grassland"), option$7({ value: "modbox dessert" }, "Dessert"), option$7({ value: "modbox kahoot" }, "Kahootiest"), option$7({ value: "modbox bitbeam" }, "Beam to the Bit [!]"), option$7({ value: "modbox egg" }, "Pretty Egg"), option$7({ value: "modbox pony" }, "Poniryoshka"), option$7({ value: "modbox gameboy" }, "Gameboy [!]"), option$7({ value: "modbox woodkid" }, "Woodkid [!]"), option$7({ value: "modbox midnight" }, "Midnight [!]"), option$7({ value: "modbox snedbox" }, "Snedbox"), option$7({ value: "modbox unnamed" }, "unnamed [!]"), option$7({ value: "modbox piano" }, "Piano [!]"), option$7({ value: "modbox halloween" }, "Halloween [!]"), option$7({ value: "modbox frozen" }, "FrozenOver❄️ [!]"), option$7({ value: "Ghost House" }, "Ghost House"), option$7({ value: "azur lane" }, "Azur Lane"), option$7({ value: "modbox classic" }, "Modbox"), option$7({ value: "sandbox classic" }, "Sandbox"), option$7({ value: "harrybox" }, "Haileybox"), option$7({ value: "brucebox" }, "Brucebox"), option$7({ value: "shitbox 3.0" }, "Shitbox 1.0/3.0"), option$7({ value: "shitbox 2.0" }, "Shitbox 2.0"), option$7({ value: "nerdbox" }, "NerdBox"), option$7({ value: "zefbox" }, "Zefbox"), option$7({ value: "cardboardbox classic" }, "Cardboardbox"), option$7({ value: "blubox classic" }, "Blubox"), option$7({ value: "dogebox classic" }, "Dogebox"), option$7({ value: "wackybox" }, "Wackybox"), option$7({ value: "todbox dark mode" }, "Todbox Dark Mode"), option$7({ value: "mainbox 1.0" }, "Mainbox"), option$7({ value: "microbox" }, "MicroBox"), option$7({ value: "paandorasbox" }, "PaandorasBox"), option$7({ value: "foxbox" }, "FoxBox"), option$7({ value: "midbox" }, "Midbox"), option$7({ value: "dogebox2" }, "Dogebox2"), option$7({ value: "nepbox" }, "Nepbox"), option$7({ value: "BoxBeep Dark" }, "BoxBeep Dark"), option$7({ value: "BoxBeep light" }, "BoxBeep Light"), option$7({ value: "birdbox dark" }, "BirdBox Dark"), option$7({ value: "birdbox light" }, "BirdBox Light"), option$7({ value: "ultrabox dark" }, "UltraBox"), option$7({ value: "slarmoosbox" }, "Slarmoo's Box"), option$7({ value: "lemmbox dark" }, "LemmBox Dark"), option$7({ value: "Deuteranopia" }, "Deuteranopia"), option$7({ value: "Protanopia" }, "Protanopia"), option$7({ value: "Tritanopia" }, "Tritanopia"), option$7({ value: "custom" }, "Custom"));
+            this._backgroundSelect = select$7({ style: "width: 100%; display:none; margin: 0.5em 0;", id: "backgroundSelect" }, option$7({ selected: true, disabled: true, hidden: false }, "Pick a Background"), option$7({ value: "none" }, "None"), option$7({ value: "AbyssBox Classic" }, "AbyssBox Classic"), option$7({ value: "AbyssBox Light" }, "AbyssBox Light"), option$7({ value: "Undertale" }, "Undertale"), option$7({ value: "Windows Xp" }, "Windows Xp"), option$7({ value: "Frutiger Aero" }, "Frutiger Aero"), option$7({ value: "Skeuomorphic" }, "Skeuomorphic/Early 2000's (LeoV)"), option$7({ value: "Glyde" }, "Glyde"), option$7({ value: "starry studio" }, "Starry Studio"), option$7({ value: "Slushie 2" }, "Slushie 2"), option$7({ value: "BeepBox Pixel" }, "BeepBox Pixel"), option$7({ value: "Forest 2" }, "Forest 2"), option$7({ value: "Canyon 2" }, "Canyon 2"), option$7({ value: "Nebula 2" }, "Nebula 2"), option$7({ value: "Ghost House 2" }, "Ghost House 2"), option$7({ value: "azur lane" }, "Azur Lane"));
+            this._borderSelect = select$7({ style: "width: 100%; display:none; margin: 0.5em 0;", id: "borderSelect" }, option$7({ selected: true, disabled: true, hidden: false }, "Pick a Border"), option$7({ value: "none" }, "None"), option$7({ value: "AbyssBox Classic" }, "AbyssBox Classic"), option$7({ value: "AbyssBox Competitive" }, "AbyssBox Competitive"), option$7({ value: "AbyssBox Light" }, "AbyssBox Light"), option$7({ value: "Scratch" }, "Scratch"), option$7({ value: "Scratch Addons" }, "Scratch Addons"), option$7({ value: "Undertale" }, "Undertale"), option$7({ value: "Windows Xp" }, "Windows Xp"), option$7({ value: "Frutiger Aero" }, "Frutiger Aero"), option$7({ value: "Skeuomorphic" }, "Skeuomorphic/Early 2000's (LeoV)"), option$7({ value: "Glyde" }, "Glyde"), option$7({ value: "Slushie 2" }, "Slushie 2"), option$7({ value: "BeepBox Pixel" }, "BeepBox Pixel"), option$7({ value: "Forest 2" }, "Forest 2"), option$7({ value: "Canyon 2" }, "Canyon 2"), option$7({ value: "Nebula 2" }, "Nebula 2"), option$7({ value: "Ghost House 2" }, "Ghost House 2"));
+            this._overlaySelect = select$7({ style: "width: 100%; display:none; margin: 0.5em 0;", id: "overlaySelect" }, option$7({ selected: true, disabled: true, hidden: false }, "Pick an Overlay"), option$7({ value: "none" }, "None"), option$7({ value: "scanlines" }, "Scanlines"), option$7({ value: "bandicam" }, "Bandicam"), option$7({ value: "fire" }, "Fire"), option$7({ value: "invert" }, "Screen Color Inversion"), option$7({ value: "480p" }, '"Low Quality" Blur (Mimics 480p)'), option$7({ value: "contrast" }, 'High Contrast'), option$7({ value: "Sepia" }, 'Sepia'), option$7({ value: "grayscale" }, 'Grayscale/Black and White'));
+            this._iconSelect = select$7({ style: "width: 100%; display:none; margin: 0.5em 0;", id: "iconSelect" }, option$7({ selected: true, disabled: true, hidden: false }, "Pick icons"), option$7({ value: "none" }, "Default"), option$7({ value: "AbyssBox Classic" }, "AbyssBox"), option$7({ value: "Scratch" }, "Scratch"), option$7({ value: "Windows Xp" }, "Windows Xp"), option$7({ value: "Frutiger Aero" }, "Frutiger Aero"));
+            this._cursorSelect = select$7({ style: "width: 100%; margin: 1em 0;", id: "cursorSelect" }, option$7({ selected: true, disabled: true, hidden: false }, "Pick a Cursor"), option$7({ value: "none" }, "Default"), option$7({ value: "My Abyss" }, "My Abyss"), option$7({ value: "Retro" }, "Retro"), option$7({ value: "Ghost House 2" }, "Ghost House"), option$7({ value: "Slushie 2" }, "Slushie 2"), option$7({ value: "Windows Xp" }, "Windows Xp"), option$7({ value: "WackyBox" }, "WackyBox"), option$7({ value: "Azur Lane" }, "Azur Lane"));
+            this._colorMenu = select$7({ style: "width: 100%;" }, option$7({ selected: true, disabled: true, hidden: false }, "Select an asset to change"), option$7({ selected: false, disabled: true, hidden: false }, "General Items"), option$7({ value: "--page-margin" }, "Page Margin"), option$7({ value: "--editor-background" }, "Editor Background"), option$7({ value: "--primary-text" }, "Primary Text"), option$7({ value: "--secondary-text" }, "Secondary Text"), option$7({ value: "--inverted-text" }, "Inverted Text"), option$7({ value: "--loop-accent" }, "Loop Accent"), option$7({ value: "--link-accent" }, "Link Accent"), option$7({ value: "--ui-widget-background" }, "UI Widget Background"), option$7({ value: "--ui-widget-focus" }, "UI Widget Focus"), option$7({ value: "--white-piano-key" }, "White Piano Key"), option$7({ value: "--black-piano-key" }, "Black Piano Key"), option$7({ value: "--white-piano-key-text" }, "White Piano Key Text"), option$7({ value: "--black-piano-key-text" }, "Black Piano Key Text"), option$7({ selected: false, disabled: true, hidden: false }, "Pitch Backgrounds"), option$7({ value: "--pitch-background" }, "Pitch Background"), option$7({ value: "--tonic" }, "Tonic"), option$7({ value: "--pitch1-background" }, "1st Pitch Background [!]"), option$7({ value: "--pitch2-background" }, "2nd Pitch Background [!]"), option$7({ value: "--pitch3-background" }, "3rd Pitch Background [!]"), option$7({ value: "--third-note" }, "Third note"), option$7({ value: "--pitch5-background" }, "5th Pitch Background [!]"), option$7({ value: "--pitch6-background" }, "6th Pitch Background [!]"), option$7({ value: "--fifth-note" }, "Fifth note"), option$7({ value: "--pitch8-background" }, "8th Pitch Background [!]"), option$7({ value: "--pitch9-background" }, "9th Pitch Background [!]"), option$7({ value: "--pitch10-background" }, "10th Pitch Background [!]"), option$7({ value: "--pitch11-background" }, "11th Pitch Background [!]"), option$7({ selected: false, disabled: true, hidden: false }, "Track Editor Backgrounds"), option$7({ value: "--track-editor-bg-pitch" }, "Track Editor Pitch BG"), option$7({ value: "--track-editor-bg-pitch-dim" }, "Empty Track Editor Pitch BG"), option$7({ value: "--track-editor-bg-noise" }, "Track Editor Noise BG"), option$7({ value: "--track-editor-bg-noise-dim" }, "Empty Track Editor Noise BG"), option$7({ value: "--track-editor-bg-mod" }, "Track Editor Mod BG"), option$7({ value: "--track-editor-bg-mod-dim" }, "Empty Track Editor Mod BG"), option$7({ selected: false, disabled: true, hidden: false }, "Extras"), option$7({ value: "--multiplicative-mod-slider" }, "Multiplicative Mod Slider"), option$7({ value: "--overwriting-mod-slider" }, "Overwriting Mod Slider"), option$7({ value: "--indicator-primary" }, "Primary Indicator"), option$7({ value: "--indicator-secondary" }, "Secondary Indicator"), option$7({ value: "--select2-opt-group" }, "Preset Catagory Background"), option$7({ value: "--input-box-outline" }, "Input Box Outline"), option$7({ value: "--mute-button-normal" }, "Mute Button (Normal)"), option$7({ value: "--mute-button-mod" }, "Mute Button (Mod)"), option$7({ value: "--mod-label-primary" }, "Mod Label Primary"), option$7({ value: "--mod-label-secondary-text" }, "Mod Label Secondary"), option$7({ value: "--mod-label-primary-text" }, "Mod Label Primary Text"), option$7({ value: "--note-flash" }, "Note Flash"), option$7({ value: "--note-flash-secondary" }, "Note Flash Secondary"), option$7({ value: "--song-player-margin" }, "Song Player Background"), option$7({ value: "--progress-bar" }, "Song Player Progress Bar"), option$7({ value: "--empty-sample-bar" }, "Empty Sample Bar"), option$7({ value: "--octave-scrollbar" }, "Octave Scrollbar"), option$7({ value: "--scrollbar-color" }, "Primary Scrollbar Color"), option$7({ value: "--scrollbar-background" }, "Secondary Scrollbar Color"));
             this._colorInput = input$6({ type: "text", value: localStorage.getItem("customColors") || longText });
             this._fileNameInput = input$6({ type: "text", value: "Your Theme" });
             this._colorpickerInput = input$6({ type: "color", id: "colorPicker", value: "#000000", style: "width: 50%; height: 30px;" });
@@ -59756,23 +60908,23 @@ You should be redirected to the song at:<br /><br />
 
     const textOnIcon = ColorConfig.getComputed("--text-enabled-icon") !== "" ? ColorConfig.getComputed("--text-enabled-icon") : "✓ ";
     const textOffIcon = ColorConfig.getComputed("--text-disabled-icon") !== "" ? ColorConfig.getComputed("--text-disabled-icon") : "　";
-    const { button: button$9, div: div$9, h2: h2$8, option: option$5, select: select$5, p: p$2 } = HTML;
+    const { button: button$9, div: div$9, h2: h2$8, option: option$6, select: select$6, p: p$2 } = HTML;
     var setPresets = new Array();
     var storedPresets = localStorage.getItem("setPresets");
-    var totalPresets = new Array("Retro Presets", "Keyboard Presets", "Idiophone Presets", "Guitar Presets", "Picked Bass Presets", "Picked String Presets", "Distortion Presets", "Bellows Presets", "String Presets", "Vocal Presets", "Brass Presets", "Reed Presets", "Flute Presets", "Pad Presets", "Drum Presets", "Novelty Presets", "Modbox Presets", "Sandbox Presets", "Blackbox Presets", "Todbox Presets", "Midbox Misc Presets", "Midbox Dubstep Presets", "Midbox Noise Presets", "UltraBox Presets", "AbyssBox 0.8 to 1.2 Presets", "AbyssBox 1.3+ Presets", "AbyssBox Spooky Presets");
+    var totalPresets = new Array("Retro Presets", "Keyboard Presets", "Idiophone Presets", "Guitar Presets", "Picked Bass Presets", "Picked String Presets", "Distortion Presets", "Bellows Presets", "String Presets", "Vocal Presets", "Brass Presets", "Reed Presets", "Flute Presets", "Pad Presets", "Drum Presets", "Novelty Presets", "Modbox Presets", "Sandbox Presets", "Blackbox Presets", "Todbox Presets", "Midbox Misc Presets", "Midbox Dubstep Presets", "Midbox Noise Presets", "UltraBox Presets", "AbyssBox 0.8 to 1.2 Presets", "AbyssBox 1.3+ Presets", "AbyssBox Templates", "AbyssBox Spooky Presets");
     if (storedPresets != null && storedPresets != undefined) {
         setPresets = JSON.parse(storedPresets);
     }
     else {
-        setPresets.push("Retro Presets", "Keyboard Presets", "Idiophone Presets", "Guitar Presets", "Picked Bass Presets", "Picked String Presets", "Distortion Presets", "Bellows Presets", "String Presets", "Vocal Presets", "Brass Presets", "Reed Presets", "Flute Presets", "Pad Presets", "Drum Presets", "Novelty Presets", "UltraBox Presets", "AbyssBox 0.8 to 1.2 Presets", "AbyssBox 1.3+ Presets", "AbyssBox Spooky Presets");
+        setPresets.push("Retro Presets", "Keyboard Presets", "Idiophone Presets", "Guitar Presets", "Picked Bass Presets", "Picked String Presets", "Distortion Presets", "Bellows Presets", "String Presets", "Vocal Presets", "Brass Presets", "Reed Presets", "Flute Presets", "Pad Presets", "Drum Presets", "Novelty Presets", "UltraBox Presets", "AbyssBox 0.8 to 1.2 Presets", "AbyssBox 1.3+ Presets", "AbyssBox Templates", "AbyssBox Spooky Presets");
     }
     class PresetPrompt {
         constructor(_doc) {
             this._doc = _doc;
             this._cancelButton = button$9({ class: "cancelButton" });
             this._okayButton = button$9({ class: "okayButton", style: "width:45%;" }, "Okay");
-            this._beepboxMenu = select$5({ style: "width: 100%; margin: 0.5em; margin-left:0;" }, option$5({ selected: true, disabled: true, hidden: false }, "BeepBox Presets"), option$5({ value: "Retro Presets" }, (setPresets.includes("Retro Presets") ? textOnIcon : textOffIcon) + "Retro Presets"), option$5({ value: "Keyboard Presets" }, (setPresets.includes("Keyboard Presets") ? textOnIcon : textOffIcon) + "Keyboard Presets"), option$5({ value: "Idiophone Presets" }, (setPresets.includes("Idiophone Presets") ? textOnIcon : textOffIcon) + "Idiophone Presets"), option$5({ value: "Guitar Presets" }, (setPresets.includes("Guitar Presets") ? textOnIcon : textOffIcon) + "Guitar Presets"), option$5({ value: "Picked Bass Presets" }, (setPresets.includes("Picked Bass Presets") ? textOnIcon : textOffIcon) + "Picked Bass Presets"), option$5({ value: "Picked String Presets" }, (setPresets.includes("Picked String Presets") ? textOnIcon : textOffIcon) + "Picked String Presets"), option$5({ value: "Distortion Presets" }, (setPresets.includes("Distortion Presets") ? textOnIcon : textOffIcon) + "Distortion Presets"), option$5({ value: "Bellows Presets" }, (setPresets.includes("Bellows Presets") ? textOnIcon : textOffIcon) + "Bellows Presets"), option$5({ value: "String Presets" }, (setPresets.includes("String Presets") ? textOnIcon : textOffIcon) + "String Presets"), option$5({ value: "Vocal Presets" }, (setPresets.includes("Vocal Presets") ? textOnIcon : textOffIcon) + "Vocal Presets"), option$5({ value: "Brass Presets" }, (setPresets.includes("Brass Presets") ? textOnIcon : textOffIcon) + "Brass Presets"), option$5({ value: "Reed Presets" }, (setPresets.includes("Reed Presets") ? textOnIcon : textOffIcon) + "Reed Presets"), option$5({ value: "Flute Presets" }, (setPresets.includes("Flute Presets") ? textOnIcon : textOffIcon) + "Flute Presets"), option$5({ value: "Drum Presets" }, (setPresets.includes("Drum Presets") ? textOnIcon : textOffIcon) + "Drum Presets"), option$5({ value: "Novelty Presets" }, (setPresets.includes("Novelty Presets") ? textOnIcon : textOffIcon) + "Novelty Presets"));
-            this._otherMenu = select$5({ style: "width: 100%;" }, option$5({ selected: true, disabled: true, hidden: false }, "Other Mod Presets"), option$5({ value: "Modbox Presets" }, (setPresets.includes("Modbox Presets") ? textOnIcon : textOffIcon) + "Modbox Presets"), option$5({ value: "Sandbox Presets" }, (setPresets.includes("Sandbox Presets") ? textOnIcon : textOffIcon) + "Sandbox Presets"), option$5({ value: "Blackbox Presets" }, (setPresets.includes("Blackbox Presets") ? textOnIcon : textOffIcon) + "Blackbox Presets"), option$5({ value: "Todbox Presets" }, (setPresets.includes("Todbox Presets") ? textOnIcon : textOffIcon) + "Todbox Presets"), option$5({ value: "Midbox Misc Presets" }, (setPresets.includes("Midbox Misc Presets") ? textOnIcon : textOffIcon) + "Midbox Misc Presets"), option$5({ value: "Midbox Dubstep Presets" }, (setPresets.includes("Midbox Dubstep Presets") ? textOnIcon : textOffIcon) + "Midbox Dubstep Presets"), option$5({ value: "Midbox Noise Presets" }, (setPresets.includes("Midbox Noise Presets") ? textOnIcon : textOffIcon) + "Midbox Noise Presets"), option$5({ value: "UltraBox Presets" }, (setPresets.includes("UltraBox Presets") ? textOnIcon : textOffIcon) + "UltraBox Presets"), option$5({ value: "AbyssBox 0.8 to 1.2 Presets" }, (setPresets.includes("AbyssBox 0.8 to 1.2 Presets") ? textOnIcon : textOffIcon) + "AbyssBox 0.8 to 1.2 Presets"), option$5({ value: "AbyssBox 1.3+ Presets" }, (setPresets.includes("AbyssBox 1.3+ Presets") ? textOnIcon : textOffIcon) + "AbyssBox 1.3+ Presets"), option$5({ value: "AbyssBox Spooky Presets" }, (setPresets.includes("AbyssBox Spooky Presets") ? textOnIcon : textOffIcon) + "AbyssBox Spooky Presets"));
+            this._beepboxMenu = select$6({ style: "width: 100%; margin: 0.5em; margin-left:0;" }, option$6({ selected: true, disabled: true, hidden: false }, "BeepBox Presets"), option$6({ value: "Retro Presets" }, (setPresets.includes("Retro Presets") ? textOnIcon : textOffIcon) + "Retro Presets"), option$6({ value: "Keyboard Presets" }, (setPresets.includes("Keyboard Presets") ? textOnIcon : textOffIcon) + "Keyboard Presets"), option$6({ value: "Idiophone Presets" }, (setPresets.includes("Idiophone Presets") ? textOnIcon : textOffIcon) + "Idiophone Presets"), option$6({ value: "Guitar Presets" }, (setPresets.includes("Guitar Presets") ? textOnIcon : textOffIcon) + "Guitar Presets"), option$6({ value: "Picked Bass Presets" }, (setPresets.includes("Picked Bass Presets") ? textOnIcon : textOffIcon) + "Picked Bass Presets"), option$6({ value: "Picked String Presets" }, (setPresets.includes("Picked String Presets") ? textOnIcon : textOffIcon) + "Picked String Presets"), option$6({ value: "Distortion Presets" }, (setPresets.includes("Distortion Presets") ? textOnIcon : textOffIcon) + "Distortion Presets"), option$6({ value: "Bellows Presets" }, (setPresets.includes("Bellows Presets") ? textOnIcon : textOffIcon) + "Bellows Presets"), option$6({ value: "String Presets" }, (setPresets.includes("String Presets") ? textOnIcon : textOffIcon) + "String Presets"), option$6({ value: "Vocal Presets" }, (setPresets.includes("Vocal Presets") ? textOnIcon : textOffIcon) + "Vocal Presets"), option$6({ value: "Brass Presets" }, (setPresets.includes("Brass Presets") ? textOnIcon : textOffIcon) + "Brass Presets"), option$6({ value: "Reed Presets" }, (setPresets.includes("Reed Presets") ? textOnIcon : textOffIcon) + "Reed Presets"), option$6({ value: "Flute Presets" }, (setPresets.includes("Flute Presets") ? textOnIcon : textOffIcon) + "Flute Presets"), option$6({ value: "Drum Presets" }, (setPresets.includes("Drum Presets") ? textOnIcon : textOffIcon) + "Drum Presets"), option$6({ value: "Novelty Presets" }, (setPresets.includes("Novelty Presets") ? textOnIcon : textOffIcon) + "Novelty Presets"));
+            this._otherMenu = select$6({ style: "width: 100%;" }, option$6({ selected: true, disabled: true, hidden: false }, "Other Mod Presets"), option$6({ value: "Modbox Presets" }, (setPresets.includes("Modbox Presets") ? textOnIcon : textOffIcon) + "Modbox Presets"), option$6({ value: "Sandbox Presets" }, (setPresets.includes("Sandbox Presets") ? textOnIcon : textOffIcon) + "Sandbox Presets"), option$6({ value: "Blackbox Presets" }, (setPresets.includes("Blackbox Presets") ? textOnIcon : textOffIcon) + "Blackbox Presets"), option$6({ value: "Todbox Presets" }, (setPresets.includes("Todbox Presets") ? textOnIcon : textOffIcon) + "Todbox Presets"), option$6({ value: "Midbox Misc Presets" }, (setPresets.includes("Midbox Misc Presets") ? textOnIcon : textOffIcon) + "Midbox Misc Presets"), option$6({ value: "Midbox Dubstep Presets" }, (setPresets.includes("Midbox Dubstep Presets") ? textOnIcon : textOffIcon) + "Midbox Dubstep Presets"), option$6({ value: "Midbox Noise Presets" }, (setPresets.includes("Midbox Noise Presets") ? textOnIcon : textOffIcon) + "Midbox Noise Presets"), option$6({ value: "UltraBox Presets" }, (setPresets.includes("UltraBox Presets") ? textOnIcon : textOffIcon) + "UltraBox Presets"), option$6({ value: "AbyssBox 0.8 to 1.2 Presets" }, (setPresets.includes("AbyssBox 0.8 to 1.2 Presets") ? textOnIcon : textOffIcon) + "AbyssBox 0.8 to 1.2 Presets"), option$6({ value: "AbyssBox 1.3+ Presets" }, (setPresets.includes("AbyssBox 1.3+ Presets") ? textOnIcon : textOffIcon) + "AbyssBox 1.3+ Presets"), option$6({ value: "AbyssBox Templates" }, (setPresets.includes("AbyssBox Templates") ? textOnIcon : textOffIcon) + "AbyssBox Templates"), option$6({ value: "AbyssBox Spooky Presets" }, (setPresets.includes("AbyssBox Spooky Presets") ? textOnIcon : textOffIcon) + "AbyssBox Spooky Presets"));
             this.container = div$9({ class: "prompt noSelection", id: "presetContainerPrompt", style: "width: 400px;" }, div$9({ class: "promptTitle" }, h2$8({ class: "presetExt", style: "text-align: inherit;" }, ""), h2$8({ class: "presetTitle", style: "margin-bottom: 0.5em;" }, "Select Presets")), p$2({ style: "margin-bottom: 1.5em; margin-top: 0; font-size: 16px; text-align: center;" }, 'Here you can select any preset category and make it visible or not. Which ones you would like are completely up to you.'), div$9({ style: "display: flex; flex-direction: column; align-items: center; height: 2em; justify-content: flex-end;" }, div$9({ class: "beepBox Presets", style: "width: 100%;" }, this._beepboxMenu), div$9({ class: "other Presets", style: "width: 100%;" }, this._otherMenu)), div$9({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" }, this._okayButton), this._cancelButton);
             this._beepboxMenuHandler = (event) => {
                 const setPresetValue = this._beepboxMenu.value;
@@ -59858,6 +61010,11 @@ You should be redirected to the song at:<br /><br />
                 case "reverb":
                     {
                         message = div$8(h2$7("Reverb"), p$1("Reverb is like a continuous echo effect. A little bit helps instruments sound more natural. Adding a lot of reverb can add sense of depth or mystery, but too much reverb can kinda \"smear\" sounds so that it's harder to distinguish notes or instruments, especially for lower \"bass\" notes."));
+                    }
+                    break;
+                case "reverbWetDry":
+                    {
+                        message = div$8(h2$7("Reverb Wet/Dry"), p$1("These sliders let you directly affect the volumes of the wet and dry samples in the effect. Wet samples are the samples that play after the reverb effect has been processed, and dry samples are the samples before the effect has been processed. If you want the original sound that reverb had, set both of these sliders to max."));
                     }
                     break;
                 case "rhythm":
@@ -60265,6 +61422,11 @@ You should be redirected to the song at:<br /><br />
                         message = div$8(h2$7("Random Envelope Type"), p$1("Random Envelopes can switch between being determined by the time in the song, the pitch of the note, or per note trigger."));
                     }
                     break;
+                case "songeq":
+                    {
+                        message = div$8(h2$7("Song Eq Filter"), p$1("Filters are a way of emphasizing or diminishing different parts of a sound. Musical notes have a fundamental (base) frequency, but the sound of a musical note also has parts at higher frequencies and filters can adjust the volume of each of these parts based on their frequency."), p$1("Click in the filter editor to insert, delete, or drag a filter control point. The horizontal position of the point determines which frequencies it affects, and the vertical position determines how the volume is affected at that frequency."), p$1("Insert a new point on the left side of the filter editor to add a \"high-pass\" filter point, which additionally reduces the volume of lower frequencies, or insert a new point on the right side to add a \"low-pass\" filter point which reduces the volume of higher frequencies."), p$1("The Song Eq Filter applies to all instruments. This can be handy for getting the sound of a certain genre or fading in and out in combination with modulation"));
+                    }
+                    break;
                 case "ringMod":
                     {
                         message = div$8(h2$7("Ring Modulation"), p$1(`This setting multiplies a selected wave's frequency with an instrument frequency, this is useful for "bell-like" instruments.`));
@@ -60298,6 +61460,11 @@ You should be redirected to the song at:<br /><br />
                 case "unisonBuzzes":
                     {
                         message = div$8(h2$7("Unison Buzzing"), p$1("This setting controls whether or not there's a buzzing noise when there's only 1 unison voice, and the spread is set to something other than 0."));
+                    }
+                    break;
+                case "invertWave":
+                    {
+                        message = div$8(h2$7("Invert Wave"), p$1("This effect multiplies the wave of the instrument by -1. If two identical instruments play at the same time while one is inverted, the noise will cancel out."));
                     }
                     break;
                 case "slideSpeedSlider":
@@ -60758,7 +61925,7 @@ You should be redirected to the song at:<br /><br />
         }
     }
 
-    const { div: div$7, input: input$5, button: button$7, h2: h2$6, select: select$4, option: option$4, canvas: canvas$1 } = HTML;
+    const { div: div$7, input: input$5, button: button$7, h2: h2$6, select: select$5, option: option$5, canvas: canvas$1 } = HTML;
     const defaultShapeFunction = (cnv, ctx, x, y, w, h) => {
         ctx.fillRect(x, y, w, h);
     };
@@ -61007,7 +62174,7 @@ You should be redirected to the song at:<br /><br />
             this._zoomInButton = button$7({ type: "button", title: "Zoom In", style: "height: var(--button-size); margin-left: 0.5em;" }, SVG.svg({ width: "20", height: "20", viewBox: "-10 -10 20 20", "pointer-events": "none", style: "width: 100%; height: 100%;" }, SVG.circle({ cx: -1, cy: -1, r: 6, "stroke-width": 2, stroke: ColorConfig.primaryText, fill: "none" }), SVG.path({ stroke: ColorConfig.primaryText, "stroke-width": 2, d: "M 3 3 L 7 7 M -1 -4 L -1 2 M -4 -1 L 2 -1", fill: "none" })));
             this._zoomOutButton = button$7({ type: "button", title: "Zoom Out", style: "height: var(--button-size); margin-left: 0.5em;" }, SVG.svg({ width: "20", height: "20", viewBox: "-10 -10 20 20", "pointer-events": "none", style: "width: 100%; height: 100%;" }, SVG.circle({ cx: -1, cy: -1, r: 6, "stroke-width": 2, stroke: ColorConfig.primaryText, fill: "none" }), SVG.path({ stroke: ColorConfig.primaryText, "stroke-width": 2, d: "M 3 3 L 7 7 M -4 -1 L 2 -1", fill: "none" })));
             this._zoom100Button = button$7({ type: "button", title: "Zoom 100%", style: "height: var(--button-size); margin-left: 0.5em;" }, "100%");
-            this._loopModeSelect = select$4({ style: "width: 100%; flex-grow: 1; margin-left: 0.5em;" }, option$4({ value: 0 }, "Loop"), option$4({ value: 1 }, "Ping-Pong"), option$4({ value: 2 }, "Play Once"), option$4({ value: 3 }, "Play Loop Once"));
+            this._loopModeSelect = select$5({ style: "width: 100%; flex-grow: 1; margin-left: 0.5em;" }, option$5({ value: 0 }, "Loop"), option$5({ value: 1 }, "Ping-Pong"), option$5({ value: 2 }, "Play Once"), option$5({ value: 3 }, "Play Loop Once"));
             this._startOffsetStepper = input$5({ style: "flex-grow: 1; margin-left: 1em; width: 100%;", type: "number", value: this._chipWaveStartOffset, min: "0", step: "1" });
             this._loopStartStepper = input$5({ style: "flex-grow: 1; margin-left: 1em; width: 100%;", type: "number", value: this._chipWaveLoopStart, min: "0", step: "1" });
             this._loopEndStepper = input$5({ style: "flex-grow: 1; margin-left: 1em; width: 100%;", type: "number", value: this._chipWaveLoopEnd, min: "0", step: "1" });
@@ -61606,7 +62773,7 @@ You should be redirected to the song at:<br /><br />
         }
     }
 
-    const { div: div$5, input: input$3, button: button$5, a, code, textarea: textarea$1, details, summary, span: span$1, ul, li, select: select$3, option: option$3, h2: h2$4 } = HTML;
+    const { div: div$5, input: input$3, button: button$5, a, code, textarea: textarea$1, details, summary, span: span$1, ul, li, select: select$4, option: option$4, h2: h2$4 } = HTML;
     class AddSamplesPrompt {
         constructor(_doc) {
             this._maxSamples = 64;
@@ -62106,7 +63273,7 @@ You should be redirected to the song at:<br /><br />
                     const chipWaveLoopStartStepper = input$3({ style: "flex-grow: 1; margin-left: 1em; width: 100%;", type: "number", value: "" + (entry.chipWaveLoopStart != null ? entry.chipWaveLoopStart : ""), min: "0", step: "1" });
                     const chipWaveLoopEndStepper = input$3({ style: "flex-grow: 1; margin-left: 1em; width: 100%;", type: "number", value: "" + (entry.chipWaveLoopEnd != null ? entry.chipWaveLoopEnd : ""), min: "0", step: "1" });
                     const chipWaveStartOffsetStepper = input$3({ style: "flex-grow: 1; margin-left: 1em; width: 100%;", type: "number", value: "" + (entry.chipWaveStartOffset != null ? entry.chipWaveStartOffset : ""), min: "0", step: "1" });
-                    const chipWaveLoopModeSelect = select$3({ style: "width: 100%; flex-grow: 1; margin-left: 0.5em;" }, option$3({ value: -1 }, ""), option$3({ value: 0 }, "Loop"), option$3({ value: 1 }, "Ping-Pong"), option$3({ value: 2 }, "Play Once"), option$3({ value: 3 }, "Play Loop Once"));
+                    const chipWaveLoopModeSelect = select$4({ style: "width: 100%; flex-grow: 1; margin-left: 0.5em;" }, option$4({ value: -1 }, ""), option$4({ value: 0 }, "Loop"), option$4({ value: 1 }, "Ping-Pong"), option$4({ value: 2 }, "Play Once"), option$4({ value: 3 }, "Play Loop Once"));
                     if (entry.chipWaveLoopMode != null) {
                         chipWaveLoopModeSelect.value = "" + entry.chipWaveLoopMode;
                     }
@@ -62206,11 +63373,11 @@ You should be redirected to the song at:<br /><br />
         }
     }
 
-    const { button: button$4, div: div$4, h2: h2$3, select: select$2, option: option$2 } = HTML;
+    const { button: button$4, div: div$4, h2: h2$3, select: select$3, option: option$3 } = HTML;
     class ShortenerConfigPrompt {
         constructor(_doc) {
             this._doc = _doc;
-            this._shortenerStrategySelect = select$2({ style: "width: 100%;" }, option$2({ value: "tinyurl" }, "tinyurl.com"), option$2({ value: "isgd" }, "is.gd"));
+            this._shortenerStrategySelect = select$3({ style: "width: 100%;" }, option$3({ value: "wackybox" }, "wackybox.org"), option$3({ value: "isgd" }, "is.gd"));
             this._cancelButton = button$4({ class: "cancelButton" });
             this._okayButton = button$4({ class: "okayButton", style: "width:45%;" }, "Okay");
             this.container = div$4({ class: "prompt noSelection", style: "width: 250px;" }, div$4({ class: "promptTitle" }, h2$3({ class: "configShortenerExt", style: "text-align: inherit;" }, ""), h2$3({ class: "configShortenerTitle" }, "Configure Shortener")), div$4({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" }, div$4({ class: "selectContainer", style: "width: 100%;" }, this._shortenerStrategySelect)), div$4({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" }, this._okayButton), this._cancelButton);
@@ -62242,12 +63409,12 @@ You should be redirected to the song at:<br /><br />
         }
     }
 
-    const { button: button$3, div: div$3, h2: h2$2, option: option$1, select: select$1, input: input$2 } = HTML;
+    const { button: button$3, div: div$3, h2: h2$2, option: option$2, select: select$2, input: input$2 } = HTML;
     let doReload = false;
     class FontPrompt {
         constructor(_doc) {
             this._doc = _doc;
-            this._fontSelect = select$1({ style: "width: 100%; margin: 0.5em 0;", id: "fontSelect" }, option$1({ selected: true, disabled: true, hidden: false }, "Pick a font"), option$1({ value: "none" }, "Default"), option$1({ value: "Roboto" }, "Roboto"), option$1({ value: "AbyssType" }, "AbyssType"), option$1({ value: "AbyssType Small" }, "AbyssType Small"), option$1({ value: "AbyssType Fusion" }, "AbyssType Fusion"), option$1({ value: "Doom 1993" }, "Doom 1993"), option$1({ value: "Tahoma Pixel" }, "Tahoma (Windows Xp)"), option$1({ value: "Tahoma" }, "Tahoma"), option$1({ value: "Trebuchet" }, "Trebuchet MS"), option$1({ value: "Monospace" }, "Monospace"), option$1({ value: "Frutiger" }, "Frutiger"), option$1({ value: "Workbench" }, "Workbench"), option$1({ value: "Varela" }, "Varela"), option$1({ value: "Arial" }, "Arial"), option$1({ value: "Comic Sans" }, "Comic Sans"), option$1({ value: "custom" }, "Custom"));
+            this._fontSelect = select$2({ style: "width: 100%; margin: 0.5em 0;", id: "fontSelect" }, option$2({ selected: true, disabled: true, hidden: false }, "Pick a font"), option$2({ value: "none" }, "Default"), option$2({ value: "Roboto" }, "Roboto"), option$2({ value: "AbyssType" }, "AbyssType"), option$2({ value: "AbyssType Small" }, "AbyssType Small"), option$2({ value: "AbyssType Fusion" }, "AbyssType Fusion"), option$2({ value: "Doom 1993" }, "Doom 1993"), option$2({ value: "Tahoma Pixel" }, "Tahoma (Windows Xp)"), option$2({ value: "Tahoma" }, "Tahoma"), option$2({ value: "Trebuchet" }, "Trebuchet MS"), option$2({ value: "Monospace" }, "Monospace"), option$2({ value: "Frutiger" }, "Frutiger"), option$2({ value: "Workbench" }, "Workbench"), option$2({ value: "Varela" }, "Varela"), option$2({ value: "Arial" }, "Arial"), option$2({ value: "Comic Sans" }, "Comic Sans"), option$2({ value: "custom" }, "Custom"));
             this._cancelButton = button$3({ class: "cancelButton" });
             this._okayButton = button$3({ class: "okayButton", style: "width:45%;" }, "Okay");
             this.lastFont = window.localStorage.getItem("customFontName");
@@ -62394,7 +63561,21 @@ You should be redirected to the song at:<br /><br />
         }
     }
 
-    const { button: button$1, div: div$1, h2, input: input$1, br, textarea } = HTML;
+    const { button: button$1, div: div$1, h2, input: input$1, br, textarea, select: select$1, option: option$1 } = HTML;
+    const shorteners = {
+        "wackybox": {
+            maxLength: 128000,
+            altName: "wackybox.org",
+            encode: encodeURIComponent,
+            shortenerStrategy: "https://wackybox.org/api-create.php?url="
+        },
+        "isgd": {
+            maxLength: 5000,
+            altName: "is.gd",
+            encode: encodeURIComponent,
+            shortenerStrategy: "https://is.gd/create.php?format=simple&url="
+        }
+    };
     class SongDetailsPrompt {
         constructor(_doc) {
             this._doc = _doc;
@@ -62403,10 +63584,12 @@ You should be redirected to the song at:<br /><br />
             this._songTitle = input$1({ placeholder: "Enter Title Here", type: "text", style: "width: 100%;", value: this._doc.song.title, maxlength: 30, "autofocus": "autofocus" });
             this._songAuthor = input$1({ placeholder: "Enter Name Here", type: "text", style: "width: 100%;", value: this._doc.song.author, maxlength: 30 });
             this._songDescription = textarea({ placeholder: "Enter Description Here", style: "width: 100%; resize: none; background: var(--editor-background); color: white; height: 64px; border: 0.5px solid var(--input-box-outline); font-size: 14px;", maxlength: 1200 }, this._doc.song.description);
-            this._showSongDetailsBox = input$1({ style: "width: 3em; margin-left: 1em;", type: "checkbox" });
+            this._showSongDetailsBox = input$1({ style: "width: 1em; margin-left: 1em;", type: "checkbox" });
             this._computedSamplesLabel = div$1({ style: "width: 10em;" }, new Text("0:00"));
             this._cantShortenLabel = div$1({}, "You cannot shorten this url!");
-            this.container = div$1({ class: "prompt noSelection", style: "width: 250px;" }, h2("Song Details"), div$1({ style: "display: flex; flex-direction: row; align-items: baseline; gap: 10px;" }, "Title: ", this._songTitle), div$1({ style: "display: flex; flex-direction: row; align-items: baseline; gap: 10px;" }, "Author: ", this._songAuthor), div$1({ style: "display: flex; flex-direction: column; align-items: baseline;" }, "Description: ", this._songDescription), div$1({ style: "vertical-align: middle; align-items: center; justify-content: space-between;" }, "Show info on load: ", this._showSongDetailsBox), div$1({ style: "display: flex; flex-direction: column; align-items: baseline;" }, "Song Theme: ", this._doc.song.setSongTheme), div$1({ style: "text-align: left;" }, div$1({ style: "display:flex; gap: 3px; margin-bottom: 1em;" }, "Song Length: ", this._computedSamplesLabel), div$1({ style: "margin-bottom: 0.5em;" }, "Pitch Channels: " + this._doc.song.pitchChannelCount), div$1({ style: "margin-bottom: 0.5em;" }, "Noise Channels: " + this._doc.song.noiseChannelCount), div$1({}, "Mod Channels: " + this._doc.song.modChannelCount), br(), "URL Length: " + location.href.length, this._cantShortenLabel, br()), div$1({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" }, this._okayButton), this._cancelButton);
+            this._songLoopTypeSelector = select$1({}, option$1({ value: 0 }, "Loop within bar"), option$1({ value: 1 }, "Loop entire song"), option$1({ value: 2 }, "Disable looping"));
+            this._songLoopTypeContainer = div$1({ id: "selectContainer" }, this._songLoopTypeSelector);
+            this.container = div$1({ class: "prompt noSelection", style: "width: 250px;" }, h2("Song Details"), div$1({ style: "display: flex; flex-direction: row; align-items: baseline; gap: 10px;" }, "Title: ", this._songTitle), div$1({ style: "display: flex; flex-direction: row; align-items: baseline; gap: 10px;" }, "Author: ", this._songAuthor), div$1({ style: "display: flex; flex-direction: column; align-items: baseline;" }, "Description: ", this._songDescription), div$1({ style: "vertical-align: middle; align-items: center; justify-content: space-between;" }, "Show info on load: ", this._showSongDetailsBox), div$1({ style: "vertical-align: middle; align-items: center; justify-content: space-between; display: flex;" }, "Song looping type: ", this._songLoopTypeContainer), div$1({ style: "display: flex; flex-direction: column; align-items: baseline;" }, "Song Theme: ", this._doc.song.setSongTheme), div$1({ style: "text-align: left;" }, div$1({ style: "display:flex; gap: 3px; margin-bottom: 1em;" }, "Song Length: ", this._computedSamplesLabel), div$1({ style: "margin-bottom: 0.5em;" }, "Pitch Channels: " + this._doc.song.pitchChannelCount), div$1({ style: "margin-bottom: 0.5em;" }, "Noise Channels: " + this._doc.song.noiseChannelCount), div$1({}, "Mod Channels: " + this._doc.song.modChannelCount), br(), "URL Length: " + location.href.length, this._cantShortenLabel, br()), div$1({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" }, this._okayButton), this._cancelButton);
             this._close = () => {
                 this._doc.undo();
             };
@@ -62420,12 +63603,15 @@ You should be redirected to the song at:<br /><br />
                 group.append(new ChangeSongAuthor(this._doc, this._doc.song.author, this._songAuthor.value));
                 group.append(new ChangeSongDescription(this._doc, this._doc.song.description, this._songDescription.value));
                 group.append(new ChangeShowSongDetails(this._doc, this._doc.song.showSongDetails, this._showSongDetailsBox.checked));
+                group.append(new ChangeLoopType(this._doc, this._doc.song.loopType, Number(this._songLoopTypeSelector.value)));
                 this._doc.prompt = null;
                 this._doc.record(group, true);
             };
             this._showSongDetailsBox.checked = this._doc.song.showSongDetails;
-            this._cantShortenLabel.style.display = (location.href.length > (window.localStorage.getItem("shortenerStrategySelect") == "isgd" ? 5010 : 12233)) ? "" : "none";
+            const shortener = shorteners[this._doc.prefs.shortenerStrategySelect || "wackybox"];
+            this._cantShortenLabel.style.display = (location.href.length > shortener.maxLength) ? "" : "none";
             this._computedSamplesLabel.firstChild.textContent = this._doc.samplesToTime(this._doc.synth.getTotalSamples(true, true, 0));
+            this._songLoopTypeSelector.value = String(this._doc.song.loopType - 1);
             this._okayButton.addEventListener("click", this._saveChanges);
             this._cancelButton.addEventListener("click", this._close);
         }
@@ -62433,6 +63619,7 @@ You should be redirected to the song at:<br /><br />
 
     const { button, div, input, select, span, optgroup, option, canvas } = HTML;
     const beepboxEditorContainer$1 = document.getElementById("beepboxEditorContainer");
+    let hiddenEffects = [];
     function buildOptions(menu, items) {
         for (let index = 0; index < items.length; index++) {
             menu.appendChild(option({ value: index }, items[index]));
@@ -62982,15 +64169,27 @@ You should be redirected to the song at:<br /><br />
         }
     }
     class SongEditor {
+        _setEffectVisible(effectName) {
+            let effectVar = document.getElementById(effectName);
+            let effectLabel = document.getElementById(effectName + "Label");
+            if (hiddenEffects.includes(effectName)) {
+                hiddenEffects.splice(hiddenEffects.indexOf(effectName), 1);
+            }
+            else {
+                hiddenEffects.push(effectName);
+            }
+            effectVar.setAttribute("class", hiddenEffects.includes(effectName) ? "effectGroup hidden" : "effectGroup");
+            effectLabel.setAttribute("class", hiddenEffects.includes(effectName) ? "effectLabel hidden" : "effectLabel");
+        }
         constructor(_doc) {
             this._doc = _doc;
             this.prompt = null;
             this._menuMode = 1;
             this._instSettingMode = 1;
-            this._mobilePatternButton = button({ class: "mobilePatternButton", type: "button", style: "display:none; width: 33vw; height: 75%;" });
-            this._mobileTrackButton = button({ class: "mobileTrackButton", type: "button", style: "display:none; width: 34vw; height: 60%;" });
-            this._mobileSettingsButton = button({ class: "mobileSettingsButton", type: "button", style: "display:none; width: 33vw; height: 60%;" });
-            this.mobileMenu = div({ class: "mobileMenu", style: "position: fixed; bottom: 0px; height: 20vh; width: 100vw; display:none; background: var(--editor-background); z-index: 5;" });
+            this._mobilePatternButton = button({ class: "mobilePatternButton", type: "button", style: "display:none; width: 100%; height: 100%;" });
+            this._mobileTrackButton = button({ class: "mobileTrackButton", type: "button", style: "display:none; width: 100%; height: 100%;" });
+            this._mobileSettingsButton = button({ class: "mobileSettingsButton", type: "button", style: "display:none; width: 100%; height: 100%;" });
+            this.mobileMenu = div({ class: "mobileMenu" });
             this._mobileEditMenuIcon = div({ class: "mobileEditMenuIcon" });
             this._mobileTrackMenuIcon = div({ class: "mobileTrackMenuIcon" });
             this._mobileSettingsMenuIcon = div({ class: "mobileSettingsMenuIcon" });
@@ -63026,14 +64225,110 @@ You should be redirected to the song at:<br /><br />
             this._volumeBarBox = div({ class: "playback-volume-bar", style: "height: 12px; align-self: center;" }, this._volumeBarContainer);
             this._fileMenu = select({ style: "width: 100%;" }, option({ selected: true, disabled: true, hidden: false }, "File"), option({ value: "new" }, "+ New Blank Song"), option({ value: "import" }, "↑ > Import/Export Song (" + EditorConfig.ctrlSymbol + "S/" + EditorConfig.ctrlSymbol + "O)"), option({ value: "copyUrl" }, "⎘ Copy Song URL"), option({ value: "shareUrl" }, "⤳ Share Song URL"), option({ value: "shortenUrl" }, "… Shorten Song URL"), option({ value: "configureShortener" }, "🛠 > Customize Url Shortener"), option({ value: "viewPlayer" }, "▶ View in Song Player"), option({ value: "copyEmbed" }, "⎘ Copy HTML Embed Code"), option({ value: "songRecovery" }, "⚠ > Recover Recent Song"), option({ value: "openManual" }, "🕮 > Open Manual"));
             this._editMenu = select({ style: "width: 100%;" }, option({ selected: true, disabled: true, hidden: false }, "Edit"), option({ value: "undo" }, "Undo (Z)"), option({ value: "redo" }, "Redo (Y)"), option({ value: "copy" }, "Copy Pattern (C)"), option({ value: "pasteNotes" }, "Paste Pattern Notes (V)"), option({ value: "pasteNumbers" }, "Paste Pattern Numbers (" + EditorConfig.ctrlSymbol + "⇧V)"), option({ value: "insertBars" }, "Insert Bar (⏎)"), option({ value: "deleteBars" }, "Delete Selected Bars (⌫)"), option({ value: "insertChannel" }, "Insert Channel (" + EditorConfig.ctrlSymbol + "⏎)"), option({ value: "deleteChannel" }, "Delete Selected Channels (" + EditorConfig.ctrlSymbol + "⌫)"), option({ value: "selectChannel" }, "Select Channel (⇧A)"), option({ value: "selectAll" }, "Select All (A)"), option({ value: "duplicatePatterns" }, "Duplicate Reused Patterns (D)"), option({ value: "transposeUp" }, "Move Notes Up (+ or ⇧+)"), option({ value: "transposeDown" }, "Move Notes Down (- or ⇧-)"), option({ value: "moveNotesSideways" }, "> Move All Notes Sideways (W)"), option({ value: "generateEuclideanRhythm" }, "> Generate Euclidean Rhythm (E)"), option({ value: "beatsPerBar" }, "> Change Beats Per Bar (B)"), option({ value: "barCount" }, "> Change Song Length (L)"), option({ value: "channelSettings" }, "> Channel Settings (Q)"), option({ value: "limiterSettings" }, "> Limiter Settings (⇧L)"), option({ value: "addExternal" }, "> Add Custom Samples (⇧Q)"), option({ value: "songTheme" }, "> Set Theme For Song"), option({ value: "presetsPrompt" }, "> Select Presets"));
-            this._optionsMenu = select({ style: "width: 100%;" }, option({ selected: true, disabled: true, hidden: false }, "Preferences"), optgroup({ label: "Technical" }, option({ value: "autoPlay" }, "Auto Play on Load"), option({ value: "autoFollow" }, "Auto Follow Playhead"), option({ value: "enableNotePreview" }, "Hear Added Notes"), option({ value: "notesOutsideScale" }, "Place Notes Out of Scale"), option({ value: "setDefaultScale" }, "Set Current Scale as Default"), option({ value: "alwaysFineNoteVol" }, "Always Fine Note Volume"), option({ value: "enableChannelMuting" }, "Enable Channel Muting"), option({ value: "instrumentCopyPaste" }, "Enable Copy/Paste Buttons"), option({ value: "instrumentImportExport" }, "Enable Import/Export Buttons"), option({ value: "displayBrowserUrl" }, "Enable Song Data in URL"), option({ value: "closePromptByClickoff" }, "Close prompts on click off"), option({ value: "oldMobileLayout" }, "Use the Old mobile layout (Reload)"), option({ value: "instrumentSettingsSimplifier" }, "Use Instrument Setting Tabs"), option({ value: "promptSongDetails" }, "Prompt Song Details on Load"), option({ value: "recordingSetup" }, "Note Recording...")), optgroup({ label: "Appearance" }, option({ value: "showThird" }, 'Highlight "Third" Note (SandBox)'), option({ value: "showFifth" }, 'Highlight "Fifth" Note'), option({ value: "advancedColorScheme" }, "Advanced Color Scheme (ModBox)"), option({ value: "notesFlashWhenPlayed" }, "Notes Flash When Played (DB2)"), option({ value: "showChannels" }, "Show All Channels"), option({ value: "showScrollBar" }, "Show Octave Scroll Bar"), option({ value: "showLetters" }, "Show Piano Keys"), option({ value: "displayVolumeBar" }, "Show Playback Volume"), option({ value: "showOscilloscope" }, "Show Oscilloscope"), option({ value: "showSampleLoadingStatus" }, "Show Sample Loading Status"), option({ value: "showDescription" }, "Show Description"), option({ value: "frostedGlassBackground" }, "Use Frosted Glass Prompt Backdrops"), option({ value: "displayShortcutButtons" }, "Display Mobile Shortcut Buttons"), option({ value: "oldModNotes" }, 'Use Old Mod Notes'), option({ value: "selectionCounter" }, 'Selection Counter'), option({ value: "layout" }, "> Set Layout"), option({ value: "colorTheme" }, "> Set Theme"), option({ value: "customFont" }, "> Set Font"), option({ value: "customTheme" }, "> Custom Theme")));
+            this._optionsMenu = select({ style: "width: 100%;" }, option({ selected: true, disabled: true, hidden: false }, "Preferences"), optgroup({ label: "Technical" }, option({ value: "autoPlay" }, "Auto Play on Load"), option({ value: "autoFollow" }, "Auto Follow Playhead"), option({ value: "enableNotePreview" }, "Hear Added Notes"), option({ value: "notesOutsideScale" }, "Place Notes Out of Scale"), option({ value: "setDefaultScale" }, "Set Current Scale as Default"), option({ value: "alwaysFineNoteVol" }, "Always Fine Note Volume"), option({ value: "enableChannelMuting" }, "Enable Channel Muting"), option({ value: "instrumentCopyPaste" }, "Enable Copy/Paste Buttons"), option({ value: "instrumentImportExport" }, "Enable Import/Export Buttons"), option({ value: "displayBrowserUrl" }, "Enable Song Data in URL"), option({ value: "closePromptByClickoff" }, "Close prompts on click off"), option({ value: "oldMobileLayout" }, "Use the Old mobile layout (Reload)"), option({ value: "instrumentSettingsSimplifier" }, "Use Instrument Setting Tabs"), option({ value: "promptSongDetails" }, "Prompt Song Details on Load"), option({ value: "recordingSetup" }, "Note Recording...")), optgroup({ label: "Appearance" }, option({ value: "showThird" }, 'Highlight "Third" Note (SandBox)'), option({ value: "showFifth" }, 'Highlight "Fifth" Note'), option({ value: "advancedColorScheme" }, "Advanced Color Scheme (ModBox)"), option({ value: "notesFlashWhenPlayed" }, "Notes Flash When Played (DB2)"), option({ value: "showChannels" }, "Show All Channels"), option({ value: "showScrollBar" }, "Show Octave Scroll Bar"), option({ value: "showLetters" }, "Show Piano Keys"), option({ value: "displayVolumeBar" }, "Show Playback Volume"), option({ value: "showOscilloscope" }, "Show Oscilloscope"), option({ value: "showSampleLoadingStatus" }, "Show Sample Loading Status"), option({ value: "showDescription" }, "Show Description"), option({ value: "frostedGlassBackground" }, "Use Frosted Glass Prompt Backdrops"), option({ value: "displayShortcutButtons" }, "Display Mobile Shortcut Buttons"), option({ value: "oldModNotes" }, 'Use Old Mod Notes'), option({ value: "newEffectMenu" }, "Collapsable Effects"), option({ value: "selectionCounter" }, 'Selection Counter'), option({ value: "layout" }, "> Set Layout"), option({ value: "colorTheme" }, "> Set Theme"), option({ value: "customFont" }, "> Set Font"), option({ value: "customTheme" }, "> Custom Theme")));
             this._scaleSelect = buildOptions(select(), Config.scales.map(scale => scale.name));
             this._keySelect = buildOptions(select(), Config.keys.map(key => key.name).reverse());
             this._octaveStepper = input({ style: "width: 59.5%;", type: "number", min: Config.octaveMin, max: Config.octaveMax, value: "0" });
             this._tempoSlider = new Slider(input({ style: "margin: 0; vertical-align: middle;", type: "range", min: "1", max: "500", value: "160", step: "1" }), this._doc, (oldValue, newValue) => new ChangeTempo(this._doc, oldValue, newValue), false);
             this._tempoStepper = input({ style: "width: 4em; font-size: 80%; margin-left: 0.4em; vertical-align: middle;", type: "number", step: "1" });
+            this._songEqFilterEditor = new FilterEditor(this._doc, false, false, true);
+            this._songEqFilterZoom = button({ style: "margin-left:0em; padding-left:0.2em; height:1.5em; max-width: 12px;", onclick: () => this._openPrompt("customSongEQFilterSettings") }, "+");
+            this._transitionDropdown = button({ style: "margin-left:0em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: () => this._toggleDropdownMenu(3) }, "▼");
+            this._transitionSelect = buildOptions(select(), Config.transitions.map(transition => transition.name));
+            this._transitionRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("transition") }, "Transition:"), this._transitionDropdown, div({ class: "selectContainer", style: "width: 52.5%;" }, this._transitionSelect));
+            this._clicklessTransitionBox = input({ type: "checkbox", style: "width: 1em; padding: 0; margin-right: 4em;" });
+            this._clicklessTransitionRow = div({ class: "selectRow dropFader" }, span({ class: "tip", style: "margin-left:4px;", onclick: () => this._openPrompt("clicklessTransition") }, "‣ Clickless:"), this._clicklessTransitionBox);
+            this._slideSpeedDisplay = span({ style: `color: ${ColorConfig.secondaryText}; font-size: smaller; text-overflow: clip;` }, "x1");
+            this._slideSpeedSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "1", max: "48", value: "3", step: "1" }), this._doc, (oldValue, newValue) => new ChangeSlideSpeed(this._doc, oldValue, newValue), false);
+            this._slideSpeedRow = div({ class: "selectRow" }, span({ class: "tip", style: "margin-left:4px;", onclick: () => this._openPrompt("slideSpeedSlider") }, "‣ Spd:"), this._slideSpeedDisplay, this._slideSpeedSlider.container);
+            this._transitionDropdownGroup = div({ class: "editor-controls", style: "display: none;" }, this._slideSpeedRow, this._clicklessTransitionRow);
+            this._transitionLabel = div({ class: "effectLabel", onclick: () => this._setEffectVisible("transition"), id: "transitionLabel" }, "Transition type");
+            this._transitionContainerRow = div({ class: "effectRow", style: "display:flex; flex-direction:column;" }, this._transitionLabel, div({ class: "effectGroup", id: "transition" }, this._transitionRow, this._transitionDropdownGroup));
+            this._chordSelect = buildOptions(select(), Config.chords.map(chord => chord.name));
+            this._chordDropdown = button({ style: "margin-left:0em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: () => this._toggleDropdownMenu(2) }, "▼");
+            this._chordSelectRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("chords") }, "Chords:"), this._chordDropdown, div({ class: "selectContainer" }, this._chordSelect));
+            this._arpeggioSpeedDisplay = span({ style: `color: ${ColorConfig.secondaryText}; font-size: smaller; text-overflow: clip;` }, "x1");
+            this._arpeggioSpeedSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.modulators.dictionary["arp speed"].maxRawVol, value: "0", step: "1" }), this._doc, (oldValue, newValue) => new ChangeArpeggioSpeed(this._doc, oldValue, newValue), false);
+            this._arpeggioSpeedRow = div({ class: "selectRow dropFader" }, span({ class: "tip", style: "margin-left:4px;", onclick: () => this._openPrompt("arpeggioSpeed") }, "‣ Spd:"), this._arpeggioSpeedDisplay, this._arpeggioSpeedSlider.container);
+            this._strumSpeedDisplay = span({ style: `color: ${ColorConfig.secondaryText}; font-size: smaller; text-overflow: clip;` }, "0.04 beat(s)");
+            this._strumSpeedSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "1", max: "48", value: "1", step: "1" }), this._doc, (oldValue, newValue) => new ChangeStrumSpeed(this._doc, oldValue, newValue), false);
+            this._strumSpeedRow = div({ class: "selectRow dropFader" }, span({ class: "tip", style: "margin-left:4px;", onclick: () => this._openPrompt("strumSpeedSlider") }, "‣ Spd:"), this._strumSpeedDisplay, this._strumSpeedSlider.container);
+            this._twoNoteArpBox = input({ type: "checkbox", style: "width: 1em; padding: 0; margin-right: 4em;" });
+            this._twoNoteArpRow = div({ class: "selectRow dropFader" }, span({ class: "tip", style: "margin-left:4px;", onclick: () => this._openPrompt("twoNoteArpeggio") }, "‣ Fast Two-Note:"), this._twoNoteArpBox);
+            this._chordDropdownGroup = div({ class: "editor-controls", style: "display: none;" }, this._strumSpeedRow, this._arpeggioSpeedRow, this._twoNoteArpRow);
+            this._chordLabel = div({ class: "effectLabel", onclick: () => this._setEffectVisible("chordType"), id: "chordTypeLabel" }, "Chord type");
+            this._chordContainerRow = div({ class: "effectRow", style: "display:flex; flex-direction:column;" }, this._chordLabel, div({ class: "effectGroup", id: "chordType" }, this._chordSelectRow, this._chordDropdownGroup));
+            this._pitchShiftSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.pitchShiftRange - 1, value: "0", step: "1" }), this._doc, (oldValue, newValue) => new ChangePitchShift(this._doc, oldValue, newValue), true);
+            this._pitchShiftTonicMarkers = [div({ class: "pitchShiftMarker", style: { color: ColorConfig.tonic } }), div({ class: "pitchShiftMarker", style: { color: ColorConfig.tonic, left: "50%" } }), div({ class: "pitchShiftMarker", style: { color: ColorConfig.tonic, left: "100%" } })];
+            this._pitchShiftFifthMarkers = [div({ class: "pitchShiftMarker", style: { color: ColorConfig.fifthNote, left: (100 * 7 / 24) + "%" } }), div({ class: "pitchShiftMarker", style: { color: ColorConfig.fifthNote, left: (100 * 19 / 24) + "%" } })];
+            this._pitchShiftMarkerContainer = div({ style: "display: flex; position: relative;" }, this._pitchShiftSlider.container, div({ class: "pitchShiftMarkerContainer" }, this._pitchShiftTonicMarkers, this._pitchShiftFifthMarkers));
+            this._pitchShiftRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("pitchShift") }, "Pitch Shift:"), this._pitchShiftMarkerContainer);
+            this._pitchShiftLabel = div({ class: "effectLabel", onclick: () => this._setEffectVisible("pitchShift"), id: "pitchShiftLabel" }, "Pitch shift");
+            this._pitchShiftContainerRow = div({ class: "effectRow", style: "display:flex; flex-direction:column;" }, this._pitchShiftLabel, div({ class: "effectGroup", id: "pitchShift" }, this._pitchShiftRow));
+            this._detuneSlider = new Slider(input({ style: "margin: 0;", type: "range", min: Config.detuneMin - Config.detuneCenter, max: Config.detuneMax - Config.detuneCenter, value: 0, step: "4" }), this._doc, (oldValue, newValue) => new ChangeDetune(this._doc, oldValue, newValue), true);
+            this._detuneSliderInputBox = input({ style: "width: 4em; font-size: 80%; ", id: "detuneSliderInputBox", type: "number", step: "1", min: Config.detuneMin - Config.detuneCenter, max: Config.detuneMax - Config.detuneCenter, value: 0 });
+            this._detuneSliderRow = div({ class: "selectRow" }, div({}, span({ class: "tip", style: "height:1em; font-size: smaller;", onclick: () => this._openPrompt("detune") }, "Detune: "), div({ style: `color: ${ColorConfig.secondaryText}; margin-top: -3px;` }, this._detuneSliderInputBox)), this._detuneSlider.container);
+            this._detuneLabel = div({ class: "effectLabel", onclick: () => this._setEffectVisible("detune"), id: "detuneLabel" }, "Detune");
+            this._detuneContainerRow = div({ class: "effectRow", style: "display:flex; flex-direction:column;" }, this._detuneLabel, div({ class: "effectGroup", id: "detune" }, this._detuneSliderRow));
+            this._vibratoSelect = buildOptions(select(), Config.vibratos.map(vibrato => vibrato.name));
+            this._vibratoDropdown = button({ style: "margin-left:0em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: () => this._toggleDropdownMenu(0) }, "▼");
+            this._vibratoSelectRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("vibrato") }, "Vibrato:"), this._vibratoDropdown, div({ class: "selectContainer", style: "width: 61.5%;" }, this._vibratoSelect));
+            this._vibratoDepthSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.modulators.dictionary["vibrato depth"].maxRawVol, value: "0", step: "1" }), this._doc, (oldValue, newValue) => new ChangeVibratoDepth(this._doc, oldValue, newValue), false);
+            this._vibratoDepthRow = div({ class: "selectRow dropFader" }, span({ class: "tip", style: "margin-left:4px;", onclick: () => this._openPrompt("vibratoDepth") }, "‣ Depth:"), this._vibratoDepthSlider.container);
+            this._vibratoSpeedDisplay = span({ style: `color: ${ColorConfig.secondaryText}; font-size: smaller; text-overflow: clip;` }, "x1");
+            this._vibratoSpeedSlider = new Slider(input({ style: "margin: 0; text-overflow: clip;", type: "range", min: "0", max: Config.modulators.dictionary["vibrato speed"].maxRawVol, value: "0", step: "1" }), this._doc, (oldValue, newValue) => new ChangeVibratoSpeed(this._doc, oldValue, newValue), false);
+            this._vibratoSpeedRow = div({ class: "selectRow dropFader" }, span({ class: "tip", style: "margin-left:4px;", onclick: () => this._openPrompt("vibratoSpeed") }, "‣ Spd:"), this._vibratoSpeedDisplay, this._vibratoSpeedSlider.container);
+            this._vibratoDelaySlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.modulators.dictionary["vibrato delay"].maxRawVol, value: "0", step: "1" }), this._doc, (oldValue, newValue) => new ChangeVibratoDelay(this._doc, oldValue, newValue), false);
+            this._vibratoDelayRow = div({ class: "selectRow dropFader" }, span({ class: "tip", style: "margin-left:4px;", onclick: () => this._openPrompt("vibratoDelay") }, "‣ Delay:"), this._vibratoDelaySlider.container);
+            this._vibratoTypeSelect = buildOptions(select(), Config.vibratoTypes.map(vibrato => vibrato.name));
+            this._vibratoTypeSelectRow = div({ class: "selectRow dropFader" }, span({ class: "tip", style: "margin-left:4px;", onclick: () => this._openPrompt("vibratoType") }, "‣ Type:"), div({ class: "selectContainer", style: "width: 61.5%;" }, this._vibratoTypeSelect));
+            this._vibratoDropdownGroup = div({ class: "editor-controls", style: `display: none;` }, this._vibratoDepthRow, this._vibratoSpeedRow, this._vibratoDelayRow, this._vibratoTypeSelectRow);
+            this._vibratoLabel = div({ class: "effectLabel", onclick: () => this._setEffectVisible("vibrato"), id: "vibratoLabel" }, "Vibrato");
+            this._vibratoContainerRow = div({ class: "effectRow", style: "display:flex; flex-direction:column;" }, this._vibratoLabel, div({ class: "effectGroup", id: "vibrato" }, this._vibratoSelectRow, this._vibratoDropdownGroup));
+            this._noteFilterSimpleButton = button({ style: "font-size: x-small; width: 50%; height: 40%", class: "no-underline", onclick: () => this._switchNoteFilterType(true) }, "simple");
+            this._noteFilterAdvancedButton = button({ style: "font-size: x-small; width: 50%; height: 40%", class: "last-button no-underline", onclick: () => this._switchNoteFilterType(false) }, "advanced");
+            this._noteFilterTypeRow = div({ class: "selectRow", style: "padding-top: 4px; margin-bottom: 0px;" }, span({ style: "font-size: x-small;", class: "tip", onclick: () => this._openPrompt("filterType") }, "Note Filt.Type:"), div({ class: "instrument-bar" }, this._noteFilterSimpleButton, this._noteFilterAdvancedButton));
+            this._noteFilterEditor = new FilterEditor(this._doc, true);
+            this._noteFilterZoom = button({ style: "margin-left:0em; padding-left:0.2em; height:1.5em; max-width: 12px;", onclick: () => this._openPrompt("customNoteFilterSettings") }, "+");
+            this._noteFilterRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("noteFilter") }, "Note Filt:"), this._noteFilterZoom, this._noteFilterEditor.container);
+            this._noteFilterSimpleCutSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.filterSimpleCutRange - 1, value: "6", step: "1" }), this._doc, (oldValue, newValue) => new ChangeNoteFilterSimpleCut(this._doc, oldValue, newValue), false);
+            this._noteFilterSimpleCutRow = div({ class: "selectRow", title: "Low-pass Filter Cutoff Frequency" }, span({ class: "tip", onclick: () => this._openPrompt("filterCutoff") }, "Filter Cut:"), this._noteFilterSimpleCutSlider.container);
+            this._noteFilterSimplePeakSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.filterSimplePeakRange - 1, value: "6", step: "1" }), this._doc, (oldValue, newValue) => new ChangeNoteFilterSimplePeak(this._doc, oldValue, newValue), false);
+            this._noteFilterSimplePeakRow = div({ class: "selectRow", title: "Low-pass Filter Peak Resonance" }, span({ class: "tip", onclick: () => this._openPrompt("filterResonance") }, "Filter Peak:"), this._noteFilterSimplePeakSlider.container);
+            this._noteFilterLabel = div({ class: "effectLabel", onclick: () => this._setEffectVisible("noteFilter"), id: "noteFilterLabel" }, "Note Filter");
+            this._noteFilterContainerRow = div({ class: "effectRow", style: "display:flex; flex-direction:column;" }, this._noteFilterLabel, div({ class: "effectGroup", id: "noteFilter" }, this._noteFilterTypeRow, this._noteFilterRow, this._noteFilterSimpleCutRow, this._noteFilterSimplePeakRow));
+            this._distortionSlider = new Slider(input({ style: "margin: 0; position: sticky;", type: "range", min: "0", max: Config.distortionRange - 1, value: "0", step: "1" }), this._doc, (oldValue, newValue) => new ChangeDistortion(this._doc, oldValue, newValue), false);
+            this._distortionRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("distortion") }, "Distortion:"), this._distortionSlider.container);
+            this._aliasingBox = input({ type: "checkbox", style: "width: 1em; padding: 0; margin-right: 4em;" });
+            this._aliasingRow = div({ class: "selectRow" }, span({ class: "tip", style: "margin-left:10px;", onclick: () => this._openPrompt("aliases") }, "Aliasing:"), this._aliasingBox);
+            this._distortionLabel = div({ class: "effectLabel", onclick: () => this._setEffectVisible("distortion"), id: "distortionLabel" }, "Distortion");
+            this._distortionContainerRow = div({ class: "effectRow", style: "display:flex; flex-direction:column;" }, this._distortionLabel, div({ class: "effectGroup", id: "distortion" }, this._distortionRow, this._aliasingRow));
+            this._bitcrusherQuantizationSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.bitcrusherQuantizationRange - 1, value: "0", step: "1" }), this._doc, (oldValue, newValue) => new ChangeBitcrusherQuantization(this._doc, oldValue, newValue), false);
+            this._bitcrusherQuantizationRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("bitcrusherQuantization") }, "Bit Crush:"), this._bitcrusherQuantizationSlider.container);
+            this._bitcrusherFreqSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.bitcrusherFreqRange - 1, value: "0", step: "1" }), this._doc, (oldValue, newValue) => new ChangeBitcrusherFreq(this._doc, oldValue, newValue), false);
+            this._bitcrusherFreqRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("bitcrusherFreq") }, "Freq Crush:"), this._bitcrusherFreqSlider.container);
+            this._bitcrusherLabel = div({ class: "effectLabel", onclick: () => this._setEffectVisible("bitcrusher"), id: "bitcrusherLabel" }, "Bitcrusher");
+            this._bitcrusherContainerRow = div({ class: "effectRow", style: "display:flex; flex-direction:column;" }, this._bitcrusherLabel, div({ class: "effectGroup", id: "bitcrusher" }, this._bitcrusherQuantizationRow, this._bitcrusherFreqRow));
             this._chorusSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.chorusRange - 1, value: "0", step: "1" }), this._doc, (oldValue, newValue) => new ChangeChorus(this._doc, oldValue, newValue), false);
             this._chorusRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("chorus") }, "Chorus:"), this._chorusSlider.container);
+            this._chorusLabel = div({ class: "effectLabel", onclick: () => this._setEffectVisible("chorus"), id: "chorusLabel" }, "Chorus");
+            this._chorusContainerRow = div({ class: "effectRow", style: "display:flex; flex-direction:column;" }, this._chorusLabel, div({ class: "effectGroup", id: "chorus" }, this._chorusRow));
+            this._echoSustainSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.echoSustainRange - 1, value: "0", step: "1" }), this._doc, (oldValue, newValue) => new ChangeEchoSustain(this._doc, oldValue, newValue), false);
+            this._echoSustainRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("echoSustain") }, "Echo:"), this._echoSustainSlider.container);
+            this._echoDelaySlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.echoDelayRange - 1, value: "0", step: "1" }), this._doc, (oldValue, newValue) => new ChangeEchoDelay(this._doc, oldValue, newValue), false);
+            this._echoDelayRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("echoDelay") }, "Echo Delay:"), this._echoDelaySlider.container);
+            this._echoLabel = div({ class: "effectLabel", onclick: () => this._setEffectVisible("echo"), id: "echoLabel" }, "Echo");
+            this._echoContainerRow = div({ class: "effectRow", style: "display:flex; flex-direction:column;" }, this._echoLabel, div({ class: "effectGroup", id: "echo" }, this._echoSustainRow, this._echoDelayRow));
+            this._reverbSlider = new Slider(input({ style: "margin: 0; position: sticky,", type: "range", min: "0", max: Config.reverbRange - 1, value: "0", step: "1" }), this._doc, (oldValue, newValue) => new ChangeReverb(this._doc, oldValue, newValue), false);
+            this._reverbWetSlider = new Slider(input({ style: "margin: 0; position: sticky,", type: "range", min: "0", max: Config.reverbWetRange - 1, value: "0", step: "1" }), this._doc, (oldValue, newValue) => new ChangeReverbWet(this._doc, oldValue, newValue), false);
+            this._reverbDrySlider = new Slider(input({ style: "margin: 0; position: sticky,", type: "range", min: "0", max: Config.reverbDryRange - 1, value: "0", step: "1" }), this._doc, (oldValue, newValue) => new ChangeReverbDry(this._doc, oldValue, newValue), false);
+            this._reverbDropdown = button({ style: "margin-left:0em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: () => this._toggleDropdownMenu(8) }, "▼");
+            this._reverbRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("reverb") }, "Reverb:"), this._reverbDropdown, this._reverbSlider.container);
+            this._reverbWetRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("reverbWetDry") }, "Wet:"), this._reverbWetSlider.container);
+            this._reverbDryRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("reverbWetDry") }, "Dry:"), this._reverbDrySlider.container);
+            this._reverbDropdownGroup = div({ class: "editor-controls", style: `display: none;` }, this._reverbWetRow, this._reverbDryRow);
+            this._reverbLabel = div({ class: "effectLabel", onclick: () => this._setEffectVisible("reverb"), id: "reverbLabel" }, "Reverb");
+            this._reverbContainerRow = div({ class: "effectRow", style: "display:flex; flex-direction:column;" }, this._reverbLabel, div({ class: "effectGroup", id: "reverb" }, this._reverbRow, this._reverbDropdownGroup));
             this._ringModWaveSelect = buildOptions(select({}), Config.operatorWaves.map(wave => wave.name));
             this._ringModSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.ringModRange - 1, value: "0", step: "1" }), this._doc, (oldValue, newValue) => new ChangeRingMod(this._doc, oldValue, newValue), false);
             this._ringModRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("ringMod") }, "Ring Mod:"), this._ringModSlider.container);
@@ -63044,9 +64339,30 @@ You should be redirected to the song at:<br /><br />
             this._ringModHzSliderRow = div({ class: "selectRow", style: "width:100%;" }, div({ style: "display:flex; flex-direction:column; align-items:center;" }, span({ class: "tip", style: "font-size: smaller;", onclick: () => this._openPrompt("RingModHz") }, "Hertz: "), div({ style: `color: ${ColorConfig.secondaryText}; ` }, this._ringModHzNum)), this._ringModHzSlider.container);
             this._rmOffsetHzSliderRow = div({ class: "selectRow", style: "width:100%;" }, div({ style: "display:flex; flex-direction:column; align-items:center;" }, span({ class: "tip", style: "font-size: smaller;", onclick: () => this._openPrompt("RingModHz") }, "Hz Offset: "), div({ style: `color: ${ColorConfig.secondaryText}; ` }, this._rmHzOffsetSliderInputBox)), this._rmHzOffsetSlider.container);
             this._ringModPulsewidthSlider = new Slider(input({ style: "margin-left: 10px; width: 85%;", type: "range", min: "0", max: Config.pwmOperatorWaves.length - 1, value: "0", step: "1", title: "Pulse Width" }), this._doc, (oldValue, newValue) => new ChangeRingModPulseWidth(this._doc, oldValue, newValue), true);
+            this._ringModLabel = div({ class: "effectLabel", onclick: () => this._setEffectVisible("ringMod"), id: "ringModLabel" }, "Ring Modulation");
             this._ringModWaveText = span({ class: "tip", onclick: () => this._openPrompt("chipWave") }, "Wave: ");
             this._ringModWaveSelectRow = div({ class: "selectRow", style: "width: 100%;" }, this._ringModWaveText, this._ringModPulsewidthSlider.container, div({ class: "selectContainer", style: "width:40%;" }, this._ringModWaveSelect));
-            this._ringModContainerRow = div({ class: "selectRow", style: "display:flex; flex-direction:column; height: 128px;" }, this._ringModRow, this._ringModHzSliderRow, this._rmOffsetHzSliderRow, this._ringModWaveSelectRow);
+            this._ringModContainerRow = div({ class: "effectRow", style: "display:flex; flex-direction:column;" }, this._ringModLabel, div({ class: "effectGroup", id: "ringMod" }, this._ringModRow, this._ringModHzSliderRow, this._rmOffsetHzSliderRow, this._ringModWaveSelectRow));
+            this._phaserMixSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.phaserMixRange - 1, value: "0", step: "1" }), this._doc, (oldValue, newValue) => new ChangePhaserMix(this._doc, oldValue, newValue), false);
+            this._phaserMixRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("phaserMix") }, span("Phaser:")), this._phaserMixSlider.container);
+            this._phaserFreqSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.phaserFreqRange - 1, value: "0", step: "1" }), this._doc, (oldValue, newValue) => new ChangePhaserFreq(this._doc, oldValue, newValue), false);
+            this._phaserFreqRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("phaserFreq") }, span(" Freq:")), this._phaserFreqSlider.container);
+            this._phaserFeedbackSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.phaserFeedbackRange - 1, value: "0", step: "1" }), this._doc, (oldValue, newValue) => new ChangePhaserFeedback(this._doc, oldValue, newValue), false);
+            this._phaserFeedbackRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("phaserFeedback") }, span(" Feedback:")), this._phaserFeedbackSlider.container);
+            this._phaserStagesSlider = new Slider(input({ style: "margin: 0;", type: "range", min: Config.phaserMinStages, max: Config.phaserMaxStages, value: "0", step: "1" }), this._doc, (oldValue, newValue) => new ChangePhaserStages(this._doc, oldValue, newValue), false);
+            this._phaserStagesRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("phaserStages") }, span(" Stages:")), this._phaserStagesSlider.container);
+            this._phaserLabel = div({ class: "effectLabel", onclick: () => this._setEffectVisible("phaser"), id: "phaserLabel" }, "Phaser");
+            this._phaserContainerRow = div({ class: "effectRow", style: "display:flex; flex-direction:column;" }, this._phaserLabel, div({ class: "effectGroup", id: "phaser" }, this._phaserMixRow, this._phaserFreqRow, this._phaserFeedbackRow, this._phaserStagesRow));
+            this._upperNoteLimitInputBox = input({ style: "width: 4em; font-size: 80%; ", id: "upperNoteLimitInputBox", type: "number", step: "1", min: 0, max: Config.maxPitch, value: 60 });
+            this._upperNoteLimitRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("upperNoteLimit") }, "Upper Note Limit:"), this._upperNoteLimitInputBox);
+            this._lowerNoteLimitInputBox = input({ style: "width: 4em; font-size: 80%; ", id: "lowerNoteLimitInputBox", type: "number", step: "1", min: 0, max: Config.maxPitch, value: 60 });
+            this._lowerNoteLimitRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("lowerNoteLimit") }, "Lower Note Limit:"), this._lowerNoteLimitInputBox);
+            this._noteRangeLabel = div({ class: "effectLabel", onclick: () => this._setEffectVisible("noteRange"), id: "noteRangeLabel" }, "Note Range");
+            this._noteRangeContainerRow = div({ class: "effectRow", style: "display:flex; flex-direction:column;" }, this._noteRangeLabel, div({ class: "effectGroup", id: "noteRange" }, this._upperNoteLimitRow, this._lowerNoteLimitRow));
+            this._invertWaveBox = input({ type: "checkbox", style: "width: 1em; padding: 0; margin-right: 4em;" });
+            this._invertWaveRow = div({ class: "selectRow" }, span({ class: "tip", style: "margin-left:10px;", onclick: () => this._openPrompt("invertWave") }, "Invert Wave:"), this._invertWaveBox);
+            this._invertWaveLabel = div({ class: "effectLabel", onclick: () => this._setEffectVisible("invertWave"), id: "invertWaveLabel" }, "Invert Wave");
+            this._invertWaveContainerRow = div({ class: "effectRow", style: "display:flex; flex-direction:column;" }, this._invertWaveLabel, div({ class: "effectGroup", id: "invertWave" }, this._invertWaveRow));
             this._granularSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.granularRange, value: "0", step: "1" }), this._doc, (oldValue, newValue) => new ChangeGranular(this._doc, oldValue, newValue), false);
             this._granularRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("granular") }, "Granular:"), this._granularSlider.container);
             this._grainSizeSlider = new Slider(input({ style: "margin: 0;", type: "range", min: Config.grainSizeMin / Config.grainSizeStep, max: Config.grainSizeMax / Config.grainSizeStep, value: Config.grainSizeMin / Config.grainSizeStep, step: "1" }), this._doc, (oldValue, newValue) => new ChangeGrainSize(this._doc, oldValue, newValue), false);
@@ -63057,22 +64373,9 @@ You should be redirected to the song at:<br /><br />
             this._grainRangeSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.grainRangeMax / Config.grainSizeStep, value: "0", step: "1" }), this._doc, (oldValue, newValue) => new ChangeGrainRange(this._doc, oldValue, newValue), false);
             this.grainRangeNum = div({ style: "font-size: 80%; ", id: "grainRangeNum" });
             this._grainRangeSliderRow = div({ class: "selectRow", style: "width:100%;" }, div({ style: "display:flex; flex-direction:column; align-items:center;" }, span({ class: "tip", style: "font-size: smaller;", onclick: () => this._openPrompt("grainRange") }, "Range: "), div({ style: `color: ${ColorConfig.secondaryText}; ` }, this.grainRangeNum)), this._grainRangeSlider.container);
-            this._granularContainerRow = div({ class: "", style: "display:flex; flex-direction:column;" }, this._granularRow, this._grainAmountsRow, this._grainSizeSliderRow, this._grainRangeSliderRow);
-            this._reverbSlider = new Slider(input({ style: "margin: 0; position: sticky,", type: "range", min: "0", max: Config.reverbRange - 1, value: "0", step: "1" }), this._doc, (oldValue, newValue) => new ChangeReverb(this._doc, oldValue, newValue), false);
-            this._reverbRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("reverb") }, "Reverb:"), this._reverbSlider.container);
-            this._echoSustainSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.echoSustainRange - 1, value: "0", step: "1" }), this._doc, (oldValue, newValue) => new ChangeEchoSustain(this._doc, oldValue, newValue), false);
-            this._echoSustainRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("echoSustain") }, "Echo:"), this._echoSustainSlider.container);
-            this._echoDelaySlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.echoDelayRange - 1, value: "0", step: "1" }), this._doc, (oldValue, newValue) => new ChangeEchoDelay(this._doc, oldValue, newValue), false);
-            this._echoDelayRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("echoDelay") }, "Echo Delay:"), this._echoDelaySlider.container);
+            this._granularLabel = div({ class: "effectLabel", onclick: () => this._setEffectVisible("granular"), id: "granularLabel" }, "Granular");
+            this._granularContainerRow = div({ class: "effectRow", style: "display:flex; flex-direction:column;" }, this._granularLabel, div({ class: "effectGroup", id: "granular" }, this._granularRow, this._grainAmountsRow, this._grainSizeSliderRow, this._grainRangeSliderRow));
             this._rhythmSelect = buildOptions(select(), Config.rhythms.map(rhythm => rhythm.name));
-            this._phaserMixSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.phaserMixRange - 1, value: "0", step: "1" }), this._doc, (oldValue, newValue) => new ChangePhaserMix(this._doc, oldValue, newValue), false);
-            this._phaserMixRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("phaserMix") }, span("Phaser:")), this._phaserMixSlider.container);
-            this._phaserFreqSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.phaserFreqRange - 1, value: "0", step: "1" }), this._doc, (oldValue, newValue) => new ChangePhaserFreq(this._doc, oldValue, newValue), false);
-            this._phaserFreqRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("phaserFreq") }, span(" Freq:")), this._phaserFreqSlider.container);
-            this._phaserFeedbackSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.phaserFeedbackRange - 1, value: "0", step: "1" }), this._doc, (oldValue, newValue) => new ChangePhaserFeedback(this._doc, oldValue, newValue), false);
-            this._phaserFeedbackRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("phaserFeedback") }, span(" Feedback:")), this._phaserFeedbackSlider.container);
-            this._phaserStagesSlider = new Slider(input({ style: "margin: 0;", type: "range", min: Config.phaserMinStages, max: Config.phaserMaxStages, value: "0", step: "1" }), this._doc, (oldValue, newValue) => new ChangePhaserStages(this._doc, oldValue, newValue), false);
-            this._phaserStagesRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("phaserStages") }, span(" Stages:")), this._phaserStagesSlider.container);
             this._pitchedPresetSelect = buildPresetOptions(false, "pitchPresetSelect");
             this._drumPresetSelect = buildPresetOptions(true, "drumPresetSelect");
             this._algorithmSelect = buildOptions(select(), Config.algorithms.map(algorithm => algorithm.name));
@@ -63113,15 +64416,6 @@ You should be redirected to the song at:<br /><br />
             this._chipWavePlayBackwardsRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("backwards") }, "Backwards: "), this._chipWavePlayBackwardsBox);
             this._fadeInOutEditor = new FadeInOutEditor(this._doc);
             this._fadeInOutRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("fadeInOut") }, "Fade:"), this._fadeInOutEditor.container);
-            this._transitionSelect = buildOptions(select(), Config.transitions.map(transition => transition.name));
-            this._transitionDropdown = button({ style: "margin-left:0em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: () => this._toggleDropdownMenu(3) }, "▼");
-            this._transitionRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("transition") }, "Transition:"), this._transitionDropdown, div({ class: "selectContainer", style: "width: 52.5%;" }, this._transitionSelect));
-            this._clicklessTransitionBox = input({ type: "checkbox", style: "width: 1em; padding: 0; margin-right: 4em;" });
-            this._clicklessTransitionRow = div({ class: "selectRow dropFader" }, span({ class: "tip", style: "margin-left:4px;", onclick: () => this._openPrompt("clicklessTransition") }, "‣ Clickless:"), this._clicklessTransitionBox);
-            this._slideSpeedDisplay = span({ style: `color: ${ColorConfig.secondaryText}; font-size: smaller; text-overflow: clip;` }, "x1");
-            this._slideSpeedSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "1", max: "48", value: "3", step: "1" }), this._doc, (oldValue, newValue) => new ChangeSlideSpeed(this._doc, oldValue, newValue), false);
-            this._slideSpeedRow = div({ class: "selectRow" }, span({ class: "tip", style: "margin-left:4px;", onclick: () => this._openPrompt("slideSpeedSlider") }, "‣ Spd:"), this._slideSpeedDisplay, this._slideSpeedSlider.container);
-            this._transitionDropdownGroup = div({ class: "editor-controls", style: "display: none;" }, this._slideSpeedRow, this._clicklessTransitionRow);
             this._effectsSelect = select(option({ selected: true, disabled: true, hidden: false }));
             this._eqFilterSimpleButton = button({ style: "font-size: x-small; width: 50%; height: 40%", class: "no-underline", onclick: () => this._switchEQFilterType(true) }, "simple");
             this._eqFilterAdvancedButton = button({ style: "font-size: x-small; width: 50%; height: 40%", class: "last-button no-underline", onclick: () => this._switchEQFilterType(false) }, "advanced");
@@ -63133,16 +64427,6 @@ You should be redirected to the song at:<br /><br />
             this._eqFilterSimpleCutRow = div({ class: "selectRow", title: "Low-pass Filter Cutoff Frequency" }, span({ class: "tip", onclick: () => this._openPrompt("filterCutoff") }, "Filter Cut:"), this._eqFilterSimpleCutSlider.container);
             this._eqFilterSimplePeakSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.filterSimplePeakRange - 1, value: "6", step: "1" }), this._doc, (oldValue, newValue) => new ChangeEQFilterSimplePeak(this._doc, oldValue, newValue), false);
             this._eqFilterSimplePeakRow = div({ class: "selectRow", title: "Low-pass Filter Peak Resonance" }, span({ class: "tip", onclick: () => this._openPrompt("filterResonance") }, "Filter Peak:"), this._eqFilterSimplePeakSlider.container);
-            this._noteFilterSimpleButton = button({ style: "font-size: x-small; width: 50%; height: 40%", class: "no-underline", onclick: () => this._switchNoteFilterType(true) }, "simple");
-            this._noteFilterAdvancedButton = button({ style: "font-size: x-small; width: 50%; height: 40%", class: "last-button no-underline", onclick: () => this._switchNoteFilterType(false) }, "advanced");
-            this._noteFilterTypeRow = div({ class: "selectRow", style: "padding-top: 4px; margin-bottom: 0px;" }, span({ style: "font-size: x-small;", class: "tip", onclick: () => this._openPrompt("filterType") }, "Note Filt.Type:"), div({ class: "instrument-bar" }, this._noteFilterSimpleButton, this._noteFilterAdvancedButton));
-            this._noteFilterEditor = new FilterEditor(this._doc, true);
-            this._noteFilterZoom = button({ style: "margin-left:0em; padding-left:0.2em; height:1.5em; max-width: 12px;", onclick: () => this._openPrompt("customNoteFilterSettings") }, "+");
-            this._noteFilterRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("noteFilter") }, "Note Filt:"), this._noteFilterZoom, this._noteFilterEditor.container);
-            this._noteFilterSimpleCutSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.filterSimpleCutRange - 1, value: "6", step: "1" }), this._doc, (oldValue, newValue) => new ChangeNoteFilterSimpleCut(this._doc, oldValue, newValue), false);
-            this._noteFilterSimpleCutRow = div({ class: "selectRow", title: "Low-pass Filter Cutoff Frequency" }, span({ class: "tip", onclick: () => this._openPrompt("filterCutoff") }, "Filter Cut:"), this._noteFilterSimpleCutSlider.container);
-            this._noteFilterSimplePeakSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.filterSimplePeakRange - 1, value: "6", step: "1" }), this._doc, (oldValue, newValue) => new ChangeNoteFilterSimplePeak(this._doc, oldValue, newValue), false);
-            this._noteFilterSimplePeakRow = div({ class: "selectRow", title: "Low-pass Filter Peak Resonance" }, span({ class: "tip", onclick: () => this._openPrompt("filterResonance") }, "Filter Peak:"), this._noteFilterSimplePeakSlider.container);
             this._supersawDynamismSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.supersawDynamismMax, value: "0", step: "1" }), this._doc, (oldValue, newValue) => new ChangeSupersawDynamism(this._doc, oldValue, newValue), false);
             this._supersawDynamismRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("supersawDynamism") }, "Dynamism:"), this._supersawDynamismSlider.container);
             this._supersawSpreadSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.supersawSpreadMax, value: "0", step: "1" }), this._doc, (oldValue, newValue) => new ChangeSupersawSpread(this._doc, oldValue, newValue), false);
@@ -63156,22 +64440,6 @@ You should be redirected to the song at:<br /><br />
             this._decimalOffsetSlider = new Slider(input({ style: "margin: 0; transform: scaleX(-1);", type: "range", min: "0", max: "99", value: "0", step: "1" }), this._doc, (oldValue, newValue) => new ChangeDecimalOffset(this._doc, oldValue, 99 - newValue), false);
             this._decimalOffsetRow = div({ class: "selectRow dropFader" }, span({ class: "tip", style: "margin-left:10px;", onclick: () => this._openPrompt("decimalOffset") }, "‣ Offset:"), this._decimalOffsetSlider.container);
             this._pulseWidthDropdownGroup = div({ class: "editor-controls", style: "display: none;" }, this._decimalOffsetRow);
-            this._pitchShiftSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.pitchShiftRange - 1, value: "0", step: "1" }), this._doc, (oldValue, newValue) => new ChangePitchShift(this._doc, oldValue, newValue), true);
-            this._pitchShiftTonicMarkers = [div({ class: "pitchShiftMarker", style: { color: ColorConfig.tonic } }), div({ class: "pitchShiftMarker", style: { color: ColorConfig.tonic, left: "50%" } }), div({ class: "pitchShiftMarker", style: { color: ColorConfig.tonic, left: "100%" } })];
-            this._pitchShiftFifthMarkers = [div({ class: "pitchShiftMarker", style: { color: ColorConfig.fifthNote, left: (100 * 7 / 24) + "%" } }), div({ class: "pitchShiftMarker", style: { color: ColorConfig.fifthNote, left: (100 * 19 / 24) + "%" } })];
-            this._pitchShiftMarkerContainer = div({ style: "display: flex; position: relative;" }, this._pitchShiftSlider.container, div({ class: "pitchShiftMarkerContainer" }, this._pitchShiftTonicMarkers, this._pitchShiftFifthMarkers));
-            this._pitchShiftRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("pitchShift") }, "Pitch Shift:"), this._pitchShiftMarkerContainer);
-            this._detuneSlider = new Slider(input({ style: "margin: 0;", type: "range", min: Config.detuneMin - Config.detuneCenter, max: Config.detuneMax - Config.detuneCenter, value: 0, step: "4" }), this._doc, (oldValue, newValue) => new ChangeDetune(this._doc, oldValue, newValue), true);
-            this._detuneSliderInputBox = input({ style: "width: 4em; font-size: 80%; ", id: "detuneSliderInputBox", type: "number", step: "1", min: Config.detuneMin - Config.detuneCenter, max: Config.detuneMax - Config.detuneCenter, value: 0 });
-            this._detuneSliderRow = div({ class: "selectRow" }, div({}, span({ class: "tip", style: "height:1em; font-size: smaller;", onclick: () => this._openPrompt("detune") }, "Detune: "), div({ style: `color: ${ColorConfig.secondaryText}; margin-top: -3px;` }, this._detuneSliderInputBox)), this._detuneSlider.container);
-            this._distortionSlider = new Slider(input({ style: "margin: 0; position: sticky;", type: "range", min: "0", max: Config.distortionRange - 1, value: "0", step: "1" }), this._doc, (oldValue, newValue) => new ChangeDistortion(this._doc, oldValue, newValue), false);
-            this._distortionRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("distortion") }, "Distortion:"), this._distortionSlider.container);
-            this._aliasingBox = input({ type: "checkbox", style: "width: 1em; padding: 0; margin-right: 4em;" });
-            this._aliasingRow = div({ class: "selectRow" }, span({ class: "tip", style: "margin-left:10px;", onclick: () => this._openPrompt("aliases") }, "Aliasing:"), this._aliasingBox);
-            this._bitcrusherQuantizationSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.bitcrusherQuantizationRange - 1, value: "0", step: "1" }), this._doc, (oldValue, newValue) => new ChangeBitcrusherQuantization(this._doc, oldValue, newValue), false);
-            this._bitcrusherQuantizationRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("bitcrusherQuantization") }, "Bit Crush:"), this._bitcrusherQuantizationSlider.container);
-            this._bitcrusherFreqSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.bitcrusherFreqRange - 1, value: "0", step: "1" }), this._doc, (oldValue, newValue) => new ChangeBitcrusherFreq(this._doc, oldValue, newValue), false);
-            this._bitcrusherFreqRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("bitcrusherFreq") }, "Freq Crush:"), this._bitcrusherFreqSlider.container);
             this._stringSustainSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.stringSustainRange - 1, value: "0", step: "1" }), this._doc, (oldValue, newValue) => new ChangeStringSustain(this._doc, oldValue, newValue), false);
             this._stringSustainLabel = span({ class: "tip", onclick: () => this._openPrompt("stringSustain") }, "Sustain:");
             this._stringSustainRow = div({ class: "selectRow" }, this._stringSustainLabel, this._stringSustainSlider.container);
@@ -63191,33 +64459,6 @@ You should be redirected to the song at:<br /><br />
             this._unisonBuzzesBox = input({ type: "checkbox", style: "width: 1em; padding: 0; margin-left: 0.4em; margin-right: 4em;" });
             this._unisonBuzzesBoxRow = div({ class: "selectRow" }, span({ class: "tip", style: "flex-shrink: 0;", onclick: () => this._openPrompt("unisonBuzzes") }, "Buzzes: "), this._unisonBuzzesBox);
             this._unisonDropdownGroup = div({ class: "editor-controls", style: "display: none; gap: 3px; margin-bottom: 0.5em;" }, this._unisonVoicesRow, this._unisonSpreadRow, this._unisonOffsetRow, this._unisonExpressionRow, this._unisonSignRow, this._unisonBuzzesBoxRow);
-            this._chordSelect = buildOptions(select(), Config.chords.map(chord => chord.name));
-            this._chordDropdown = button({ style: "margin-left:0em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: () => this._toggleDropdownMenu(2) }, "▼");
-            this._chordSelectRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("chords") }, "Chords:"), this._chordDropdown, div({ class: "selectContainer" }, this._chordSelect));
-            this._arpeggioSpeedDisplay = span({ style: `color: ${ColorConfig.secondaryText}; font-size: smaller; text-overflow: clip;` }, "x1");
-            this._arpeggioSpeedSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.modulators.dictionary["arp speed"].maxRawVol, value: "0", step: "1" }), this._doc, (oldValue, newValue) => new ChangeArpeggioSpeed(this._doc, oldValue, newValue), false);
-            this._arpeggioSpeedRow = div({ class: "selectRow dropFader" }, span({ class: "tip", style: "margin-left:4px;", onclick: () => this._openPrompt("arpeggioSpeed") }, "‣ Spd:"), this._arpeggioSpeedDisplay, this._arpeggioSpeedSlider.container);
-            this._strumSpeedDisplay = span({ style: `color: ${ColorConfig.secondaryText}; font-size: smaller; text-overflow: clip;` }, "0.04 beat(s)");
-            this._strumSpeedSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "1", max: "48", value: "1", step: "1" }), this._doc, (oldValue, newValue) => new ChangeStrumSpeed(this._doc, oldValue, newValue), false);
-            this._strumSpeedRow = div({ class: "selectRow dropFader" }, span({ class: "tip", style: "margin-left:4px;", onclick: () => this._openPrompt("strumSpeedSlider") }, "‣ Spd:"), this._strumSpeedDisplay, this._strumSpeedSlider.container);
-            this._twoNoteArpBox = input({ type: "checkbox", style: "width: 1em; padding: 0; margin-right: 4em;" });
-            this._twoNoteArpRow = div({ class: "selectRow dropFader" }, span({ class: "tip", style: "margin-left:4px;", onclick: () => this._openPrompt("twoNoteArpeggio") }, "‣ Fast Two-Note:"), this._twoNoteArpBox);
-            this._chordDropdownGroup = div({ class: "editor-controls", style: "display: none;" }, this._strumSpeedRow, this._arpeggioSpeedRow, this._twoNoteArpRow);
-            this._invertWaveBox = input({ type: "checkbox", style: "width: 1em; padding: 0; margin-right: 4em;" });
-            this._invertWaveRow = div({ class: "selectRow" }, span({ class: "tip", style: "margin-left:10px;", onclick: () => this._openPrompt("invertWave") }, "Invert Wave:"), this._invertWaveBox);
-            this._vibratoSelect = buildOptions(select(), Config.vibratos.map(vibrato => vibrato.name));
-            this._vibratoDropdown = button({ style: "margin-left:0em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: () => this._toggleDropdownMenu(0) }, "▼");
-            this._vibratoSelectRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("vibrato") }, "Vibrato:"), this._vibratoDropdown, div({ class: "selectContainer", style: "width: 61.5%;" }, this._vibratoSelect));
-            this._vibratoDepthSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.modulators.dictionary["vibrato depth"].maxRawVol, value: "0", step: "1" }), this._doc, (oldValue, newValue) => new ChangeVibratoDepth(this._doc, oldValue, newValue), false);
-            this._vibratoDepthRow = div({ class: "selectRow dropFader" }, span({ class: "tip", style: "margin-left:4px;", onclick: () => this._openPrompt("vibratoDepth") }, "‣ Depth:"), this._vibratoDepthSlider.container);
-            this._vibratoSpeedDisplay = span({ style: `color: ${ColorConfig.secondaryText}; font-size: smaller; text-overflow: clip;` }, "x1");
-            this._vibratoSpeedSlider = new Slider(input({ style: "margin: 0; text-overflow: clip;", type: "range", min: "0", max: Config.modulators.dictionary["vibrato speed"].maxRawVol, value: "0", step: "1" }), this._doc, (oldValue, newValue) => new ChangeVibratoSpeed(this._doc, oldValue, newValue), false);
-            this._vibratoSpeedRow = div({ class: "selectRow dropFader" }, span({ class: "tip", style: "margin-left:4px;", onclick: () => this._openPrompt("vibratoSpeed") }, "‣ Spd:"), this._vibratoSpeedDisplay, this._vibratoSpeedSlider.container);
-            this._vibratoDelaySlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.modulators.dictionary["vibrato delay"].maxRawVol, value: "0", step: "1" }), this._doc, (oldValue, newValue) => new ChangeVibratoDelay(this._doc, oldValue, newValue), false);
-            this._vibratoDelayRow = div({ class: "selectRow dropFader" }, span({ class: "tip", style: "margin-left:4px;", onclick: () => this._openPrompt("vibratoDelay") }, "‣ Delay:"), this._vibratoDelaySlider.container);
-            this._vibratoTypeSelect = buildOptions(select(), Config.vibratoTypes.map(vibrato => vibrato.name));
-            this._vibratoTypeSelectRow = div({ class: "selectRow dropFader" }, span({ class: "tip", style: "margin-left:4px;", onclick: () => this._openPrompt("vibratoType") }, "‣ Type:"), div({ class: "selectContainer", style: "width: 61.5%;" }, this._vibratoTypeSelect));
-            this._vibratoDropdownGroup = div({ class: "editor-controls", style: `display: none;` }, this._vibratoDepthRow, this._vibratoSpeedRow, this._vibratoDelayRow, this._vibratoTypeSelectRow);
             this._phaseModGroup = div({ class: "editor-controls" });
             this._feedbackTypeSelect = buildOptions(select(), Config.feedbacks.map(feedback => feedback.name));
             this._feedbackRow1 = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("feedbackType") }, "Feedback:"), div({ class: "selectContainer" }, this._feedbackTypeSelect));
@@ -63238,10 +64479,6 @@ You should be redirected to the song at:<br /><br />
             this._drumsetGroup = div({ class: "editor-controls" });
             this._drumsetZoom = button({ style: "margin-left:0em; padding-left:0.3em; margin-right:0.5em; height:1.5em; max-width: 16px;", onclick: () => this._openPrompt("drumsetSettings") }, "+");
             this._modulatorGroup = div({ class: "editor-controls" });
-            this._upperNoteLimitInputBox = input({ style: "width: 4em; font-size: 80%; ", id: "upperNoteLimitInputBox", type: "number", step: "1", min: 0, max: Config.maxPitch, value: 60 });
-            this._upperNoteLimitRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("upperNoteLimit") }, "Upper Note Limit:"), this._upperNoteLimitInputBox);
-            this._lowerNoteLimitInputBox = input({ style: "width: 4em; font-size: 80%; ", id: "lowerNoteLimitInputBox", type: "number", step: "1", min: 0, max: Config.maxPitch, value: 60 });
-            this._lowerNoteLimitRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("lowerNoteLimit") }, "Lower Note Limit:"), this._lowerNoteLimitInputBox);
             this._feedback6OpTypeSelect = buildOptions(select(), Config.feedbacks6Op.map(feedback => feedback.name));
             this._feedback6OpRow1 = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("feedbackType") }, "Feedback:"), div({ class: "selectContainer" }, this._feedback6OpTypeSelect));
             this._algorithmCanvasSwitch = button({ style: "margin-left:0em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: (e) => this._toggleAlgorithmCanvas(e) }, "F");
@@ -63275,12 +64512,13 @@ You should be redirected to the song at:<br /><br />
             this._feedbackRow2 = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("feedbackVolume") }, "Fdback Vol:"), this._feedbackAmplitudeSlider.container);
             this._addEnvelopeButton = button({ type: "button", class: "add-envelope" });
             this._instrumentDiv = div({ id: "InstrumentDiv" }, this._panSliderRow, this._panDropdownGroup, this._chipWaveSelectRow, this._chipNoiseSelectRow, this._useChipWaveAdvancedLoopControlsRow, this._chipWaveLoopModeSelectRow, this._chipWaveLoopStartRow, this._chipWaveLoopEndRow, this._chipWaveStartOffsetRow, this._chipWavePlayBackwardsRow, this._customWaveDraw, this._eqFilterTypeRow, this._eqFilterRow, this._eqFilterSimpleCutRow, this._eqFilterSimplePeakRow, this._fadeInOutRow, this._algorithmSelectRow, this._algorithm6OpSelectRow, this._phaseModGroup, this._feedbackRow1, this._feedback6OpRow1, this._feedbackRow2, this._spectrumRow, this._harmonicsRow, this._drumsetGroup, this._supersawDynamismRow, this._supersawSpreadRow, this._supersawShapeRow, this._pulseWidthRow, this._pulseWidthDropdownGroup, this._stringSustainRow, div({ style: "" }, this._unisonSelectRow), this._unisonDropdownGroup);
-            this._effectDiv = div({ id: "effectsDiv" }, div({ class: "effectsNameDiv", style: `padding: 2px 0; margin-left: 2em; display: flex; align-items: center;` }, span({ style: `flex-grow: 1; text-align: center;` }, span({ class: "tip", onclick: () => this._openPrompt("effects") }, "Effects")), div({ class: "effects-menu" }, this._effectsSelect)), div({ class: "effectsOpDiv" }, this._transitionRow, this._transitionDropdownGroup, this._chordSelectRow, this._chordDropdownGroup, this._pitchShiftRow, this._detuneSliderRow, this._vibratoSelectRow, this._vibratoDropdownGroup, this._noteFilterTypeRow, this._noteFilterRow, this._noteFilterSimpleCutRow, this._noteFilterSimplePeakRow, this._distortionRow, this._aliasingRow, this._bitcrusherQuantizationRow, this._bitcrusherFreqRow, this._chorusRow, this._echoSustainRow, this._echoDelayRow, this._reverbRow, this._ringModContainerRow, this._phaserMixRow, this._phaserFreqRow, this._phaserFeedbackRow, this._phaserStagesRow, this._upperNoteLimitRow, this._lowerNoteLimitRow, this._invertWaveRow, this._granularContainerRow));
+            this._effectDiv = div({ id: "effectsDiv" }, div({ class: "effectsNameDiv", style: `padding: 2px 0; margin-left: 2em; display: flex; align-items: center;` }, span({ style: `flex-grow: 1; text-align: center;` }, span({ class: "tip", onclick: () => this._openPrompt("effects") }, "Effects")), div({ class: "effects-menu" }, this._effectsSelect)), div({ class: "effectsOpDiv" }, this._transitionContainerRow, this._chordContainerRow, this._chordDropdownGroup, this._pitchShiftContainerRow, this._detuneContainerRow, this._vibratoContainerRow, this._noteFilterContainerRow, this._distortionContainerRow, this._bitcrusherContainerRow, this._chorusContainerRow, this._echoContainerRow, this._reverbContainerRow, this._ringModContainerRow, this._phaserContainerRow, this._noteRangeContainerRow, this._invertWaveContainerRow, this._granularContainerRow));
             this._envelopeDiv = div({ id: "envelopesDiv" }, div({ class: "envelopesNameDiv", style: `padding: 2px 0; margin-left: 2em; display: flex; align-items: center;` }, span({ style: `flex-grow: 1; text-align: center;` }, span({ class: "tip", onclick: () => this._openPrompt("envelopes") }, "Envelopes")), this._envelopeDropdown, this._addEnvelopeButton), div({ class: "envelopesOpDiv" }, this._envelopeDropdownGroup, this._envelopeEditor.container));
             this._customInstrumentSettingsGroup = div({ class: "editor-controls" }, this._instrumentDiv, this._effectDiv, this._envelopeDiv);
             this._instrumentCopyGroup = div({ class: "editor-controls" }, div({ class: "selectRow" }, this._instrumentCopyButton, this._instrumentPasteButton));
             this._instrumentExportGroup = div({ class: "editor-controls" }, div({ class: "selectRow" }, this._instrumentExportButton, this._instrumentImportButton));
             this._instrumentSettingsTextRow = div({ id: "instrumentSettingsText", style: `padding: 3px 0; max-width: 15em; text-align: center; color: ${ColorConfig.secondaryText};` }, "Instrument Settings");
+            this._modulatorTextRow = div({ id: "modulatorSettingsText", style: `padding: 3px 0; max-width: 15em; text-align: center; color: ${ColorConfig.secondaryText};` }, "Modulator Settings");
             this._instrumentTypeSelectRow = div({ class: "selectRow", id: "typeSelectRow" }, span({ class: "tip", onclick: () => this._openPrompt("instrumentType") }, "Type:"), div(div({ class: "pitchSelect" }, this._pitchedPresetSelect), div({ class: "drumSelect" }, this._drumPresetSelect)));
             this.selectedPatternCounter = div({ style: "margin:5px; pointer-events: none;" }, this._doc.selection.boxSelectionWidth * this._doc.selection.boxSelectionHeight);
             this.selectedPatternDiv = div({ style: "background: var(--ui-widget-background); font-weight: bold; border-radius: 5px; height: 32px; position: absolute; font-size: 20px; text-align: center; align-content: center;", title: "The total number of patterns you have selected in the track editor." }, this.selectedPatternCounter);
@@ -63317,26 +64555,29 @@ You should be redirected to the song at:<br /><br />
             this._notesUpButton = button({ class: "notesUpButton", type: "button", title: "Move Notes Up" });
             this._notesDownButton = button({ class: "notesDownButton", type: "button", title: "Move Notes Down" });
             this._loopBarButton = button({ class: "loopBarButton", type: "button", title: "Loop only on the Currently Selected Bar" });
-            this._fullscreenButton = button({ class: "fullscreenButton", type: "button", title: "Make the screen fit fully in your browser (Mobile Only)" });
             this._patternEditorRow = div({ style: "flex: 1; height: 100%; display: flex; overflow: hidden; justify-content: center;" }, this._patternEditorPrev.container, this._patternEditor.container, this._patternEditorNext.container);
-            this._patternArea = div({ class: "pattern-area", id: "pattern-area" }, this._piano.container, this._patternEditorRow, this._octaveScrollBar.container, this._zoomInButton, this._zoomOutButton, this._undoButton, this._redoButton, this._copyPatternButton, this._pastePatternButton, this._insertChannelButton, this._deleteChannelButton, this._selectAllButton, this._duplicateButton, this._notesUpButton, this._notesDownButton, this._loopBarButton, this._fullscreenButton, this.selectedPatternDiv);
+            this._patternArea = div({ class: "pattern-area", id: "pattern-area" }, this._piano.container, this._patternEditorRow, this._octaveScrollBar.container, this._zoomInButton, this._zoomOutButton, this._undoButton, this._redoButton, this._copyPatternButton, this._pastePatternButton, this._insertChannelButton, this._deleteChannelButton, this._selectAllButton, this._duplicateButton, this._notesUpButton, this._notesDownButton, this._loopBarButton, this.selectedPatternDiv);
             this._trackContainer = div({ class: "trackContainer" }, this._trackEditor.container, this._loopEditor.container);
             this._trackVisibleArea = div({ style: "position: absolute; width: 100%; height: 100%; pointer-events: none;" });
             this._trackAndMuteContainer = div({ class: "trackAndMuteContainer" }, this._muteEditor.container, this._trackContainer, this._trackVisibleArea);
             this._barScrollBar = new BarScrollBar(this._doc);
             this._trackArea = div({ class: "track-area" }, this._trackAndMuteContainer, this._barScrollBar.container);
             this._menuArea = div({ class: "menu-area" }, div({ class: "selectContainer menu file" }, this._fileMenu), div({ class: "selectContainer menu edit" }, this._editMenu), div({ class: "selectContainer menu preferences" }, this._optionsMenu));
+            this._notifierPopup = div({
+                style: "display: flex; flex-direction: row-reverse; align-items: center; gap: 10px;", id: "popup", onclick: this.closeNotif
+            }, button({ type: "button", class: "delete-envelope", style: `flex: 1; background-color: ${ColorConfig.sampleFailed}` }), HTML.p());
             this._sampleLoadingBar = div({ style: `width: 0%; height: 100%; background-color: ${ColorConfig.indicatorPrimary};` });
             this._sampleFailedBar = div({ style: `width: 0%; height: 100%; background-color: ${ColorConfig.sampleFailed};` });
             this._sampleLoadingBarContainer = div({ class: `sampleLoadingContainer`, style: `width: 80%; height: 4px; overflow: hidden; margin-left: auto; margin-right: auto; margin-top: 0.5em; cursor: pointer; display: flex; flex-direction: row; background-color: var(--empty-sample-bar, ${ColorConfig.indicatorSecondary});` }, this._sampleLoadingBar, this._sampleFailedBar);
             this._sampleLoadingStatusContainer = div({ style: "cursor: pointer;" }, div({ style: `margin-top: 0.5em; text-align: center; color: ${ColorConfig.secondaryText};` }, "Sample Loading Status"), div({ class: "selectRow", style: "height: 6px; margin-bottom: 0.5em;" }, this._sampleLoadingBarContainer));
-            this._songSettingsArea = div({ class: "song-settings-area" }, div({ class: "editor-controls" }, div({ class: "editor-song-settings" }, div({ style: "margin: 3px 0; position: relative; text-align: center; color: ${ColorConfig.secondaryText};" }, div({ class: "tip", style: "flex-shrink: 0; position:absolute; left: 0; top: 0; width: 12px; height: 12px", onclick: () => this._openPrompt("usedPattern") }, SVG.svg({ style: "flex-shrink: 0; position: absolute; left: 0; top: 0; pointer-events: none;", width: "12px", height: "12px", "margin-right": "0.5em", viewBox: "-6 -6 12 12" }, this._usedPatternIndicator)), div({ class: "tip", style: "flex-shrink: 0; position: absolute; left: 14px; top: 0; width: 12px; height: 12px", onclick: () => this._openPrompt("usedInstrument") }, SVG.svg({ style: "flex-shrink: 0; position: absolute; left: 0; top: 0; pointer-events: none;", width: "12px", height: "12px", "margin-right": "1em", viewBox: "-6 -6 12 12" }, this._usedInstrumentIndicator)), "Song Settings", div({ style: "width: 100%; left: 0; top: -1px; position:absolute; overflow-x:clip;" }, this._jumpToModIndicator))), div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("scale") }, "Scale: "), div({ class: "selectContainer" }, this._scaleSelect)), div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("key") }, "Key: "), div({ class: "selectContainer" }, this._keySelect)), div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("key_octave") }, "Octave: "), this._octaveStepper), div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("tempo") }, "Tempo: "), span({ style: "display: flex;" }, this._tempoSlider.container, this._tempoStepper)), div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("rhythm") }, "Rhythm: "), div({ class: "selectContainer" }, this._rhythmSelect)), this._sampleLoadingStatusContainer));
+            this._songSettingsArea = div({ class: "song-settings-area" }, div({ class: "editor-controls" }, div({ class: "editor-song-settings" }, div({ style: "margin: 3px 0; position: relative; text-align: center; color: ${ColorConfig.secondaryText};" }, div({ class: "tip", style: "flex-shrink: 0; position:absolute; left: 0; top: 0; width: 12px; height: 12px", onclick: () => this._openPrompt("usedPattern") }, SVG.svg({ style: "flex-shrink: 0; position: absolute; left: 0; top: 0; pointer-events: none;", width: "12px", height: "12px", "margin-right": "0.5em", viewBox: "-6 -6 12 12" }, this._usedPatternIndicator)), div({ class: "tip", style: "flex-shrink: 0; position: absolute; left: 14px; top: 0; width: 12px; height: 12px", onclick: () => this._openPrompt("usedInstrument") }, SVG.svg({ style: "flex-shrink: 0; position: absolute; left: 0; top: 0; pointer-events: none;", width: "12px", height: "12px", "margin-right": "1em", viewBox: "-6 -6 12 12" }, this._usedInstrumentIndicator)), "Song Settings", div({ style: "width: 100%; left: 0; top: -1px; position:absolute; overflow-x:clip;" }, this._jumpToModIndicator))), div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("scale") }, "Scale: "), div({ class: "selectContainer" }, this._scaleSelect)), div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("key") }, "Key: "), div({ class: "selectContainer" }, this._keySelect)), div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("key_octave") }, "Octave: "), this._octaveStepper), div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("tempo") }, "Tempo: "), span({ style: "display: flex;" }, this._tempoSlider.container, this._tempoStepper)), div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("rhythm") }, "Rhythm: "), div({ class: "selectContainer" }, this._rhythmSelect)), div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("songeq") }, span("Song EQ:")), this._songEqFilterZoom, this._songEqFilterEditor.container), this._sampleLoadingStatusContainer));
             this._songDetailsButton = button({ class: "details-button" });
             this._instrumentSettingsArea = div({ class: "instrument-settings-area" }, this._instrumentSettingsGroup, this._modulatorGroup);
-            this._playbackMobileDiv = div({ class: "playback-bar-controls2", id: 'playback-bar-controls2', style: 'width: 100%; display: flex; background: var(--editor-background); z-index: 6;' }, this._mobilePlayButton, this._mobilePauseButton, this._mobilePrevBarButton, this._mobileNextBarButton);
-            this._playPauseAreaMobile = div({ class: "play-pause-area2", id: "play-pause-area2", style: 'flex-direction:row; position: absolute; width: 100%; display: flex; bottom: 16vh;' }, this._playbackMobileDiv);
-            this._settingsArea = div({ class: "settings-area noSelection" }, div({ class: "version-area" }, div({ style: `text-align: center; margin: 3px 0; color: ${ColorConfig.secondaryText}; display:flex;` }, this._songTitleInputBox.input, this._songDetailsButton)), div({ class: "play-pause-area", id: "play-pause-area" }, this._volumeBarBox, div({ class: "playback-bar-controls" }, this._playButton, this._pauseButton, this._recordButton, this._stopButton, this._prevBarButton, this._nextBarButton), div({ class: "playback-volume-controls" }, span({ class: "volume-speaker" }), this._volumeSlider.container), this._globalOscscopeContainer), this._menuArea, this._songSettingsArea, this._instrumentSettingsArea);
-            this.mainLayer = div({ class: "beepboxEditor", tabIndex: "0" }, this._patternArea, this._trackArea, this._settingsArea, this._promptContainer);
+            this._playbackMobileDiv = div({ class: "playback-bar-controls2", id: 'playback-bar-controls2' }, this._mobilePlayButton, this._mobilePauseButton, this._mobilePrevBarButton, this._mobileNextBarButton);
+            this._playPauseAreaMobile = div({ class: "play-pause-area2", id: "play-pause-area2" }, this._playbackMobileDiv);
+            this._settingsArea = div({ class: "settings-area noSelection", style: "display: grid" }, div({ class: "version-area" }, div({ style: `text-align: center; margin: 3px 0; color: ${ColorConfig.secondaryText}; display:flex;` }, this._songTitleInputBox.input, this._songDetailsButton)), div({ class: "play-pause-area", id: "play-pause-area" }, this._volumeBarBox, div({ class: "playback-bar-controls" }, this._playButton, this._pauseButton, this._recordButton, this._stopButton, this._prevBarButton, this._nextBarButton), div({ class: "playback-volume-controls" }, span({ class: "volume-speaker" }), this._volumeSlider.container), this._globalOscscopeContainer), this._menuArea, this._songSettingsArea, this._instrumentSettingsArea);
+            this._mobileButtonContainer = div({ class: "mobileButtonContainer" }, this._playPauseAreaMobile, this.mobileMenu);
+            this.mainLayer = div({ class: "beepboxEditor", tabIndex: "0" }, this._patternArea, this._trackArea, this._settingsArea, this._promptContainer, this._mobileButtonContainer);
             this._wasPlaying = false;
             this._currentPromptName = null;
             this._highlightedInstrumentIndex = -1;
@@ -63371,6 +64612,7 @@ You should be redirected to the song at:<br /><br />
             this._openOperatorDropdowns = [];
             this._openPulseWidthDropdown = false;
             this._openUnisonDropdown = false;
+            this._openReverbDropdown = false;
             this.outVolumeHistoricTimer = 0;
             this.outVolumeHistoricCap = 0;
             this.lastOutVolumeCap = 0;
@@ -63383,32 +64625,16 @@ You should be redirected to the song at:<br /><br />
                 this._openPrompt("sampleLoadingStatus");
             };
             this._loopTypeEvent = () => {
-                if (this._doc.song.loopType == 3) {
-                    this._doc.synth.loopRepeatCount = 0;
-                    this._loopEditor.container.style.display = "none";
-                    SongEditor._styleElement.textContent = SongEditor._setLoopIcon[3];
+                const loopTypeNum = this._doc.song.loopType;
+                this._muteEditor._loopButtonInput.setAttribute("class", "songLoopButton a" + String(loopTypeNum));
+                this._doc.synth.loopRepeatCount = loopTypeNum == 3 ? 0 : -1;
+                this._loopEditor.container.style.display = loopTypeNum == 1 ? "" : "none";
+                this._loopBarButton.style.display = this._doc.prefs.displayShortcutButtons && loopTypeNum == 1 ? "" : "none";
+                this._trackAndMuteContainer.style.marginBottom = loopTypeNum == 1 ? "" : "0.3em";
+                if (loopTypeNum != 1) {
                     this._doc.synth.loopBarStart = -1;
                     this._doc.synth.loopBarEnd = -1;
                     this._loopEditor.setLoopAt(this._doc.synth.loopBarStart, this._doc.synth.loopBarEnd);
-                    this._loopBarButton.style.display = "none";
-                    this._trackAndMuteContainer.style.marginBottom = "0.3em";
-                }
-                else if (this._doc.song.loopType == 2) {
-                    this._doc.synth.loopRepeatCount = -1;
-                    this._loopEditor.container.style.display = "none";
-                    SongEditor._styleElement.textContent = SongEditor._setLoopIcon[2];
-                    this._doc.synth.loopBarStart = -1;
-                    this._doc.synth.loopBarEnd = -1;
-                    this._loopEditor.setLoopAt(this._doc.synth.loopBarStart, this._doc.synth.loopBarEnd);
-                    this._loopBarButton.style.display = "none";
-                    this._trackAndMuteContainer.style.marginBottom = "0.3em";
-                }
-                else if (this._doc.song.loopType == 1) {
-                    this._doc.synth.loopRepeatCount = -1;
-                    this._loopEditor.container.style.display = "";
-                    SongEditor._styleElement.textContent = SongEditor._setLoopIcon[1];
-                    this._loopBarButton.style.display = this._doc.prefs.displayShortcutButtons ? "" : "none";
-                    this._trackAndMuteContainer.style.marginBottom = "";
                 }
             };
             this.refocusStage = () => {
@@ -63426,38 +64652,7 @@ You should be redirected to the song at:<br /><br />
                 if (!this._patternEditor.editingModLabel)
                     this.mainLayer.focus({ preventScroll: true });
             };
-            this.whenUpdated = () => {
-                const prefs = this._doc.prefs;
-                this._muteEditor.container.style.display = prefs.enableChannelMuting ? "" : "none";
-                const trackBounds = this._trackVisibleArea.getBoundingClientRect();
-                this._doc.trackVisibleBars = Math.floor((trackBounds.right - trackBounds.left - (prefs.enableChannelMuting ? 32 : 0)) / this._doc.getBarWidth());
-                this._doc.trackVisibleChannels = Math.floor((trackBounds.bottom - trackBounds.top - 30) / ChannelRow.patternHeight);
-                for (let i = this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount; i < this._doc.song.channels.length; i++) {
-                    const channel = this._doc.song.channels[i];
-                    for (let j = 0; j < channel.instruments.length; j++) {
-                        this._doc.synth.determineInvalidModulators(channel.instruments[j]);
-                    }
-                }
-                this._loopTypeEvent();
-                this._barScrollBar.render();
-                this._trackEditor.render();
-                this._muteEditor.render();
-                this._trackAndMuteContainer.scrollLeft = this._doc.barScrollPos * this._doc.getBarWidth();
-                this._trackAndMuteContainer.scrollTop = this._doc.channelScrollPos * ChannelRow.patternHeight;
-                if (document.activeElement != this._patternEditor.modDragValueLabel && this._patternEditor.editingModLabel) {
-                    this._patternEditor.stopEditingModLabel(false);
-                }
-                this._piano.container.style.display = prefs.showLetters ? "" : "none";
-                this._octaveScrollBar.container.style.display = prefs.showScrollBar ? "" : "none";
-                this._barScrollBar.container.style.display = this._doc.song.barCount > this._doc.trackVisibleBars ? "" : "none";
-                this._volumeBarBox.style.display = this._doc.prefs.displayVolumeBar ? "" : "none";
-                this._globalOscscopeContainer.style.display = this._doc.prefs.showOscilloscope ? "" : "none";
-                this._doc.synth.oscEnabled = this._doc.prefs.showOscilloscope;
-                this._sampleLoadingStatusContainer.style.display = this._doc.prefs.showSampleLoadingStatus ? "" : "none";
-                this._instrumentCopyGroup.style.display = this._doc.prefs.instrumentCopyPaste ? "" : "none";
-                this._instrumentExportGroup.style.display = this._doc.prefs.instrumentImportExport ? "" : "none";
-                if (document.getElementById('text-content'))
-                    document.getElementById('text-content').style.display = this._doc.prefs.showDescription ? "" : "none";
+            this.patternEditorStuffs = (prefs) => {
                 if (!isMobile) {
                     this._playPauseAreaMobile.style.display = "none";
                     if (window.localStorage.getItem("tutorialComplete") != "true") ;
@@ -63470,7 +64665,7 @@ You should be redirected to the song at:<br /><br />
                         const patternEditorWidth = beatWidth * this._doc.song.beatsPerBar;
                         if (this._doc.selection.boxSelectionWidth * this._doc.selection.boxSelectionHeight > 1) {
                             this.selectedPatternCounter.innerHTML = String(this._doc.selection.boxSelectionWidth * this._doc.selection.boxSelectionHeight);
-                            this.selectedPatternDiv.style.display = this._doc.prefs.selectionCounter ? "" : "none";
+                            this.selectedPatternDiv.style.display = prefs.selectionCounter ? "" : "none";
                             this.selectedPatternDiv.style.left = prefs.showLetters ? "40px" : "10px";
                             this.selectedPatternDiv.style.top = prefs.displayShortcutButtons ? "200px" : "10px";
                             this.selectedPatternDiv.style.right = "";
@@ -63478,7 +64673,7 @@ You should be redirected to the song at:<br /><br />
                         else {
                             this.selectedPatternDiv.style.display = "none";
                         }
-                        if (this._doc.prefs.showDescription == false) {
+                        if (prefs.showDescription == false) {
                             beepboxEditorContainer$1.style.paddingBottom = "0";
                             beepboxEditorContainer$1.style.borderStyle = "none";
                         }
@@ -63527,7 +64722,6 @@ You should be redirected to the song at:<br /><br />
                         this._notesUpButton.style.left = prefs.showLetters ? "40px" : "10px";
                         this._notesDownButton.style.left = prefs.showLetters ? "70px" : "40px";
                         this._loopBarButton.style.left = prefs.showLetters ? "40px" : "10px";
-                        this._fullscreenButton.style.display = "none";
                         const secondImage = document.getElementById("secondImage");
                         if (secondImage != null) {
                             secondImage.style.minHeight = "100vh";
@@ -63542,7 +64736,7 @@ You should be redirected to the song at:<br /><br />
                         this._zoomOutButton.style.display = "none";
                         if (this._doc.selection.boxSelectionWidth * this._doc.selection.boxSelectionHeight > 1) {
                             this.selectedPatternCounter.innerHTML = String(this._doc.selection.boxSelectionWidth * this._doc.selection.boxSelectionHeight);
-                            this.selectedPatternDiv.style.display = this._doc.prefs.selectionCounter ? "" : "none";
+                            this.selectedPatternDiv.style.display = prefs.selectionCounter ? "" : "none";
                             this.selectedPatternDiv.style.right = "104.5%";
                             this.selectedPatternDiv.style.left = "";
                             this.selectedPatternDiv.style.top = prefs.displayShortcutButtons ? "200px" : "10px";
@@ -63577,7 +64771,6 @@ You should be redirected to the song at:<br /><br />
                         this._notesUpButton.style.left = "-80px";
                         this._notesDownButton.style.left = "-50px";
                         this._loopBarButton.style.left = "-50px";
-                        this._fullscreenButton.style.display = "none";
                         beepboxEditorContainer$1.style.paddingBottom = "";
                         beepboxEditorContainer$1.style.borderStyle = "";
                         const secondImage = document.getElementById("secondImage");
@@ -63588,8 +64781,7 @@ You should be redirected to the song at:<br /><br />
                 }
                 else {
                     this.selectedPatternDiv.style.display = "none";
-                    if (this._doc.prefs.oldMobileLayout != true) {
-                        this._promptContainer.style.left = "50vw";
+                    if (prefs.oldMobileLayout != true) {
                         this._instSettingMode == 1 ? this._instrumentDiv.style.display = "" : this._instrumentDiv.style.display = "none";
                         this._instSettingMode == 2 ? this._effectDiv.style.display = "" : this._effectDiv.style.display = "none";
                         this._instSettingMode == 3 ? this._envelopeDiv.style.display = "" : this._envelopeDiv.style.display = "none";
@@ -63597,7 +64789,6 @@ You should be redirected to the song at:<br /><br />
                         this._settingsArea.style.display = "none";
                         this._trackArea.style.display = "none";
                         this._patternArea.style.display = "";
-                        this.mainLayer.style.display = "unset";
                         if (window.innerWidth > window.innerHeight) {
                             if (SongEditor.getMobileUi() != 'landscape') {
                                 SongEditor.setMobileUi("landscape");
@@ -63605,9 +64796,6 @@ You should be redirected to the song at:<br /><br />
                             this._patternArea.style.display = this._menuMode == 1 ? "" : "none";
                             this._trackArea.style.display = this._menuMode == 2 ? "" : "none";
                             this._settingsArea.style.display = this._menuMode == 3 ? "" : "none";
-                            this._mobilePatternButton.style.width = this._menuMode == 1 ? "100%" : "80%";
-                            this._mobileTrackButton.style.width = this._menuMode == 2 ? "100%" : "80%";
-                            this._mobileSettingsButton.style.width = this._menuMode == 3 ? "100%" : "80%";
                             this._playPauseAreaMobile.style.display = this._menuMode == 1 ? "flex" : "none";
                         }
                         else if (window.innerWidth < window.innerHeight) {
@@ -63617,27 +64805,25 @@ You should be redirected to the song at:<br /><br />
                             this._patternArea.style.display = this._menuMode == 1 ? "" : "none";
                             this._trackArea.style.display = this._menuMode == 2 ? "" : "none";
                             this._settingsArea.style.display = this._menuMode == 3 ? "" : "none";
-                            this._mobilePatternButton.style.height = this._menuMode == 1 ? "100%" : "80%";
-                            this._mobileTrackButton.style.height = this._menuMode == 2 ? "100%" : "80%";
-                            this._mobileSettingsButton.style.height = this._menuMode == 3 ? "100%" : "80%";
                             this._playPauseAreaMobile.style.display = this._menuMode == 1 ? "flex" : "none";
                         }
-                        this.mainLayer.style.minHeight = "80vh";
-                        beepboxEditorContainer$1.style.maxHeight = "80vh";
+                        this.mainLayer.style.minHeight = "80dvh";
+                        beepboxEditorContainer$1.style.maxHeight = "80dvh";
+                        this._mobilePatternButton.setAttribute("class", this._menuMode == 1 ? "mobilePatternButton focused" : "mobilePatternButton");
+                        this._mobileTrackButton.setAttribute("class", this._menuMode == 2 ? "mobileTrackButton focused" : "mobileTrackButton");
+                        this._mobileSettingsButton.setAttribute("class", this._menuMode == 3 ? "mobileSettingsButton focused" : "mobileSettingsButton");
                         this._mobilePatternButton.style.display = "";
                         this._mobileTrackButton.style.display = "";
                         this._mobileSettingsButton.style.display = "";
                         this.mobileMenu.style.display = "";
                         this._instOptionsDiv.style.display = "";
-                        beepboxEditorContainer$1.appendChild(this._playPauseAreaMobile);
                         const playPauseArea = document.getElementById('play-pause-area');
                         const textContentMobile = document.getElementById('text-content');
                         textContentMobile.style.display = "none";
-                        this._trackAndMuteContainer.style.maxHeight = "85vh";
+                        this._trackAndMuteContainer.style.maxHeight = "85dvh";
                         playPauseArea.style.display = "flex";
                         playPauseArea.style.flexDirection = "column";
                     }
-                    document.body.appendChild(this.mobileMenu);
                     this.mobileMenu.appendChild(this._mobilePatternButton);
                     this.mobileMenu.appendChild(this._mobileTrackButton);
                     this.mobileMenu.appendChild(this._mobileSettingsButton);
@@ -63681,15 +64867,13 @@ You should be redirected to the song at:<br /><br />
                     this._notesDownButton.style.left = prefs.showScrollBar ? "2px" : "2px";
                     this._loopBarButton.style.top = prefs.showScrollBar ? "300px" : "300px";
                     this._loopBarButton.style.left = prefs.showScrollBar ? "2px" : "2px";
-                    this._fullscreenButton.style.display = "none";
                     this._zoomInButton.style.display = "none";
                     this._zoomOutButton.style.display = "none";
                     this._patternArea.style.paddingLeft = prefs.showScrollBar ? "32px" : "32px";
                     beepboxEditorContainer$1.style.paddingTop = "0px";
                 }
-                this._patternEditor.render();
-                const textOnIcon = ColorConfig.getComputed("--text-enabled-icon") !== "" ? ColorConfig.getComputed("--text-enabled-icon") : "✓ ";
-                const textOffIcon = ColorConfig.getComputed("--text-disabled-icon") !== "" ? ColorConfig.getComputed("--text-disabled-icon") : "　";
+            };
+            this.renderPreferences = (prefs, textOnIcon, textOffIcon) => {
                 const optionCommands = [
                     "Technical",
                     (prefs.autoPlay ? textOnIcon : textOffIcon) + "Auto Play on Load",
@@ -63722,6 +64906,7 @@ You should be redirected to the song at:<br /><br />
                     (prefs.frostedGlassBackground ? textOnIcon : textOffIcon) + "Use Frosted Glass Prompt Backdrop",
                     (prefs.displayShortcutButtons ? textOnIcon : textOffIcon) + "Display Mobile Shortcut Buttons",
                     (prefs.oldModNotes ? textOnIcon : textOffIcon) + "Use Old Mod Notes",
+                    (prefs.newEffectMenu ? textOnIcon : textOffIcon) + "Collapsable Effects",
                     (prefs.selectionCounter ? textOnIcon : textOffIcon) + "Selection Counter",
                     "> Set Layout",
                     "> Set Theme",
@@ -63740,68 +64925,20 @@ You should be redirected to the song at:<br /><br />
                     if (option.textContent != optionCommands[i + (technicalOptionGroup.children.length + 2)])
                         option.textContent = optionCommands[i + (technicalOptionGroup.children.length + 2)];
                 }
-                const channel = this._doc.song.channels[this._doc.channel];
-                const instrumentIndex = this._doc.getCurrentInstrument();
-                const instrument = channel.instruments[instrumentIndex];
-                const wasActive = this.mainLayer.contains(document.activeElement);
-                const activeElement = document.activeElement;
-                const colors = ColorConfig.getChannelColor(this._doc.song, this._doc.channel);
-                for (let i = this._effectsSelect.childElementCount - 1; i < Config.effectOrder.length; i++) {
-                    this._effectsSelect.appendChild(option({ value: i }));
-                }
-                this._effectsSelect.selectedIndex = -1;
-                for (let i = 0; i < Config.effectOrder.length; i++) {
-                    let effectFlag = Config.effectOrder[i];
-                    const selected = ((instrument.effects & (1 << effectFlag)) != 0);
-                    const label = (selected ? textOnIcon : textOffIcon) + Config.effectNames[effectFlag];
-                    const option = this._effectsSelect.children[i + 1];
-                    if (option.textContent != label)
-                        option.textContent = label;
-                }
-                setSelectedValue(this._scaleSelect, this._doc.song.scale);
-                this._scaleSelect.title = Config.scales[this._doc.song.scale].realName;
-                setSelectedValue(this._keySelect, Config.keys.length - 1 - this._doc.song.key);
-                this._octaveStepper.value = Math.round(this._doc.song.octave).toString();
-                this._tempoSlider.updateValue(Math.max(0, Math.round(this._doc.song.tempo)));
-                this._tempoStepper.value = Math.round(this._doc.song.tempo).toString();
-                this._songTitleInputBox.updateValue(this._doc.song.title);
-                this._eqFilterTypeRow.style.setProperty("--text-color-lit", colors.primaryNote);
-                this._eqFilterTypeRow.style.setProperty("--text-color-dim", colors.secondaryNote);
-                this._eqFilterTypeRow.style.setProperty("--background-color-lit", colors.primaryChannel);
-                this._eqFilterTypeRow.style.setProperty("--background-color-dim", colors.secondaryChannel);
-                if (instrument.eqFilterType) {
-                    this._eqFilterSimpleButton.classList.remove("deactivated");
-                    this._eqFilterAdvancedButton.classList.add("deactivated");
-                    this._eqFilterRow.style.display = "none";
-                    this._eqFilterSimpleCutRow.style.display = "";
-                    this._eqFilterSimplePeakRow.style.display = "";
-                }
-                else {
-                    this._eqFilterSimpleButton.classList.add("deactivated");
-                    this._eqFilterAdvancedButton.classList.remove("deactivated");
-                    this._eqFilterRow.style.display = "";
-                    this._eqFilterSimpleCutRow.style.display = "none";
-                    this._eqFilterSimplePeakRow.style.display = "none";
-                }
-                setSelectedValue(this._rhythmSelect, this._doc.song.rhythm);
+            };
+            this.renderChannelData = (prefs, instrumentIndex, instrument, colors, channel) => {
                 if (!this._doc.song.getChannelIsMod(this._doc.channel)) {
+                    this._instrumentSettingsGroup.style.display = "";
+                    this._modulatorGroup.style.display = "none";
+                    this._instrumentSettingsGroup.style.color = ColorConfig.getChannelColor(this._doc.song, this._doc.channel).primaryNote;
                     this._customInstrumentSettingsGroup.style.display = "";
-                    this._panSliderRow.style.display = "";
-                    this._panDropdownGroup.style.display = (this._openPanDropdown ? "" : "none");
-                    this._detuneSliderRow.style.display = "";
                     this._instrumentVolumeSliderRow.style.display = "";
                     this._instrumentTypeSelectRow.style.setProperty("display", "");
                     this._instrumentSettingsGroup.insertBefore(this._instrumentExportGroup, this._instrumentSettingsGroup.firstChild);
                     this._instrumentSettingsGroup.insertBefore(this._instrumentCopyGroup, this._instrumentSettingsGroup.firstChild);
                     this._instrumentSettingsGroup.insertBefore(this._instrumentsButtonRow, this._instrumentSettingsGroup.firstChild);
                     this._instrumentSettingsGroup.insertBefore(this._instrumentSettingsTextRow, this._instrumentSettingsGroup.firstChild);
-                    if (this._doc.song.channels[this._doc.channel].name == "") {
-                        this._instrumentSettingsTextRow.textContent = "Instrument Settings";
-                    }
-                    else {
-                        this._instrumentSettingsTextRow.textContent = this._doc.song.channels[this._doc.channel].name;
-                    }
-                    this._modulatorGroup.style.display = "none";
+                    this._instrumentSettingsTextRow.textContent = this._doc.song.channels[this._doc.channel].name == "" ? "Instrument Settings" : this._doc.song.channels[this._doc.channel].name;
                     this._usageCheck(this._doc.channel, instrumentIndex);
                     if (this._doc.song.getChannelIsNoise(this._doc.channel)) {
                         this._pitchedPresetSelect.style.display = "none";
@@ -63817,100 +64954,37 @@ You should be redirected to the song at:<br /><br />
                         $("#drumPresetSelect").parent().hide();
                         setSelectedValue(this._pitchedPresetSelect, instrument.preset, true);
                     }
-                    if (instrument.type == 2) {
-                        this._chipWaveSelectRow.style.display = "none";
-                        this._useChipWaveAdvancedLoopControlsRow.style.display = "none";
-                        this._chipWaveLoopModeSelectRow.style.display = "none";
-                        this._chipWaveLoopStartRow.style.display = "none";
-                        this._chipWaveLoopEndRow.style.display = "none";
-                        this._chipWaveStartOffsetRow.style.display = "none";
-                        this._chipWavePlayBackwardsRow.style.display = "none";
-                        this._chipNoiseSelectRow.style.display = "";
-                        setSelectedValue(this._chipNoiseSelect, instrument.chipNoise, true);
+                    let instSettingsTabs = prefs.instrumentSettingsSimplifier || isMobile;
+                    this._instrumentDiv.style.display = (this._instSettingMode == 1 && instSettingsTabs) || !instSettingsTabs ? "" : "none";
+                    this._effectDiv.style.display = (this._instSettingMode == 2 && instSettingsTabs) || !instSettingsTabs ? "" : "none";
+                    this._envelopeDiv.style.display = (this._instSettingMode == 3 && instSettingsTabs) || !instSettingsTabs ? "" : "none";
+                    this._instOptionsDiv.style.display = instSettingsTabs ? "" : "none";
+                    if (instSettingsTabs) {
+                        this._instOptionsDiv.style.setProperty("--text-color-lit", colors.primaryNote);
+                        this._instOptionsDiv.style.setProperty("--text-color-dim", colors.secondaryNote);
+                        this._instOptionsDiv.style.setProperty("--background-color-lit", colors.primaryChannel);
+                        this._instOptionsDiv.style.setProperty("--background-color-dim", colors.secondaryChannel);
+                        this._mobileInstSettingsButton.style.color = (this._instSettingMode == 1) ? "var(--text-color-lit)" : "var(--text-color-dim)";
+                        this._mobileEffectsButton.style.color = (this._instSettingMode == 2) ? "var(--text-color-lit)" : "var(--text-color-dim)";
+                        this._mobileEnvelopesButton.style.color = (this._instSettingMode == 3) ? "var(--text-color-lit)" : "var(--text-color-dim)";
+                        this._mobileInstSettingsButton.style.background = (this._instSettingMode == 1) ? "" : "#fff0";
+                        this._mobileEffectsButton.style.background = (this._instSettingMode == 2) ? "" : "#fff0";
+                        this._mobileEnvelopesButton.style.background = (this._instSettingMode == 3) ? "" : "#fff0";
+                        this._instSettingMode == 1 ? this._mobileInstSettingsButton.classList.remove("deactivated") : this._mobileInstSettingsButton.classList.add("deactivated");
+                        this._instSettingMode == 2 ? this._mobileEffectsButton.classList.remove("deactivated") : this._mobileEffectsButton.classList.add("deactivated");
+                        this._instSettingMode == 3 ? this._mobileEnvelopesButton.classList.remove("deactivated") : this._mobileEnvelopesButton.classList.add("deactivated");
+                        this._loopBarButton.style.display = prefs.displayShortcutButtons ? "" : "none";
                     }
-                    else {
-                        this._chipNoiseSelectRow.style.display = "none";
-                    }
-                    if (instrument.type == 3) {
-                        this._chipWaveSelectRow.style.display = "none";
-                        this._useChipWaveAdvancedLoopControlsRow.style.display = "none";
-                        this._chipWaveLoopModeSelectRow.style.display = "none";
-                        this._chipWaveLoopStartRow.style.display = "none";
-                        this._chipWaveLoopEndRow.style.display = "none";
-                        this._chipWaveStartOffsetRow.style.display = "none";
-                        this._chipWavePlayBackwardsRow.style.display = "none";
-                        this._spectrumRow.style.display = "";
-                        this._spectrumEditor.render();
-                    }
-                    else {
-                        this._spectrumRow.style.display = "none";
-                    }
-                    if (instrument.type == 5 || instrument.type == 7) {
-                        this._chipWaveSelectRow.style.display = "none";
-                        this._useChipWaveAdvancedLoopControlsRow.style.display = "none";
-                        this._chipWaveLoopModeSelectRow.style.display = "none";
-                        this._chipWaveLoopStartRow.style.display = "none";
-                        this._chipWaveLoopEndRow.style.display = "none";
-                        this._chipWaveStartOffsetRow.style.display = "none";
-                        this._chipWavePlayBackwardsRow.style.display = "none";
-                        this._harmonicsRow.style.display = "";
-                        this._harmonicsEditor.render();
-                    }
-                    else {
-                        this._harmonicsRow.style.display = "none";
-                    }
-                    if (instrument.type == 7) {
-                        this._chipWaveSelectRow.style.display = "none";
-                        this._useChipWaveAdvancedLoopControlsRow.style.display = "none";
-                        this._chipWaveLoopModeSelectRow.style.display = "none";
-                        this._chipWaveLoopStartRow.style.display = "none";
-                        this._chipWaveLoopEndRow.style.display = "none";
-                        this._chipWaveStartOffsetRow.style.display = "none";
-                        this._chipWavePlayBackwardsRow.style.display = "none";
-                        this._stringSustainRow.style.display = "";
-                        this._stringSustainSlider.updateValue(instrument.stringSustain);
-                        this._stringSustainLabel.textContent = Config.enableAcousticSustain ? "Sustain (" + Config.sustainTypeNames[instrument.stringSustainType].substring(0, 1).toUpperCase() + "):" : "Sustain:";
-                    }
-                    else {
-                        this._stringSustainRow.style.display = "none";
-                    }
-                    if (instrument.type == 4) {
-                        this._drumsetGroup.style.display = "";
-                        this._chipWaveSelectRow.style.display = "none";
-                        this._useChipWaveAdvancedLoopControlsRow.style.display = "none";
-                        this._chipWaveLoopModeSelectRow.style.display = "none";
-                        this._chipWaveLoopStartRow.style.display = "none";
-                        this._chipWaveLoopEndRow.style.display = "none";
-                        this._chipWaveStartOffsetRow.style.display = "none";
-                        this._chipWavePlayBackwardsRow.style.display = "none";
-                        this._fadeInOutRow.style.display = "none";
-                        for (let i = 0; i < Config.drumCount; i++) {
-                            setSelectedValue(this._drumsetEnvelopeSelects[i], instrument.drumsetEnvelopes[i]);
-                            this._drumsetSpectrumEditors[i].render();
-                        }
-                    }
-                    else {
-                        this._drumsetGroup.style.display = "none";
-                        this._fadeInOutRow.style.display = "";
-                        this._fadeInOutEditor.render();
-                    }
-                    if (instrument.type == 0) {
-                        this._chipWaveSelectRow.style.display = "";
-                        this._useChipWaveAdvancedLoopControlsRow.style.display = "";
-                        if (instrument.isUsingAdvancedLoopControls) {
-                            this._chipWaveLoopModeSelectRow.style.display = "";
-                            this._chipWaveLoopStartRow.style.display = "";
-                            this._chipWaveLoopEndRow.style.display = "";
-                            this._chipWaveStartOffsetRow.style.display = "";
-                            this._chipWavePlayBackwardsRow.style.display = "";
-                        }
-                        else {
-                            this._chipWaveLoopModeSelectRow.style.display = "none";
-                            this._chipWaveLoopStartRow.style.display = "none";
-                            this._chipWaveLoopEndRow.style.display = "none";
-                            this._chipWaveStartOffsetRow.style.display = "none";
-                            this._chipWavePlayBackwardsRow.style.display = "none";
-                        }
+                    const getInstType = instrument.type;
+                    const advLoopingEnabled = instrument.isUsingAdvancedLoopControls && getInstType == 0;
+                    this._chipWaveSelectRow.style.display = getInstType == 0 ? "" : "none";
+                    this._useChipWaveAdvancedLoopControlsRow.style.display = advLoopingEnabled ? "" : "none";
+                    this._chipWaveLoopModeSelectRow.style.display = advLoopingEnabled ? "" : "none";
+                    this._chipWaveLoopStartRow.style.display = advLoopingEnabled ? "" : "none";
+                    this._chipWaveLoopEndRow.style.display = advLoopingEnabled ? "" : "none";
+                    this._chipWaveStartOffsetRow.style.display = advLoopingEnabled ? "" : "none";
+                    this._chipWavePlayBackwardsRow.style.display = advLoopingEnabled ? "" : "none";
+                    if (getInstType == 0) {
                         setSelectedValue(this._chipWaveSelect, instrument.chipWave);
                         this._useChipWaveAdvancedLoopControlsBox.checked = instrument.isUsingAdvancedLoopControls ? true : false;
                         setSelectedValue(this._chipWaveLoopModeSelect, instrument.chipWaveLoopMode);
@@ -63919,61 +64993,34 @@ You should be redirected to the song at:<br /><br />
                         this._chipWaveStartOffsetStepper.value = instrument.chipWaveStartOffset + "";
                         this._chipWavePlayBackwardsBox.checked = instrument.chipWavePlayBackwards ? true : false;
                     }
-                    if (instrument.type == 9) {
-                        this._customWaveDraw.style.display = "";
-                        this._chipWaveSelectRow.style.display = "none";
-                        this._useChipWaveAdvancedLoopControlsRow.style.display = "none";
-                        this._chipWaveLoopModeSelectRow.style.display = "none";
-                        this._chipWaveLoopStartRow.style.display = "none";
-                        this._chipWaveLoopEndRow.style.display = "none";
-                        this._chipWaveStartOffsetRow.style.display = "none";
-                        this._chipWavePlayBackwardsRow.style.display = "none";
+                    this._customWaveDraw.style.display = getInstType == 9 ? "" : "none";
+                    if (getInstType == 9) {
+                        this._customWaveDrawCanvas.redrawCanvas();
+                        if (this.prompt instanceof CustomChipPrompt)
+                            this.prompt.customChipCanvas.render();
                     }
-                    else {
-                        this._customWaveDraw.style.display = "none";
-                    }
-                    if (instrument.type == 8) {
-                        this._supersawDynamismRow.style.display = "";
-                        this._supersawSpreadRow.style.display = "";
-                        this._supersawShapeRow.style.display = "";
-                        this._supersawDynamismSlider.updateValue(instrument.supersawDynamism);
-                        this._supersawSpreadSlider.updateValue(instrument.supersawSpread);
-                        this._supersawShapeSlider.updateValue(instrument.supersawShape);
-                    }
-                    else {
-                        this._supersawDynamismRow.style.display = "none";
-                        this._supersawSpreadRow.style.display = "none";
-                        this._supersawShapeRow.style.display = "none";
-                    }
-                    if (instrument.type == 6 || instrument.type == 8) {
-                        this._chipWaveSelectRow.style.display = "none";
-                        this._useChipWaveAdvancedLoopControlsRow.style.display = "none";
-                        this._chipWaveLoopModeSelectRow.style.display = "none";
-                        this._chipWaveLoopStartRow.style.display = "none";
-                        this._chipWaveLoopEndRow.style.display = "none";
-                        this._chipWaveStartOffsetRow.style.display = "none";
-                        this._chipWavePlayBackwardsRow.style.display = "none";
-                        this._pulseWidthRow.style.display = "";
+                    const isPwmOrSuperSaw = getInstType == 6 || getInstType == 8;
+                    this._pulseWidthRow.style.display = isPwmOrSuperSaw ? "" : "none";
+                    this._pulseWidthDropdownGroup.style.display = (this._openPulseWidthDropdown && isPwmOrSuperSaw) ? "" : "none";
+                    if (isPwmOrSuperSaw) {
                         this._pulseWidthSlider.input.title = prettyNumber(instrument.pulseWidth) + "%";
                         this._pulseWidthSlider.updateValue(instrument.pulseWidth);
                         this._decimalOffsetSlider.input.title = instrument.decimalOffset / 100 <= 0 ? "none" : "-" + prettyNumber(instrument.decimalOffset / 100) + "%";
                         this._decimalOffsetSlider.updateValue(99 - instrument.decimalOffset);
-                        this._pulseWidthDropdownGroup.style.display = (this._openPulseWidthDropdown ? "" : "none");
                     }
-                    else {
-                        this._pulseWidthRow.style.display = "none";
-                        this._pulseWidthDropdownGroup.style.display = "none";
-                    }
-                    if (instrument.type == 1 || instrument.type == 11) {
-                        this._phaseModGroup.style.display = "";
-                        this._feedbackRow2.style.display = "";
-                        this._chipWaveSelectRow.style.display = "none";
-                        this._useChipWaveAdvancedLoopControlsRow.style.display = "none";
-                        this._chipWaveLoopModeSelectRow.style.display = "none";
-                        this._chipWaveLoopStartRow.style.display = "none";
-                        this._chipWaveLoopEndRow.style.display = "none";
-                        this._chipWaveStartOffsetRow.style.display = "none";
-                        this._chipWavePlayBackwardsRow.style.display = "none";
+                    this._pwmSliderInputBox.value = instrument.pulseWidth + "";
+                    const isFM = instrument.type == 1 || instrument.type == 11;
+                    this._algorithm6OpSelectRow.style.display = getInstType == 11 ? "" : "none";
+                    this._feedback6OpRow1.style.display = getInstType == 11 ? "" : "none";
+                    this._algorithmSelectRow.style.display = getInstType == 1 ? "" : "none";
+                    this._phaseModGroup.style.display = isFM ? "" : "none";
+                    this._feedbackRow1.style.display = getInstType == 1 ? "" : "none";
+                    this._feedbackRow2.style.display = isFM ? "" : "none";
+                    this._operatorRows[4].style.display = getInstType == 11 ? "" : "none";
+                    this._operatorRows[5].style.display = getInstType == 11 ? "" : "none";
+                    this._operatorDropdownGroups[4].style.display = (this._openOperatorDropdowns[4] && getInstType == 11 ? "" : "none");
+                    this._operatorDropdownGroups[5].style.display = (this._openOperatorDropdowns[5] && getInstType == 11 ? "" : "none");
+                    if (isFM) {
                         setSelectedValue(this._algorithmSelect, instrument.algorithm);
                         setSelectedValue(this._feedbackTypeSelect, instrument.feedbackType);
                         this._feedbackAmplitudeSlider.updateValue(instrument.feedbackAmplitude);
@@ -63990,277 +65037,52 @@ You should be redirected to the song at:<br /><br />
                             this._operatorFrequencySelects[i].title = operatorName + " Frequency";
                             this._operatorAmplitudeSliders[i].input.title = operatorName + (isCarrier ? " Volume" : " Amplitude");
                             this._operatorDropdownGroups[i].style.display = (this._openOperatorDropdowns[i] ? "" : "none");
-                            if (instrument.operators[i].waveform == 2) {
-                                this._operatorWaveformPulsewidthSliders[i].container.style.display = "";
-                                this._operatorWaveformHints[i].style.display = "none";
-                            }
-                            else {
-                                this._operatorWaveformPulsewidthSliders[i].container.style.display = "none";
-                                this._operatorWaveformHints[i].style.display = "";
-                            }
+                            this._operatorWaveformPulsewidthSliders[i].container.style.display = instrument.operators[i].waveform == 2 ? "" : "none";
+                            this._operatorWaveformHints[i].style.display = instrument.operators[i].waveform == 2 ? "none" : "";
                         }
                         if (instrument.type == 11) {
                             setSelectedValue(this._algorithm6OpSelect, instrument.algorithm6Op);
                             setSelectedValue(this._feedback6OpTypeSelect, instrument.feedbackType6Op);
                             this._customAlgorithmCanvas.redrawCanvas();
-                            this._algorithm6OpSelectRow.style.display = "";
-                            this._feedback6OpRow1.style.display = "";
-                            this._operatorRows[4].style.display = "";
-                            this._operatorRows[5].style.display = "";
-                            this._operatorDropdownGroups[4].style.display = (this._openOperatorDropdowns[4] ? "" : "none");
-                            this._operatorDropdownGroups[5].style.display = (this._openOperatorDropdowns[5] ? "" : "none");
-                            this._algorithmSelectRow.style.display = "none";
-                            this._feedbackRow1.style.display = "none";
-                        }
-                        else {
-                            this._algorithm6OpSelectRow.style.display = "none";
-                            this._feedback6OpRow1.style.display = "none";
-                            this._operatorRows[4].style.display = "none";
-                            this._operatorRows[5].style.display = "none";
-                            this._operatorDropdownGroups[4].style.display = "none";
-                            this._operatorDropdownGroups[5].style.display = "none";
-                            this._feedbackRow1.style.display = "";
-                            this._algorithmSelectRow.style.display = "";
                         }
                     }
-                    else {
-                        this._algorithm6OpSelectRow.style.display = "none";
-                        this._feedback6OpRow1.style.display = "none";
-                        this._algorithmSelectRow.style.display = "none";
-                        this._phaseModGroup.style.display = "none";
-                        this._feedbackRow1.style.display = "none";
-                        this._feedbackRow2.style.display = "none";
+                    this._supersawDynamismRow.style.display = getInstType == 8 ? "" : "none";
+                    this._supersawSpreadRow.style.display = getInstType == 8 ? "" : "none";
+                    this._supersawShapeRow.style.display = getInstType == 8 ? "" : "none";
+                    if (getInstType == 8) {
+                        this._supersawDynamismSlider.updateValue(instrument.supersawDynamism);
+                        this._supersawSpreadSlider.updateValue(instrument.supersawSpread);
+                        this._supersawShapeSlider.updateValue(instrument.supersawShape);
                     }
-                    this._pulseWidthSlider.input.title = prettyNumber(instrument.pulseWidth) + "%";
-                    if (effectsIncludeTransition(instrument.effects)) {
-                        this._transitionRow.style.display = "";
-                        if (this._openTransitionDropdown)
-                            this._transitionDropdownGroup.style.display = "";
-                        setSelectedValue(this._transitionSelect, instrument.transition);
-                        this._slideSpeedRow.style.display = (Config.transitions[instrument.transition].slides == true) ? "" : "none";
-                        this._slideSpeedSlider.input.title = "x" + prettyNumber(49 - instrument.slideTicks);
-                        this._slideSpeedDisplay.textContent = "x" + prettyNumber(49 - instrument.slideTicks);
-                        this._slideSpeedSlider.updateValue(instrument.slideTicks);
+                    this._harmonicsRow.style.display = getInstType == 5 || getInstType == 7 ? "" : "none";
+                    if (getInstType == 5 || getInstType == 7)
+                        this._harmonicsEditor.render();
+                    this._stringSustainRow.style.display = getInstType == 7 ? "" : "none";
+                    if (getInstType == 7) {
+                        this._stringSustainSlider.updateValue(instrument.stringSustain);
+                        this._stringSustainLabel.textContent = Config.enableAcousticSustain ? "Sustain (" + Config.sustainTypeNames[instrument.stringSustainType].substring(0, 1).toUpperCase() + "):" : "Sustain:";
                     }
-                    else {
-                        this._transitionDropdownGroup.style.display = "none";
-                        this._transitionRow.style.display = "none";
-                    }
-                    if (effectsIncludeChord(instrument.effects)) {
-                        this._chordSelectRow.style.display = "";
-                        this._chordDropdown.style.display = (instrument.chord == Config.chords.dictionary["arpeggio"].index) || (instrument.chord == Config.chords.dictionary["strum"].index) ? "" : "none";
-                        this._chordDropdownGroup.style.display = (((instrument.chord == Config.chords.dictionary["arpeggio"].index) || (instrument.chord == Config.chords.dictionary["strum"].index)) && this._openChordDropdown) ? "" : "none";
-                        setSelectedValue(this._chordSelect, instrument.chord);
-                        this._twoNoteArpRow.style.display = instrument.chord == Config.chords.dictionary["arpeggio"].index ? "" : "none";
-                        this._arpeggioSpeedRow.style.display = instrument.chord == Config.chords.dictionary["arpeggio"].index ? "" : "none";
-                        this._strumSpeedRow.style.display = instrument.chord == Config.chords.dictionary["strum"].index ? "" : "none";
-                    }
-                    else {
-                        this._chordSelectRow.style.display = "none";
-                        this._chordDropdown.style.display = "none";
-                        this._chordDropdownGroup.style.display = "none";
-                    }
-                    if (effectsIncludePitchShift(instrument.effects)) {
-                        this._pitchShiftRow.style.display = "";
-                        this._pitchShiftSlider.updateValue(instrument.pitchShift);
-                        this._pitchShiftSlider.input.title = (instrument.pitchShift - Config.pitchShiftCenter) + " semitone(s)";
-                        for (const marker of this._pitchShiftFifthMarkers) {
-                            marker.style.display = prefs.showFifth ? "" : "none";
+                    this._spectrumRow.style.display = getInstType == 3 ? "" : "none";
+                    if (getInstType == 3)
+                        this._spectrumEditor.render();
+                    this._chipNoiseSelectRow.style.display = getInstType == 2 ? "" : "none";
+                    if (getInstType == 2)
+                        setSelectedValue(this._chipNoiseSelect, instrument.chipNoise, true);
+                    this._drumsetGroup.style.display = getInstType == 4 ? "" : "none";
+                    this._fadeInOutRow.style.display = getInstType == 4 ? "none" : "";
+                    if (getInstType == 4) {
+                        for (let i = 0; i < Config.drumCount; i++) {
+                            setSelectedValue(this._drumsetEnvelopeSelects[i], instrument.drumsetEnvelopes[i]);
+                            this._drumsetSpectrumEditors[i].render();
                         }
                     }
                     else {
-                        this._pitchShiftRow.style.display = "none";
+                        this._fadeInOutEditor.render();
                     }
-                    if (effectsIncludeDetune(instrument.effects)) {
-                        this._detuneSliderRow.style.display = "";
-                        this._detuneSlider.updateValue(instrument.detune - Config.detuneCenter);
-                        this._detuneSlider.input.title = (Synth.detuneToCents(instrument.detune)) + " cent(s)";
-                    }
-                    else {
-                        this._detuneSliderRow.style.display = "none";
-                    }
-                    if (effectsIncludeVibrato(instrument.effects)) {
-                        this._vibratoSelectRow.style.display = "";
-                        if (this._openVibratoDropdown)
-                            this._vibratoDropdownGroup.style.display = "";
-                        setSelectedValue(this._vibratoSelect, instrument.vibrato);
-                    }
-                    else {
-                        this._vibratoDropdownGroup.style.display = "none";
-                        this._vibratoSelectRow.style.display = "none";
-                    }
-                    if (effectsIncludeNoteFilter(instrument.effects)) {
-                        this._noteFilterTypeRow.style.setProperty("--text-color-lit", colors.primaryNote);
-                        this._noteFilterTypeRow.style.setProperty("--text-color-dim", colors.secondaryNote);
-                        this._noteFilterTypeRow.style.setProperty("--background-color-lit", colors.primaryChannel);
-                        this._noteFilterTypeRow.style.setProperty("--background-color-dim", colors.secondaryChannel);
-                        this._noteFilterTypeRow.style.display = "";
-                        if (this._doc.synth.isFilterModActive(true, this._doc.channel, this._doc.getCurrentInstrument())) {
-                            this._noteFilterEditor.render(true, this._ctrlHeld || this._shiftHeld);
-                        }
-                        else {
-                            this._noteFilterEditor.render();
-                        }
-                        if (instrument.noteFilterType) {
-                            this._noteFilterSimpleButton.classList.remove("deactivated");
-                            this._noteFilterAdvancedButton.classList.add("deactivated");
-                            this._noteFilterRow.style.display = "none";
-                            this._noteFilterSimpleCutRow.style.display = "";
-                            this._noteFilterSimplePeakRow.style.display = "";
-                        }
-                        else {
-                            this._noteFilterSimpleButton.classList.add("deactivated");
-                            this._noteFilterAdvancedButton.classList.remove("deactivated");
-                            this._noteFilterRow.style.display = "";
-                            this._noteFilterSimpleCutRow.style.display = "none";
-                            this._noteFilterSimplePeakRow.style.display = "none";
-                        }
-                    }
-                    else {
-                        this._noteFilterRow.style.display = "none";
-                        this._noteFilterSimpleCutRow.style.display = "none";
-                        this._noteFilterSimplePeakRow.style.display = "none";
-                        this._noteFilterTypeRow.style.display = "none";
-                    }
-                    if (this._doc.prefs.instrumentSettingsSimplifier) {
-                        const colors = ColorConfig.getChannelColor(this._doc.song, this._doc.channel);
-                        this._instOptionsDiv.style.setProperty("--text-color-lit", colors.primaryNote);
-                        this._instOptionsDiv.style.setProperty("--text-color-dim", colors.secondaryNote);
-                        this._instOptionsDiv.style.setProperty("--background-color-lit", colors.primaryChannel);
-                        this._instOptionsDiv.style.setProperty("--background-color-dim", colors.secondaryChannel);
-                        this._instrumentDiv.style.display = (this._instSettingMode == 1) ? "" : "none";
-                        this._effectDiv.style.display = (this._instSettingMode == 2) ? "" : "none";
-                        this._envelopeDiv.style.display = (this._instSettingMode == 3) ? "" : "none";
-                        this._mobileInstSettingsButton.style.color = (this._instSettingMode == 1) ? "var(--text-color-lit)" : "var(--text-color-dim)";
-                        this._mobileEffectsButton.style.color = (this._instSettingMode == 2) ? "var(--text-color-lit)" : "var(--text-color-dim)";
-                        this._mobileEnvelopesButton.style.color = (this._instSettingMode == 3) ? "var(--text-color-lit)" : "var(--text-color-dim)";
-                        this._mobileInstSettingsButton.style.background = (this._instSettingMode == 1) ? "" : "#fff0";
-                        this._mobileEffectsButton.style.background = (this._instSettingMode == 2) ? "" : "#fff0";
-                        this._mobileEnvelopesButton.style.background = (this._instSettingMode == 3) ? "" : "#fff0";
-                        this._instSettingMode == 1 ? this._mobileInstSettingsButton.classList.remove("deactivated") : this._mobileInstSettingsButton.classList.add("deactivated");
-                        this._instSettingMode == 2 ? this._mobileEffectsButton.classList.remove("deactivated") : this._mobileEffectsButton.classList.add("deactivated");
-                        this._instSettingMode == 3 ? this._mobileEnvelopesButton.classList.remove("deactivated") : this._mobileEnvelopesButton.classList.add("deactivated");
-                        this._loopBarButton.style.display = prefs.displayShortcutButtons ? "" : "none";
-                        this._instOptionsDiv.style.display = "";
-                    }
-                    else {
-                        this._instrumentDiv.style.display = "";
-                        this._effectDiv.style.display = "";
-                        this._envelopeDiv.style.display = "";
-                        this._instOptionsDiv.style.display = "none";
-                    }
-                    if (effectsIncludeDistortion(instrument.effects)) {
-                        this._distortionRow.style.display = "";
-                        if (instrument.type == 0 || instrument.type == 9 || instrument.type == 6 || instrument.type == 8)
-                            this._aliasingRow.style.display = "";
-                        else
-                            this._aliasingRow.style.display = "none";
-                        this._distortionSlider.updateValue(instrument.distortion);
-                    }
-                    else {
-                        this._distortionRow.style.display = "none";
-                        this._aliasingRow.style.display = "none";
-                    }
-                    if (effectsIncludeInvertWave(instrument.effects)) {
-                        this._invertWaveRow.style.display = "";
-                    }
-                    else {
-                        this._invertWaveRow.style.display = "none";
-                    }
-                    if (effectsIncludeBitcrusher(instrument.effects)) {
-                        this._bitcrusherQuantizationRow.style.display = "";
-                        this._bitcrusherFreqRow.style.display = "";
-                        this._bitcrusherQuantizationSlider.updateValue(instrument.bitcrusherQuantization);
-                        this._bitcrusherFreqSlider.updateValue(instrument.bitcrusherFreq);
-                    }
-                    else {
-                        this._bitcrusherQuantizationRow.style.display = "none";
-                        this._bitcrusherFreqRow.style.display = "none";
-                    }
-                    if (effectsIncludePanning(instrument.effects)) {
-                        this._panSliderRow.style.display = "";
-                        if (this._openPanDropdown)
-                            this._panDropdownGroup.style.display = "";
-                        this._panSlider.updateValue(instrument.pan);
-                    }
-                    else {
-                        this._panSliderRow.style.display = "none";
-                        this._panDropdownGroup.style.display = "none";
-                    }
-                    if (effectsIncludeChorus(instrument.effects)) {
-                        this._chorusRow.style.display = "";
-                        this._chorusSlider.updateValue(instrument.chorus);
-                    }
-                    else {
-                        this._chorusRow.style.display = "none";
-                    }
-                    if (effectsIncludeEcho(instrument.effects)) {
-                        this._echoSustainRow.style.display = "";
-                        this._echoSustainSlider.updateValue(instrument.echoSustain);
-                        this._echoDelayRow.style.display = "";
-                        this._echoDelaySlider.updateValue(instrument.echoDelay);
-                        this._echoDelaySlider.input.title = (Math.round((instrument.echoDelay + 1) * Config.echoDelayStepTicks / (Config.ticksPerPart * Config.partsPerBeat) * 1000) / 1000) + " beat(s)";
-                    }
-                    else {
-                        this._echoSustainRow.style.display = "none";
-                        this._echoDelayRow.style.display = "none";
-                    }
-                    if (effectsIncludeReverb(instrument.effects)) {
-                        this._reverbRow.style.display = "";
-                        this._reverbSlider.updateValue(instrument.reverb);
-                    }
-                    else {
-                        this._reverbRow.style.display = "none";
-                    }
-                    if (effectsIncludeRM(instrument.effects)) {
-                        this._ringModContainerRow.style.display = "";
-                        this._ringModSlider.updateValue(instrument.ringModulation);
-                        this._ringModHzSlider.updateValue(instrument.ringModulationHz);
-                        this._rmHzOffsetSlider.updateValue(instrument.rmHzOffset - Config.rmHzOffsetCenter);
-                        setSelectedValue(this._ringModWaveSelect, instrument.rmWaveformIndex);
-                        this._ringModPulsewidthSlider.updateValue(instrument.rmPulseWidth);
-                    }
-                    else {
-                        this._ringModContainerRow.style.display = "none";
-                    }
-                    if (effectsIncludePhaser(instrument.effects)) {
-                        this._phaserMixRow.style.display = "";
-                        this._phaserMixSlider.updateValue(instrument.phaserMix);
-                        this._phaserFreqRow.style.display = "";
-                        this._phaserFreqSlider.updateValue(instrument.phaserFreq);
-                        this._phaserFeedbackRow.style.display = "";
-                        this._phaserFeedbackSlider.updateValue(instrument.phaserFeedback);
-                        this._phaserStagesRow.style.display = "";
-                        this._phaserStagesSlider.updateValue(instrument.phaserStages);
-                    }
-                    else {
-                        this._phaserMixRow.style.display = "none";
-                        this._phaserFreqRow.style.display = "none";
-                        this._phaserFeedbackRow.style.display = "none";
-                        this._phaserStagesRow.style.display = "none";
-                    }
-                    if (effectsIncludeNoteRange(instrument.effects)) {
-                        this._upperNoteLimitRow.style.display = "";
-                        this._lowerNoteLimitRow.style.display = "";
-                        this._upperNoteLimitInputBox.value = String(instrument.upperNoteLimit);
-                        this._lowerNoteLimitInputBox.value = String(instrument.lowerNoteLimit);
-                    }
-                    else {
-                        this._upperNoteLimitRow.style.display = "none";
-                        this._lowerNoteLimitRow.style.display = "none";
-                    }
-                    if (effectsIncludeGranular(instrument.effects)) {
-                        this._granularContainerRow.style.display = "";
-                        this._granularSlider.updateValue(instrument.granular);
-                        this._grainSizeSlider.updateValue(instrument.grainSize);
-                        this._grainAmountsSlider.updateValue(instrument.grainAmounts);
-                        this._grainRangeSlider.updateValue(instrument.grainRange);
-                    }
-                    else {
-                        this._granularContainerRow.style.display = "none";
-                    }
-                    if (instrument.type == 0 || instrument.type == 9 || instrument.type == 5 || instrument.type == 7 || instrument.type == 3 || instrument.type == 6 || instrument.type == 2) {
-                        this._unisonSelectRow.style.display = "";
+                    const canUseUnison = getInstType != 1 && getInstType != 11 && getInstType != 8;
+                    this._unisonSelectRow.style.display = canUseUnison ? "" : "none";
+                    this._unisonDropdownGroup.style.display = canUseUnison && this._openUnisonDropdown ? "" : "none";
+                    if (canUseUnison) {
                         setSelectedValue(this._unisonSelect, instrument.unison);
                         this._unisonVoicesInputBox.value = instrument.unisonVoices + "";
                         this._unisonSpreadInputBox.value = instrument.unisonSpread + "";
@@ -64269,17 +65091,173 @@ You should be redirected to the song at:<br /><br />
                         this._unisonSignInputBox.value = instrument.unisonSign + "";
                         this._unisonBuzzesBox.checked = instrument.unisonBuzzes ? true : false;
                         this._unisonBuzzesBoxRow.style.display = (instrument.unison == Config.unisons.length ? "" : "none");
-                        this._unisonDropdownGroup.style.display = (this._openUnisonDropdown ? "" : "none");
                     }
-                    else {
-                        this._unisonSelectRow.style.display = "none";
-                        this._unisonDropdownGroup.style.display = "none";
+                    const transitionIncluded = effectsIncludeTransition(instrument.effects);
+                    const chordIncluded = effectsIncludeChord(instrument.effects);
+                    const pitchShiftIncluded = effectsIncludePitchShift(instrument.effects);
+                    const detuneIncluded = effectsIncludeDetune(instrument.effects);
+                    const vibratoIncluded = effectsIncludeVibrato(instrument.effects);
+                    const noteFilterIncluded = effectsIncludeNoteFilter(instrument.effects);
+                    const distortionIncluded = effectsIncludeDistortion(instrument.effects);
+                    const invertWaveIncluded = effectsIncludeInvertWave(instrument.effects);
+                    const bitcrusherIncluded = effectsIncludeBitcrusher(instrument.effects);
+                    const panningIncluded = effectsIncludePanning(instrument.effects);
+                    const chorusIncluded = effectsIncludeChorus(instrument.effects);
+                    const echoIncluded = effectsIncludeEcho(instrument.effects);
+                    const reverbIncluded = effectsIncludeReverb(instrument.effects);
+                    const rmIncluded = effectsIncludeRM(instrument.effects);
+                    const phaserIncluded = effectsIncludePhaser(instrument.effects);
+                    const noteRangeIncluded = effectsIncludeNoteRange(instrument.effects);
+                    const granularIncluded = effectsIncludeGranular(instrument.effects);
+                    this._transitionDropdownGroup.style.display = transitionIncluded && this._openTransitionDropdown ? "" : "none";
+                    this._transitionContainerRow.style.display = transitionIncluded ? "flex" : "none";
+                    if (transitionIncluded) {
+                        setSelectedValue(this._transitionSelect, instrument.transition);
+                        this._slideSpeedRow.style.display = (Config.transitions[instrument.transition].slides == true) ? "" : "none";
+                        this._slideSpeedSlider.input.title = "x" + prettyNumber(49 - instrument.slideTicks);
+                        this._slideSpeedDisplay.textContent = "x" + prettyNumber(49 - instrument.slideTicks);
+                        this._slideSpeedSlider.updateValue(instrument.slideTicks);
                     }
-                    if (this._openEnvelopeDropdown)
-                        this._envelopeDropdownGroup.style.display = "";
-                    else
-                        this._envelopeDropdownGroup.style.display = "none";
+                    const hasChordDropdown = (instrument.chord == Config.chords.dictionary["arpeggio"].index) || (instrument.chord == Config.chords.dictionary["strum"].index);
+                    this._chordContainerRow.style.display = chordIncluded ? "flex" : "none";
+                    this._chordDropdown.style.display = hasChordDropdown && chordIncluded ? "" : "none";
+                    this._chordDropdownGroup.style.display = (hasChordDropdown && this._openChordDropdown) && chordIncluded ? "" : "none";
+                    if (chordIncluded) {
+                        setSelectedValue(this._chordSelect, instrument.chord);
+                        this._twoNoteArpRow.style.display = instrument.chord == Config.chords.dictionary["arpeggio"].index ? "" : "none";
+                        this._arpeggioSpeedRow.style.display = instrument.chord == Config.chords.dictionary["arpeggio"].index ? "" : "none";
+                        this._strumSpeedRow.style.display = instrument.chord == Config.chords.dictionary["strum"].index ? "" : "none";
+                        this._arpeggioSpeedSlider.updateValue(instrument.arpeggioSpeed);
+                        this._arpeggioSpeedSlider.input.title = "x" + prettyNumber(Config.arpSpeedScale[instrument.arpeggioSpeed]);
+                        this._arpeggioSpeedDisplay.textContent = "x" + prettyNumber(Config.arpSpeedScale[instrument.arpeggioSpeed]);
+                        this._strumSpeedSlider.updateValue(instrument.strumParts);
+                        this._strumSpeedSlider.input.title = prettyNumber(instrument.strumParts / Config.partsPerBeat) + " beat(s)";
+                        this._strumSpeedDisplay.textContent = prettyNumber(instrument.strumParts / Config.partsPerBeat) + " beat(s)";
+                    }
+                    this._pitchShiftContainerRow.style.display = pitchShiftIncluded ? "flex" : "none";
+                    if (pitchShiftIncluded) {
+                        this._pitchShiftSlider.updateValue(instrument.pitchShift);
+                        this._pitchShiftSlider.input.title = (instrument.pitchShift - Config.pitchShiftCenter) + " semitone(s)";
+                        for (const marker of this._pitchShiftFifthMarkers) {
+                            marker.style.display = prefs.showFifth || prefs.advancedColorScheme ? "" : "none";
+                        }
+                    }
+                    this._detuneContainerRow.style.display = detuneIncluded ? "flex" : "none";
+                    if (detuneIncluded) {
+                        this._detuneSlider.updateValue(instrument.detune - Config.detuneCenter);
+                        this._detuneSlider.input.title = (Synth.detuneToCents(instrument.detune)) + " cent(s)";
+                        this._detuneSliderInputBox.value = (instrument.detune - Config.detuneCenter) + "";
+                    }
+                    this._vibratoContainerRow.style.display = vibratoIncluded ? "flex" : "none";
+                    this._vibratoDropdownGroup.style.display = this._openVibratoDropdown && vibratoIncluded ? "" : "none";
+                    if (vibratoIncluded) {
+                        setSelectedValue(this._vibratoSelect, instrument.vibrato);
+                        setSelectedValue(this._vibratoTypeSelect, instrument.vibratoType);
+                        this._vibratoDepthSlider.updateValue(Math.round(instrument.vibratoDepth * 25));
+                        this._vibratoDelaySlider.updateValue(Math.round(instrument.vibratoDelay));
+                        this._vibratoSpeedSlider.updateValue(instrument.vibratoSpeed);
+                        this._vibratoDelaySlider.input.title = "" + Math.round(instrument.vibratoDelay);
+                        this._vibratoDepthSlider.input.title = "" + instrument.vibratoDepth;
+                        this._vibratoSpeedSlider.input.title = "x" + instrument.vibratoSpeed / 10;
+                        this._vibratoSpeedDisplay.textContent = "x" + instrument.vibratoSpeed / 10;
+                    }
+                    this._noteFilterContainerRow.style.display = noteFilterIncluded ? "flex" : "none";
+                    this._noteFilterRow.style.display = noteFilterIncluded && instrument.noteFilterType ? "none" : "";
+                    this._noteFilterSimpleCutRow.style.display = noteFilterIncluded && instrument.noteFilterType ? "" : "none";
+                    this._noteFilterSimplePeakRow.style.display = noteFilterIncluded && instrument.noteFilterType ? "" : "none";
+                    this._noteFilterTypeRow.style.display = noteFilterIncluded ? "" : "none";
+                    if (noteFilterIncluded) {
+                        this._noteFilterTypeRow.style.setProperty("--text-color-lit", colors.primaryNote);
+                        this._noteFilterTypeRow.style.setProperty("--text-color-dim", colors.secondaryNote);
+                        this._noteFilterTypeRow.style.setProperty("--background-color-lit", colors.primaryChannel);
+                        this._noteFilterTypeRow.style.setProperty("--background-color-dim", colors.secondaryChannel);
+                        this._doc.synth.isFilterModActive(true, this._doc.channel, this._doc.getCurrentInstrument()) ?
+                            this._noteFilterEditor.render() : this._noteFilterEditor.render(true, this._ctrlHeld || this._shiftHeld);
+                        if (instrument.noteFilterType) {
+                            this._noteFilterSimpleButton.classList.remove("deactivated");
+                            this._noteFilterAdvancedButton.classList.add("deactivated");
+                        }
+                        else {
+                            this._noteFilterSimpleButton.classList.add("deactivated");
+                            this._noteFilterAdvancedButton.classList.remove("deactivated");
+                        }
+                        this._noteFilterSimpleCutSlider.updateValue(instrument.noteFilterSimpleCut);
+                        this._noteFilterSimplePeakSlider.updateValue(instrument.noteFilterSimplePeak);
+                    }
+                    const hasAliasing = instrument.type == 0 || instrument.type == 9 || instrument.type == 6 || instrument.type == 8;
+                    this._distortionContainerRow.style.display = distortionIncluded ? "flex" : "none";
+                    this._aliasingRow.style.display = distortionIncluded && hasAliasing ? "" : "none";
+                    if (distortionIncluded)
+                        this._distortionSlider.updateValue(instrument.distortion);
+                    this._bitcrusherContainerRow.style.display = bitcrusherIncluded ? "flex" : "none";
+                    if (bitcrusherIncluded) {
+                        this._bitcrusherQuantizationSlider.updateValue(instrument.bitcrusherQuantization);
+                        this._bitcrusherFreqSlider.updateValue(instrument.bitcrusherFreq);
+                    }
+                    this._panSliderRow.style.display = panningIncluded ? "flex" : "none";
+                    this._panDropdownGroup.style.display = panningIncluded && this._openPanDropdown ? "" : "none";
+                    if (panningIncluded) {
+                        this._panSlider.updateValue(instrument.pan);
+                        this._panSliderInputBox.value = instrument.pan + "";
+                        this._panDelaySlider.updateValue(instrument.panDelay);
+                        this._panDelaySlider.input.title = "" + instrument.panDelay;
+                    }
+                    this._chorusContainerRow.style.display = chorusIncluded ? "flex" : "none";
+                    if (chorusIncluded)
+                        this._chorusSlider.updateValue(instrument.chorus);
+                    this._echoContainerRow.style.display = echoIncluded ? "flex" : "none";
+                    if (echoIncluded) {
+                        this._echoSustainSlider.updateValue(instrument.echoSustain);
+                        this._echoDelaySlider.updateValue(instrument.echoDelay);
+                        this._echoDelaySlider.input.title = (Math.round((instrument.echoDelay + 1) * Config.echoDelayStepTicks / (Config.ticksPerPart * Config.partsPerBeat) * 1000) / 1000) + " beat(s)";
+                    }
+                    this._reverbContainerRow.style.display = reverbIncluded ? "flex" : "none";
+                    if (this._openReverbDropdown)
+                        this._reverbDropdownGroup.style.display = reverbIncluded ? "" : "";
+                    if (reverbIncluded) {
+                        this._reverbSlider.updateValue(instrument.reverb);
+                        this._reverbWetSlider.updateValue(instrument.reverbWet);
+                        this._reverbDrySlider.updateValue(instrument.reverbDry);
+                    }
+                    this._ringModContainerRow.style.display = rmIncluded ? "flex" : "none";
+                    if (rmIncluded) {
+                        this._ringModSlider.updateValue(instrument.ringModulation);
+                        this._ringModHzSlider.updateValue(instrument.ringModulationHz);
+                        this._rmHzOffsetSlider.updateValue(instrument.rmHzOffset - Config.rmHzOffsetCenter);
+                        setSelectedValue(this._ringModWaveSelect, instrument.rmWaveformIndex);
+                        this._ringModPulsewidthSlider.updateValue(instrument.rmPulseWidth);
+                    }
+                    this._rmHzOffsetSliderInputBox.value = (instrument.rmHzOffset - Config.rmHzOffsetCenter) + "";
+                    this._ringModHzNum.innerHTML = (clamp(1, 4600, Math.floor(20 * Math.pow(4400 / 20, Math.min(1.0, instrument.ringModulationHz / (Config.ringModHzRange - 1)))) + (instrument.rmHzOffset - Config.rmHzOffsetCenter))) + " (" + (Math.floor(20 * Math.pow(4400 / 20, Math.min(1.0, instrument.ringModulationHz / (Config.ringModHzRange - 1))))) + ")";
+                    this._phaserContainerRow.style.display = phaserIncluded ? "flex" : "none";
+                    if (phaserIncluded) {
+                        this._phaserMixSlider.updateValue(instrument.phaserMix);
+                        this._phaserFreqSlider.updateValue(instrument.phaserFreq);
+                        this._phaserFeedbackSlider.updateValue(instrument.phaserFeedback);
+                        this._phaserStagesSlider.updateValue(instrument.phaserStages);
+                    }
+                    this._invertWaveContainerRow.style.display = invertWaveIncluded ? "flex" : "none";
+                    this._noteRangeContainerRow.style.display = noteRangeIncluded ? "flex" : "none";
+                    if (noteRangeIncluded) {
+                        this._upperNoteLimitInputBox.value = String(instrument.upperNoteLimit);
+                        this._lowerNoteLimitInputBox.value = String(instrument.lowerNoteLimit);
+                        this._upperNoteLimitRow.firstChild.textContent = "Upper Note Limit [" + Piano.getPitchNameAlwaysOctave((instrument.upperNoteLimit + Config.keys[this._doc.song.key].basePitch) % Config.pitchesPerOctave, instrument.upperNoteLimit, this._doc.song.octave)
+                            + "]:";
+                        this._lowerNoteLimitRow.firstChild.textContent = "Lower Note Limit [" + Piano.getPitchNameAlwaysOctave((instrument.lowerNoteLimit + Config.keys[this._doc.song.key].basePitch) % Config.pitchesPerOctave, instrument.lowerNoteLimit, this._doc.song.octave)
+                            + "]:";
+                    }
+                    this._granularContainerRow.style.display = granularIncluded ? "flex" : "none";
+                    if (granularIncluded) {
+                        this._granularSlider.updateValue(instrument.granular);
+                        this._grainSizeSlider.updateValue(instrument.grainSize);
+                        this._grainAmountsSlider.updateValue(instrument.grainAmounts);
+                        this._grainRangeSlider.updateValue(instrument.grainRange);
+                    }
+                    this._envelopeDropdownGroup.style.display = this._openEnvelopeDropdown ? "" : "none";
                     this._envelopeEditor.render();
+                    this._envelopeSpeedSlider.updateValue(instrument.envelopeSpeed);
+                    this._envelopeSpeedSlider.input.title = "x" + prettyNumber(Config.arpSpeedScale[instrument.envelopeSpeed]);
+                    this._envelopeSpeedDisplay.textContent = "x" + prettyNumber(Config.arpSpeedScale[instrument.envelopeSpeed]);
                     for (let chordIndex = 0; chordIndex < Config.chords.length; chordIndex++) {
                         let hidden = (!Config.instrumentTypeHasSpecialInterval[instrument.type] && Config.chords[chordIndex].customInterval);
                         const option = this._chordSelect.children[chordIndex];
@@ -64292,54 +65270,26 @@ You should be redirected to the song at:<br /><br />
                             option.removeAttribute("hidden");
                         }
                     }
-                    this._instrumentSettingsGroup.style.color = ColorConfig.getChannelColor(this._doc.song, this._doc.channel).primaryNote;
-                    setSelectedValue(this._transitionSelect, instrument.transition);
-                    setSelectedValue(this._vibratoSelect, instrument.vibrato);
-                    setSelectedValue(this._vibratoTypeSelect, instrument.vibratoType);
-                    setSelectedValue(this._chordSelect, instrument.chord);
-                    this._panSliderInputBox.value = instrument.pan + "";
-                    this._pwmSliderInputBox.value = instrument.pulseWidth + "";
-                    this._detuneSliderInputBox.value = (instrument.detune - Config.detuneCenter) + "";
-                    this._rmHzOffsetSliderInputBox.value = (instrument.rmHzOffset - Config.rmHzOffsetCenter) + "";
-                    this._ringModHzNum.innerHTML = (clamp(1, 4600, Math.floor(20 * Math.pow(4400 / 20, Math.min(1.0, instrument.ringModulationHz / (Config.ringModHzRange - 1)))) + (instrument.rmHzOffset - Config.rmHzOffsetCenter))) + " (" + (Math.floor(20 * Math.pow(4400 / 20, Math.min(1.0, instrument.ringModulationHz / (Config.ringModHzRange - 1))))) + ")";
+                    if (this._doc.synth.isFilterModActive(false, 0, 0, true)) {
+                        this._songEqFilterEditor.render(true, this._ctrlHeld || this._shiftHeld);
+                    }
+                    else {
+                        this._songEqFilterEditor.render();
+                    }
                     this._instrumentVolumeSlider.updateValue(instrument.volume);
                     this._instrumentVolumeSliderInputBox.value = "" + (instrument.volume);
-                    this._vibratoDepthSlider.updateValue(Math.round(instrument.vibratoDepth * 25));
-                    this._vibratoDelaySlider.updateValue(Math.round(instrument.vibratoDelay));
-                    this._vibratoSpeedSlider.updateValue(instrument.vibratoSpeed);
-                    setSelectedValue(this._vibratoTypeSelect, instrument.vibratoType);
-                    this._arpeggioSpeedSlider.updateValue(instrument.arpeggioSpeed);
-                    this._strumSpeedSlider.updateValue(instrument.strumParts);
-                    this._panDelaySlider.updateValue(instrument.panDelay);
-                    this._vibratoDelaySlider.input.title = "" + Math.round(instrument.vibratoDelay);
-                    this._vibratoDepthSlider.input.title = "" + instrument.vibratoDepth;
-                    this._vibratoSpeedSlider.input.title = "x" + instrument.vibratoSpeed / 10;
-                    this._vibratoSpeedDisplay.textContent = "x" + instrument.vibratoSpeed / 10;
-                    this._panDelaySlider.input.title = "" + instrument.panDelay;
-                    this._arpeggioSpeedSlider.input.title = "x" + prettyNumber(Config.arpSpeedScale[instrument.arpeggioSpeed]);
-                    this._arpeggioSpeedDisplay.textContent = "x" + prettyNumber(Config.arpSpeedScale[instrument.arpeggioSpeed]);
-                    this._strumSpeedSlider.input.title = prettyNumber(instrument.strumParts / Config.partsPerBeat) + " beat(s)";
-                    this._strumSpeedDisplay.textContent = prettyNumber(instrument.strumParts / Config.partsPerBeat) + " beat(s)";
                     this._eqFilterSimpleCutSlider.updateValue(instrument.eqFilterSimpleCut);
                     this._eqFilterSimplePeakSlider.updateValue(instrument.eqFilterSimplePeak);
-                    this._noteFilterSimpleCutSlider.updateValue(instrument.noteFilterSimpleCut);
-                    this._noteFilterSimplePeakSlider.updateValue(instrument.noteFilterSimplePeak);
-                    this._envelopeSpeedSlider.updateValue(instrument.envelopeSpeed);
-                    this._envelopeSpeedSlider.input.title = "x" + prettyNumber(Config.arpSpeedScale[instrument.envelopeSpeed]);
-                    this._envelopeSpeedDisplay.textContent = "x" + prettyNumber(Config.arpSpeedScale[instrument.envelopeSpeed]);
-                    this._upperNoteLimitRow.firstChild.textContent = "Upper Note Limit [" + Piano.getPitchNameAlwaysOctave((instrument.upperNoteLimit + Config.keys[this._doc.song.key].basePitch) % Config.pitchesPerOctave, instrument.upperNoteLimit, this._doc.song.octave)
-                        + "]:";
-                    this._lowerNoteLimitRow.firstChild.textContent = "Lower Note Limit [" + Piano.getPitchNameAlwaysOctave((instrument.lowerNoteLimit + Config.keys[this._doc.song.key].basePitch) % Config.pitchesPerOctave, instrument.lowerNoteLimit, this._doc.song.octave)
-                        + "]:";
-                    if (instrument.type == 9) {
-                        this._customWaveDrawCanvas.redrawCanvas();
-                        if (this.prompt instanceof CustomChipPrompt) {
-                            this.prompt.customChipCanvas.render();
-                        }
-                    }
                     this._renderInstrumentBar(channel, instrumentIndex, colors);
                 }
                 else {
+                    this._instrumentSettingsGroup.style.display = "none";
+                    this._modulatorGroup.style.display = "";
+                    this._modulatorGroup.style.color = ColorConfig.getChannelColor(this._doc.song, this._doc.channel).primaryNote;
+                    this._customInstrumentSettingsGroup.style.display = "none";
+                    this._instrumentVolumeSliderRow.style.display = "none";
+                    this._instrumentTypeSelectRow.style.setProperty("display", "none");
+                    this._instrumentSettingsGroup.style.color = ColorConfig.getChannelColor(this._doc.song, this._doc.channel).primaryNote;
                     this._usageCheck(this._doc.channel, instrumentIndex);
                     this._pitchedPresetSelect.style.display = "none";
                     this._drumPresetSelect.style.display = "none";
@@ -64348,49 +65298,7 @@ You should be redirected to the song at:<br /><br />
                     this._modulatorGroup.insertBefore(this._instrumentExportGroup, this._modulatorGroup.firstChild);
                     this._modulatorGroup.insertBefore(this._instrumentCopyGroup, this._modulatorGroup.firstChild);
                     this._modulatorGroup.insertBefore(this._instrumentsButtonRow, this._modulatorGroup.firstChild);
-                    this._modulatorGroup.insertBefore(this._instrumentSettingsTextRow, this._modulatorGroup.firstChild);
-                    if (this._doc.song.channels[this._doc.channel].name == "") {
-                        this._instrumentSettingsTextRow.textContent = "Modulator Settings";
-                    }
-                    else {
-                        this._instrumentSettingsTextRow.textContent = this._doc.song.channels[this._doc.channel].name;
-                    }
-                    if (this._doc.prefs.instrumentSettingsSimplifier == true) {
-                        this._instOptionsDiv.style.display = "none";
-                    }
-                    this._chipNoiseSelectRow.style.display = "none";
-                    this._chipWaveSelectRow.style.display = "none";
-                    this._useChipWaveAdvancedLoopControlsRow.style.display = "none";
-                    this._chipWaveLoopModeSelectRow.style.display = "none";
-                    this._chipWaveLoopStartRow.style.display = "none";
-                    this._chipWaveLoopEndRow.style.display = "none";
-                    this._chipWaveStartOffsetRow.style.display = "none";
-                    this._chipWavePlayBackwardsRow.style.display = "none";
-                    this._spectrumRow.style.display = "none";
-                    this._harmonicsRow.style.display = "none";
-                    this._transitionRow.style.display = "none";
-                    this._chordSelectRow.style.display = "none";
-                    this._chordDropdownGroup.style.display = "none";
-                    this._drumsetGroup.style.display = "none";
-                    this._customWaveDraw.style.display = "none";
-                    this._supersawDynamismRow.style.display = "none";
-                    this._supersawSpreadRow.style.display = "none";
-                    this._supersawShapeRow.style.display = "none";
-                    this._algorithmSelectRow.style.display = "none";
-                    this._phaseModGroup.style.display = "none";
-                    this._feedbackRow1.style.display = "none";
-                    this._feedbackRow2.style.display = "none";
-                    this._pulseWidthRow.style.display = "none";
-                    this._vibratoSelectRow.style.display = "none";
-                    this._vibratoDropdownGroup.style.display = "none";
-                    this._envelopeDropdownGroup.style.display = "none";
-                    this._detuneSliderRow.style.display = "none";
-                    this._panSliderRow.style.display = "none";
-                    this._panDropdownGroup.style.display = "none";
-                    this._pulseWidthDropdownGroup.style.display = "none";
-                    this._unisonDropdownGroup.style.display = "none";
-                    this._modulatorGroup.style.display = "";
-                    this._modulatorGroup.style.color = ColorConfig.getChannelColor(this._doc.song, this._doc.channel).primaryNote;
+                    this._modulatorGroup.insertBefore(this._modulatorTextRow, this._modulatorGroup.firstChild);
                     for (let mod = 0; mod < Config.modCount; mod++) {
                         let instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
                         let modChannel = Math.max(0, instrument.modChannels[mod]);
@@ -64476,13 +65384,13 @@ You should be redirected to the song at:<br /><br />
                                 settingList.push("song distortion");
                                 settingList.push("song ring modulation");
                                 settingList.push("song pitch shift");
+                                settingList.push("song eq");
                             }
                             else {
                                 settingList.push("note volume");
                                 settingList.push("mix volume");
                                 let tgtInstrumentTypes = [];
-                                let anyInstrumentAdvancedEQ = false, anyInstrumentSimpleEQ = false, anyInstrumentAdvancedNote = false, anyInstrumentSimpleNote = false, anyInstrumentArps = false, anyInstrumentPitchShifts = false, anyInstrumentDetunes = false, anyInstrumentVibratos = false, anyInstrumentNoteFilters = false, anyInstrumentDistorts = false, anyInstrumentBitcrushes = false, anyInstrumentPans = false, anyInstrumentChorus = false, anyInstrumentEchoes = false, anyInstrumentReverbs = false, anyInstrumentRMs = false, anyInstrumentPhasers = false, anyInstrumentGranulars = false, anyInstrumentHasEnvelopes = false;
-                                let allInstrumentNoteFilters = true, allInstrumentDetunes = true, allInstrumentVibratos = true, allInstrumentDistorts = true, allInstrumentBitcrushes = true, allInstrumentPans = true, allInstrumentChorus = true, allInstrumentEchoes = true, allInstrumentReverbs = true, anyInstrumentInvertWave = true, allInstrumentGranulars = true;
+                                let anyAdvancedEQ = false, anySimpleEQ = false, anyArps = false, anyPitchShifts = false, anyDetunes = false, anyVibratos = false, anyNoteFilters = false, anyAdvancedNote = false, anySimpleNote = false, anyDistorts = false, anyBitcrushes = false, anyPans = false, anyChorus = false, anyEchoes = false, anyReverbs = false, anyRMs = false, anyPhasers = false, anyInvertWave = false, anyGranulars = false, anyHasEnvelopes = false, allPitchShifts = true, allNoteFilters = true, allDetunes = true, allVibratos = true, allDistorts = true, allBitcrushes = true, allPans = true, allChorus = true, allEchoes = true, allReverbs = true, allInvertWave = true, allGranulars = true;
                                 let instrumentCandidates = [];
                                 if (modInstrument >= channel.instruments.length) {
                                     for (let i = 0; i < channel.instruments.length; i++) {
@@ -64496,106 +65404,43 @@ You should be redirected to the song at:<br /><br />
                                     let instrumentIndex = instrumentCandidates[i];
                                     if (!tgtInstrumentTypes.includes(channel.instruments[instrumentIndex].type))
                                         tgtInstrumentTypes.push(channel.instruments[instrumentIndex].type);
-                                    if (channel.instruments[instrumentIndex].eqFilterType)
-                                        anyInstrumentSimpleEQ = true;
-                                    else
-                                        anyInstrumentAdvancedEQ = true;
-                                    if (effectsIncludeChord(channel.instruments[instrumentIndex].effects) && channel.instruments[instrumentIndex].getChord().arpeggiates) {
-                                        anyInstrumentArps = true;
-                                    }
-                                    if (effectsIncludePitchShift(channel.instruments[instrumentIndex].effects)) {
-                                        anyInstrumentPitchShifts = true;
-                                    }
-                                    if (effectsIncludeDetune(channel.instruments[instrumentIndex].effects)) {
-                                        anyInstrumentDetunes = true;
-                                    }
-                                    else {
-                                        allInstrumentDetunes = false;
-                                    }
-                                    if (effectsIncludeVibrato(channel.instruments[instrumentIndex].effects)) {
-                                        anyInstrumentVibratos = true;
-                                    }
-                                    else {
-                                        allInstrumentVibratos = false;
-                                    }
-                                    if (effectsIncludeNoteFilter(channel.instruments[instrumentIndex].effects)) {
-                                        anyInstrumentNoteFilters = true;
-                                        if (channel.instruments[instrumentIndex].noteFilterType)
-                                            anyInstrumentSimpleNote = true;
-                                        else
-                                            anyInstrumentAdvancedNote = true;
-                                    }
-                                    else {
-                                        allInstrumentNoteFilters = false;
-                                    }
-                                    if (effectsIncludeDistortion(channel.instruments[instrumentIndex].effects)) {
-                                        anyInstrumentDistorts = true;
-                                    }
-                                    else {
-                                        allInstrumentDistorts = false;
-                                    }
-                                    if (effectsIncludeBitcrusher(channel.instruments[instrumentIndex].effects)) {
-                                        anyInstrumentBitcrushes = true;
-                                    }
-                                    else {
-                                        allInstrumentBitcrushes = false;
-                                    }
-                                    if (effectsIncludePanning(channel.instruments[instrumentIndex].effects)) {
-                                        anyInstrumentPans = true;
-                                    }
-                                    else {
-                                        allInstrumentPans = false;
-                                    }
-                                    if (effectsIncludeChorus(channel.instruments[instrumentIndex].effects)) {
-                                        anyInstrumentChorus = true;
-                                    }
-                                    else {
-                                        allInstrumentChorus = false;
-                                    }
-                                    if (effectsIncludeEcho(channel.instruments[instrumentIndex].effects)) {
-                                        anyInstrumentEchoes = true;
-                                    }
-                                    else {
-                                        allInstrumentEchoes = false;
-                                    }
-                                    if (effectsIncludeReverb(channel.instruments[instrumentIndex].effects)) {
-                                        anyInstrumentReverbs = true;
-                                    }
-                                    else {
-                                        allInstrumentReverbs = false;
-                                    }
-                                    if (effectsIncludeRM(channel.instruments[instrumentIndex].effects)) {
-                                        anyInstrumentRMs = true;
-                                    }
-                                    else {
-                                        anyInstrumentRMs = false;
-                                    }
-                                    if (effectsIncludePhaser(channel.instruments[instrumentIndex].effects)) {
-                                        anyInstrumentPhasers = true;
-                                    }
-                                    else {
-                                        anyInstrumentPhasers = false;
-                                    }
-                                    if (effectsIncludeInvertWave(channel.instruments[instrumentIndex].effects)) {
-                                        anyInstrumentInvertWave = true;
-                                    }
-                                    else {
-                                        anyInstrumentInvertWave = false;
-                                    }
-                                    if (effectsIncludeGranular(channel.instruments[instrumentIndex].effects)) {
-                                        anyInstrumentGranulars = true;
-                                    }
-                                    else {
-                                        allInstrumentGranulars = false;
-                                    }
-                                    if (channel.instruments[instrumentIndex].envelopes.length > 0) {
-                                        anyInstrumentHasEnvelopes = true;
-                                    }
+                                    anyAdvancedEQ || (anyAdvancedEQ = channel.instruments[instrumentIndex].eqFilterType);
+                                    anySimpleEQ || (anySimpleEQ = !anyAdvancedEQ);
+                                    anyArps || (anyArps = effectsIncludeChord(channel.instruments[instrumentIndex].effects) && channel.instruments[instrumentIndex].getChord().arpeggiates);
+                                    anyPitchShifts || (anyPitchShifts = effectsIncludePitchShift(channel.instruments[instrumentIndex].effects));
+                                    anyDetunes || (anyDetunes = effectsIncludeDetune(channel.instruments[instrumentIndex].effects));
+                                    anyVibratos || (anyVibratos = effectsIncludeVibrato(channel.instruments[instrumentIndex].effects));
+                                    anyNoteFilters || (anyNoteFilters = effectsIncludeNoteFilter(channel.instruments[instrumentIndex].effects));
+                                    anyAdvancedNote || (anyAdvancedNote = anyNoteFilters && !channel.instruments[instrumentIndex].noteFilterType);
+                                    anySimpleNote || (anySimpleNote = anyNoteFilters && channel.instruments[instrumentIndex].noteFilterType);
+                                    anyDistorts || (anyDistorts = effectsIncludeDistortion(channel.instruments[instrumentIndex].effects));
+                                    anyBitcrushes || (anyBitcrushes = effectsIncludeBitcrusher(channel.instruments[instrumentIndex].effects));
+                                    anyPans || (anyPans = effectsIncludePanning(channel.instruments[instrumentIndex].effects));
+                                    anyChorus || (anyChorus = effectsIncludeChorus(channel.instruments[instrumentIndex].effects));
+                                    anyEchoes || (anyEchoes = effectsIncludeEcho(channel.instruments[instrumentIndex].effects));
+                                    anyReverbs || (anyReverbs = effectsIncludeReverb(channel.instruments[instrumentIndex].effects));
+                                    anyRMs || (anyRMs = effectsIncludeRM(channel.instruments[instrumentIndex].effects));
+                                    anyPhasers || (anyPhasers = effectsIncludePhaser(channel.instruments[instrumentIndex].effects));
+                                    anyInvertWave || (anyInvertWave = effectsIncludeInvertWave(channel.instruments[instrumentIndex].effects));
+                                    anyGranulars || (anyGranulars = effectsIncludeGranular(channel.instruments[instrumentIndex].effects));
+                                    anyHasEnvelopes || (anyHasEnvelopes = channel.instruments[instrumentIndex].envelopes.length > 0);
+                                    allPitchShifts && (allPitchShifts = effectsIncludePitchShift(channel.instruments[instrumentIndex].effects));
+                                    allNoteFilters && (allNoteFilters = effectsIncludeNoteFilter(channel.instruments[instrumentIndex].effects));
+                                    allDetunes && (allDetunes = effectsIncludeDetune(channel.instruments[instrumentIndex].effects));
+                                    allVibratos && (allVibratos = effectsIncludeVibrato(channel.instruments[instrumentIndex].effects));
+                                    allDistorts && (allDistorts = effectsIncludeDistortion(channel.instruments[instrumentIndex].effects));
+                                    allBitcrushes && (allBitcrushes = effectsIncludeBitcrusher(channel.instruments[instrumentIndex].effects));
+                                    allPans && (allPans = effectsIncludePanning(channel.instruments[instrumentIndex].effects));
+                                    allChorus && (allChorus = effectsIncludeChorus(channel.instruments[instrumentIndex].effects));
+                                    allEchoes && (allEchoes = effectsIncludeEcho(channel.instruments[instrumentIndex].effects));
+                                    allReverbs && (allReverbs = effectsIncludeReverb(channel.instruments[instrumentIndex].effects));
+                                    allInvertWave && (allInvertWave = effectsIncludeInvertWave(channel.instruments[instrumentIndex].effects));
+                                    allGranulars && (allGranulars = effectsIncludeGranular(channel.instruments[instrumentIndex].effects));
                                 }
-                                if (anyInstrumentAdvancedEQ) {
+                                if (anyAdvancedEQ) {
                                     settingList.push("eq filter");
                                 }
-                                if (anyInstrumentSimpleEQ) {
+                                if (anySimpleEQ) {
                                     settingList.push("eq filt cut");
                                     settingList.push("eq filt peak");
                                 }
@@ -64627,104 +65472,112 @@ You should be redirected to the song at:<br /><br />
                                 if (tgtInstrumentTypes.includes(7)) {
                                     settingList.push("sustain");
                                 }
-                                if (anyInstrumentArps) {
+                                if (anyArps) {
                                     settingList.push("arp speed");
                                     settingList.push("reset arp");
                                 }
-                                if (anyInstrumentPitchShifts) {
+                                if (anyPitchShifts) {
                                     settingList.push("pitch shift");
                                 }
-                                if (anyInstrumentDetunes) {
+                                if (!allPitchShifts) {
+                                    unusedSettingList.push("+ pitch shift");
+                                }
+                                if (anyDetunes) {
                                     settingList.push("detune");
                                 }
-                                if (!allInstrumentDetunes) {
+                                if (!allDetunes) {
                                     unusedSettingList.push("+ detune");
                                 }
-                                if (anyInstrumentVibratos) {
+                                if (anyVibratos) {
                                     settingList.push("vibrato depth");
                                     settingList.push("vibrato speed");
                                     settingList.push("vibrato delay");
                                 }
-                                if (!allInstrumentVibratos) {
+                                if (!allVibratos) {
                                     unusedSettingList.push("+ vibrato depth");
                                     unusedSettingList.push("+ vibrato speed");
                                     unusedSettingList.push("+ vibrato delay");
                                 }
-                                if (anyInstrumentNoteFilters) {
-                                    if (anyInstrumentAdvancedNote) {
+                                if (anyNoteFilters) {
+                                    if (anyAdvancedNote) {
                                         settingList.push("note filter");
                                     }
-                                    if (anyInstrumentSimpleNote) {
+                                    if (anySimpleNote) {
                                         settingList.push("note filt cut");
                                         settingList.push("note filt peak");
                                     }
                                 }
-                                if (!allInstrumentNoteFilters) {
+                                if (!allNoteFilters) {
                                     unusedSettingList.push("+ note filter");
                                 }
-                                if (anyInstrumentDistorts) {
+                                if (anyDistorts) {
                                     settingList.push("distortion");
                                 }
-                                if (!allInstrumentDistorts) {
+                                if (!allDistorts) {
                                     unusedSettingList.push("+ distortion");
                                 }
-                                if (anyInstrumentBitcrushes) {
+                                if (anyBitcrushes) {
                                     settingList.push("bit crush");
                                     settingList.push("freq crush");
                                 }
-                                if (!allInstrumentBitcrushes) {
+                                if (!allBitcrushes) {
                                     unusedSettingList.push("+ bit crush");
                                     unusedSettingList.push("+ freq crush");
                                 }
-                                if (anyInstrumentPans) {
+                                if (anyPans) {
                                     settingList.push("pan");
                                     settingList.push("pan delay");
                                 }
-                                if (!allInstrumentPans) {
+                                if (!allPans) {
                                     unusedSettingList.push("+ pan");
                                     unusedSettingList.push("+ pan delay");
                                 }
-                                if (anyInstrumentChorus) {
+                                if (anyChorus) {
                                     settingList.push("chorus");
                                 }
-                                if (!allInstrumentChorus) {
+                                if (!allChorus) {
                                     unusedSettingList.push("+ chorus");
                                 }
-                                if (anyInstrumentEchoes) {
+                                if (anyEchoes) {
                                     settingList.push("echo");
                                 }
-                                if (!allInstrumentEchoes) {
+                                if (!allEchoes) {
                                     unusedSettingList.push("+ echo");
                                 }
-                                if (anyInstrumentReverbs) {
+                                if (anyReverbs) {
                                     settingList.push("reverb");
+                                    settingList.push("reverb wet");
+                                    settingList.push("reverb dry");
                                 }
-                                if (!allInstrumentReverbs) {
+                                if (!allReverbs) {
                                     unusedSettingList.push("+ reverb");
                                 }
-                                if (anyInstrumentHasEnvelopes) {
+                                if (anyHasEnvelopes) {
                                     settingList.push("envelope speed");
                                 }
-                                if (anyInstrumentRMs) {
+                                if (anyRMs) {
                                     settingList.push("ring modulation");
                                     settingList.push("ring mod hertz");
                                 }
-                                if (anyInstrumentPhasers) {
+                                if (anyPhasers) {
                                     settingList.push("phaser");
                                     settingList.push("phaser frequency");
                                     settingList.push("phaser feedback");
                                     settingList.push("phaser stages");
                                 }
-                                if (anyInstrumentInvertWave) {
+                                if (anyInvertWave) {
                                     settingList.push("invert wave");
                                 }
-                                if (anyInstrumentGranulars) {
+                                if (!allInvertWave) {
+                                    unusedSettingList.push("+ invert wave");
+                                }
+                                if (anyGranulars) {
                                     settingList.push("granular");
                                     settingList.push("grain freq");
                                     settingList.push("grain size");
                                     settingList.push("grain range");
                                 }
-                                if (!allInstrumentGranulars) {
+                                if (!allGranulars) {
                                     unusedSettingList.push("+ granular");
                                     unusedSettingList.push("+ grain freq");
                                     unusedSettingList.push("+ grain size");
@@ -64777,6 +65630,9 @@ You should be redirected to the song at:<br /><br />
                             this._modTargetIndicators[mod].classList.add("modTarget");
                         }
                         let filterType = Config.modulators[instrument.modulators[mod]].name;
+                        let useSongEq = filterType == "song eq";
+                        if (useSongEq)
+                            filterType = "eq filter";
                         if (filterType == "eq filter" || filterType == "note filter") {
                             $("#modFilterText" + mod).get(0).style.display = "";
                             $("#modSettingText" + mod).get(0).style.setProperty("margin-bottom", "2px");
@@ -64802,10 +65658,24 @@ You should be redirected to the song at:<br /><br />
                             let dotCount = (filterType == "eq filter")
                                 ? channel.instruments[useInstrument].getLargestControlPointCount(false)
                                 : channel.instruments[useInstrument].getLargestControlPointCount(true);
-                            const isSimple = (filterType == "eq filter" ? channel.instruments[useInstrument].eqFilterType : channel.instruments[useInstrument].noteFilterType);
+                            const isSimple = useSongEq ? false : (filterType == "eq filter" ? channel.instruments[useInstrument].eqFilterType : channel.instruments[useInstrument].noteFilterType);
                             if (isSimple)
                                 dotCount = 0;
-                            if (isSimple || this._modFilterBoxes[mod].children.length != 1 + dotCount * 2) {
+                            if (useSongEq) {
+                                dotCount = this._doc.song.eqFilter.controlPointCount;
+                                if (this._modFilterBoxes[mod].children.length != 1 + dotCount * 2) {
+                                    while (this._modFilterBoxes[mod].firstChild)
+                                        this._modFilterBoxes[mod].remove(0);
+                                    const dotList = [];
+                                    dotList.push("morph");
+                                    for (let i = 0; i < dotCount; i++) {
+                                        dotList.push("dot " + (i + 1) + " x");
+                                        dotList.push("dot " + (i + 1) + " y");
+                                    }
+                                    buildOptions(this._modFilterBoxes[mod], dotList);
+                                }
+                            }
+                            else if (isSimple || this._modFilterBoxes[mod].children.length != 1 + dotCount * 2) {
                                 while (this._modFilterBoxes[mod].firstChild)
                                     this._modFilterBoxes[mod].remove(0);
                                 const dotList = [];
@@ -64846,23 +65716,113 @@ You should be redirected to the song at:<br /><br />
                             option.setAttribute("hidden", "");
                         }
                     }
-                    this._customInstrumentSettingsGroup.style.display = "none";
-                    this._panSliderRow.style.display = "none";
-                    this._panDropdownGroup.style.display = "none";
-                    this._instrumentVolumeSliderRow.style.display = "none";
-                    this._instrumentTypeSelectRow.style.setProperty("display", "none");
-                    this._instrumentSettingsGroup.style.color = ColorConfig.getChannelColor(this._doc.song, this._doc.channel).primaryNote;
                     if (this._doc.channel >= this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount) {
                         this._piano.forceRender();
                     }
                     this._renderInstrumentBar(channel, instrumentIndex, colors);
                 }
+            };
+            this.whenUpdated = () => {
+                const prefs = this._doc.prefs;
+                this._muteEditor.container.style.display = prefs.enableChannelMuting ? "" : "none";
+                const trackBounds = this._trackVisibleArea.getBoundingClientRect();
+                this._doc.trackVisibleBars = Math.floor((trackBounds.right - trackBounds.left - (prefs.enableChannelMuting ? 32 : 0)) / this._doc.getBarWidth());
+                this._doc.trackVisibleChannels = Math.floor((trackBounds.bottom - trackBounds.top - 30) / ChannelRow.patternHeight);
+                for (let i = this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount; i < this._doc.song.channels.length; i++) {
+                    const channel = this._doc.song.channels[i];
+                    for (let j = 0; j < channel.instruments.length; j++) {
+                        this._doc.synth.determineInvalidModulators(channel.instruments[j]);
+                    }
+                }
+                this._loopTypeEvent();
+                this._barScrollBar.render();
+                this._trackEditor.render();
+                this._muteEditor.render();
+                this.effectRowsDisplay();
+                this._trackAndMuteContainer.scrollLeft = this._doc.barScrollPos * this._doc.getBarWidth();
+                this._trackAndMuteContainer.scrollTop = this._doc.channelScrollPos * ChannelRow.patternHeight;
+                if (document.activeElement != this._patternEditor.modDragValueLabel && this._patternEditor.editingModLabel) {
+                    this._patternEditor.stopEditingModLabel(false);
+                }
+                this._piano.container.style.display = prefs.showLetters ? "" : "none";
+                this._octaveScrollBar.container.style.display = prefs.showScrollBar ? "" : "none";
+                this._barScrollBar.container.style.display = this._doc.song.barCount > this._doc.trackVisibleBars ? "" : "none";
+                this._volumeBarBox.style.display = prefs.displayVolumeBar ? "" : "none";
+                this._globalOscscopeContainer.style.display = prefs.showOscilloscope ? "" : "none";
+                this._doc.synth.oscEnabled = prefs.showOscilloscope;
+                this._sampleLoadingStatusContainer.style.display = prefs.showSampleLoadingStatus ? "" : "none";
+                this._instrumentCopyGroup.style.display = prefs.instrumentCopyPaste ? "" : "none";
+                this._instrumentExportGroup.style.display = prefs.instrumentImportExport ? "" : "none";
+                if (document.getElementById('text-content'))
+                    document.getElementById('text-content').style.display = prefs.showDescription ? "" : "none";
+                this.patternEditorStuffs(prefs);
+                this._patternEditor.render();
+                const textOnIcon = ColorConfig.getComputed("--text-enabled-icon") !== "" ? ColorConfig.getComputed("--text-enabled-icon") : "✓ ";
+                const textOffIcon = ColorConfig.getComputed("--text-disabled-icon") !== "" ? ColorConfig.getComputed("--text-disabled-icon") : "　";
+                this.renderPreferences(prefs, textOnIcon, textOffIcon);
+                const channel = this._doc.song.channels[this._doc.channel];
+                const instrumentIndex = this._doc.getCurrentInstrument();
+                const instrument = channel.instruments[instrumentIndex];
+                const wasActive = this.mainLayer.contains(document.activeElement);
+                const activeElement = document.activeElement;
+                const colors = ColorConfig.getChannelColor(this._doc.song, this._doc.channel);
+                for (let i = this._effectsSelect.childElementCount - 1; i < Config.effectOrder.length; i++) {
+                    this._effectsSelect.appendChild(option({ value: i }));
+                }
+                this._effectsSelect.selectedIndex = -1;
+                for (let i = 0; i < Config.effectOrder.length; i++) {
+                    let effectFlag = Config.effectOrder[i];
+                    const selected = ((instrument.effects & (1 << effectFlag)) != 0);
+                    const label = (selected ? textOnIcon : textOffIcon) + Config.effectNames[effectFlag];
+                    const option = this._effectsSelect.children[i + 1];
+                    if (option.textContent != label)
+                        option.textContent = label;
+                }
+                setSelectedValue(this._scaleSelect, this._doc.song.scale);
+                this._scaleSelect.title = Config.scales[this._doc.song.scale].realName;
+                setSelectedValue(this._keySelect, Config.keys.length - 1 - this._doc.song.key);
+                this._octaveStepper.value = Math.round(this._doc.song.octave).toString();
+                this._tempoSlider.updateValue(Math.max(0, Math.round(this._doc.song.tempo)));
+                this._tempoStepper.value = Math.round(this._doc.song.tempo).toString();
+                this._songTitleInputBox.updateValue(this._doc.song.title);
+                if (this._doc.synth.isFilterModActive(false, 0, 0, true)) {
+                    this._songEqFilterEditor.render(true, this._ctrlHeld || this._shiftHeld);
+                }
+                else {
+                    this._songEqFilterEditor.render();
+                }
+                this._eqFilterTypeRow.style.setProperty("--text-color-lit", colors.primaryNote);
+                this._eqFilterTypeRow.style.setProperty("--text-color-dim", colors.secondaryNote);
+                this._eqFilterTypeRow.style.setProperty("--background-color-lit", colors.primaryChannel);
+                this._eqFilterTypeRow.style.setProperty("--background-color-dim", colors.secondaryChannel);
+                if (instrument.eqFilterType) {
+                    this._eqFilterSimpleButton.classList.remove("deactivated");
+                    this._eqFilterAdvancedButton.classList.add("deactivated");
+                    this._eqFilterRow.style.display = "none";
+                    this._eqFilterSimpleCutRow.style.display = "";
+                    this._eqFilterSimplePeakRow.style.display = "";
+                }
+                else {
+                    this._eqFilterSimpleButton.classList.add("deactivated");
+                    this._eqFilterAdvancedButton.classList.remove("deactivated");
+                    this._eqFilterRow.style.display = "";
+                    this._eqFilterSimpleCutRow.style.display = "none";
+                    this._eqFilterSimplePeakRow.style.display = "none";
+                }
+                setSelectedValue(this._rhythmSelect, this._doc.song.rhythm);
+                this.renderChannelData(prefs, instrumentIndex, instrument, colors, channel);
                 this._instrumentSettingsGroup.style.color = colors.primaryNote;
                 if (this._doc.synth.isFilterModActive(false, this._doc.channel, this._doc.getCurrentInstrument())) {
                     this._eqFilterEditor.render(true, this._ctrlHeld || this._shiftHeld);
                 }
                 else {
                     this._eqFilterEditor.render();
+                }
+                if (this._doc.synth.isFilterModActive(false, 0, 0, true)) {
+                    this._songEqFilterEditor.render(true, this._ctrlHeld || this._shiftHeld);
+                }
+                else {
+                    this._songEqFilterEditor.render();
                 }
                 this._instrumentVolumeSlider.updateValue(instrument.volume);
                 this._detuneSlider.updateValue(instrument.detune - Config.detuneCenter);
@@ -65301,6 +66261,9 @@ You should be redirected to the song at:<br /><br />
                             event.preventDefault();
                             break;
                         }
+                        else if (needControlForShortcuts == (event.ctrlKey || event.metaKey)) {
+                            this._openPrompt("customSongEQFilterSettings");
+                        }
                         break;
                     case 70:
                         if (canPlayNotes)
@@ -65518,6 +66481,31 @@ You should be redirected to the song at:<br /><br />
                                 event.preventDefault();
                             }
                         }
+                        break;
+                    case 84:
+                        if (!this._doc.prefs.newEffectMenu)
+                            break;
+                        if (event.altKey) {
+                            if (hiddenEffects.length > 0) {
+                                for (let i = 0; i < hiddenEffects.length; i++) {
+                                    const element = document.getElementById(hiddenEffects[i]);
+                                    const elementLabel = document.getElementById(hiddenEffects[i] + "Label");
+                                    element.setAttribute("class", "effectGroup");
+                                    elementLabel.setAttribute("class", "effectLabel");
+                                }
+                                hiddenEffects.splice(0);
+                            }
+                            else {
+                                const effectGroupVisible = document.getElementsByClassName("effectGroup");
+                                const effectLabelVisible = document.getElementsByClassName("effectLabel");
+                                for (let i = 0; i < effectGroupVisible.length; i++) {
+                                    effectGroupVisible[i].className = "effectGroup hidden";
+                                    effectLabelVisible[i].className = "effectLabel hidden";
+                                    hiddenEffects.push(effectGroupVisible[i].id);
+                                }
+                            }
+                        }
+                        event.preventDefault();
                         break;
                     case 79:
                         if (canPlayNotes)
@@ -65846,6 +66834,9 @@ You should be redirected to the song at:<br /><br />
                 }
                 if (this._doc.synth.isFilterModActive(true, this._doc.channel, this._doc.getCurrentInstrument())) {
                     this._noteFilterEditor.render(true, this._ctrlHeld || this._shiftHeld);
+                }
+                if (this._doc.synth.isFilterModActive(false, 0, 0, true)) {
+                    this._songEqFilterEditor.render(true, this._ctrlHeld || this._shiftHeld);
                 }
                 window.requestAnimationFrame(this._animate);
             };
@@ -66196,10 +67187,6 @@ You should be redirected to the song at:<br /><br />
                 }
                 this._loopEditor.setLoopAt(this._doc.synth.loopBarStart, this._doc.synth.loopBarEnd);
             };
-            this._goFullscreen = () => {
-                this.isMobileFullscreen = !this.isMobileFullscreen;
-                this._doc.notifier.changed();
-            };
             this._fileMenuHandler = (event) => {
                 switch (this._fileMenu.value) {
                     case "new":
@@ -66224,17 +67211,36 @@ You should be redirected to the song at:<br /><br />
                         navigator.share({ url: new URL("#" + this._doc.song.toBase64String(), location.href).href });
                         break;
                     case "shortenUrl":
-                        let shortenerStrategy = "https://tinyurl.com/api-create.php?url=";
-                        const localShortenerStrategy = window.localStorage.getItem("shortenerStrategySelect");
-                        if (localShortenerStrategy == "isgd")
-                            shortenerStrategy = "https://is.gd/create.php?format=simple&url=";
-                        window.open(shortenerStrategy + encodeURIComponent(new URL("#" + this._doc.song.toBase64String(), location.href).href));
+                        const shorteners = {
+                            "wackybox": {
+                                maxLength: 128000,
+                                altName: "wackybox.org",
+                                encode: encodeURIComponent,
+                                shortenerStrategy: "https://wackybox.org/api-create.php?url="
+                            },
+                            "isgd": {
+                                maxLength: 5000,
+                                altName: "is.gd",
+                                encode: encodeURIComponent,
+                                shortenerStrategy: "https://is.gd/create.php?format=simple&url="
+                            }
+                        };
+                        const shortener = shorteners[this._doc.prefs.shortenerStrategySelect || "wackybox"];
+                        const uri = shortener.encode(new URL("#" + this._doc.song.toBase64String(), location.href).href);
+                        const uriLength = uri.length;
+                        if (uriLength > shortener.maxLength) {
+                            this.notify(`Unable to shorten url; Link is too large for ${shortener.altName}\n Max size: ${shortener.maxLength}. Your song: ${uriLength}`);
+                            break;
+                        }
+                        this.closeNotif();
+                        window.open(shortener.shortenerStrategy + uri);
                         break;
                     case "configureShortener":
                         this._openPrompt("configureShortener");
                         break;
                     case "viewPlayer":
-                        location.href = "player/#song=" + this._doc.song.toBase64String();
+                        const isIndexHmtl = location.pathname.includes("index.html") ? "index.html" : "";
+                        location.href = `player/${isIndexHmtl}#song=` + this._doc.song.toBase64String();
                         break;
                     case "copyEmbed":
                         this._copyTextToClipboard(`<iframe width="384" height="60" style="border: none;" src="${new URL("player/#song=" + this._doc.song.toBase64String(), location.href).href}"></iframe>`);
@@ -66379,6 +67385,9 @@ You should be redirected to the song at:<br /><br />
                         break;
                     case "oldModNotes":
                         this._doc.prefs.oldModNotes = !this._doc.prefs.oldModNotes;
+                        break;
+                    case "newEffectMenu":
+                        this._doc.prefs.newEffectMenu = !this._doc.prefs.newEffectMenu;
                         break;
                     case "selectionCounter":
                         this._doc.prefs.selectionCounter = !this._doc.prefs.selectionCounter;
@@ -66640,7 +67649,6 @@ You should be redirected to the song at:<br /><br />
             this._notesUpButton.addEventListener("click", this._notesUp);
             this._notesDownButton.addEventListener("click", this._notesDown);
             this._loopBarButton.addEventListener("click", this._tempLoopBar);
-            this._fullscreenButton.addEventListener("click", this._goFullscreen);
             this._patternArea.addEventListener("mousedown", this._refocusStageNotEditing);
             this._trackArea.addEventListener("mousedown", this.refocusStage);
             this._patternArea.addEventListener('dragover', this._dropHandler);
@@ -66672,6 +67680,7 @@ You should be redirected to the song at:<br /><br />
             this._spectrumEditor.container.addEventListener("mousedown", this.refocusStage);
             this._eqFilterEditor.container.addEventListener("mousedown", this.refocusStage);
             this._noteFilterEditor.container.addEventListener("mousedown", this.refocusStage);
+            this._songEqFilterEditor.container.addEventListener("mousedown", this.refocusStage);
             this._harmonicsEditor.container.addEventListener("mousedown", this.refocusStage);
             this._tempoStepper.addEventListener("keydown", this._tempoStepperCaptureNumberKeys, false);
             this._addEnvelopeButton.addEventListener("click", this._addNewEnvelope);
@@ -66817,6 +67826,11 @@ You should be redirected to the song at:<br /><br />
                     this._openUnisonDropdown = this._openUnisonDropdown ? false : true;
                     group = this._unisonDropdownGroup;
                     break;
+                case 8:
+                    target = this._reverbDropdown;
+                    this._openReverbDropdown = this._openReverbDropdown ? false : true;
+                    group = this._reverbDropdownGroup;
+                    break;
             }
             if (target.textContent == "▼") {
                 let instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
@@ -66846,6 +67860,7 @@ You should be redirected to the song at:<br /><br />
         _modSliderUpdate() {
             if (!this._doc.synth.playing) {
                 this._hasActiveModSliders = false;
+                this._songEqFilterEditor.render();
                 for (let setting = 0; setting < Config.modulators.length; setting++) {
                     if (this._showModSliders[setting] == true) {
                         this._showModSliders[setting] = false;
@@ -66933,6 +67948,10 @@ You should be redirected to the song at:<br /><br />
                     return this._decimalOffsetSlider;
                 case Config.modulators.dictionary["reverb"].index:
                     return this._reverbSlider;
+                case Config.modulators.dictionary["reverb wet"].index:
+                    return this._reverbWetSlider;
+                case Config.modulators.dictionary["reverb dry"].index:
+                    return this._reverbDrySlider;
                 case Config.modulators.dictionary["distortion"].index:
                     return this._distortionSlider;
                 case Config.modulators.dictionary["ring modulation"].index:
@@ -67069,6 +68088,9 @@ You should be redirected to the song at:<br /><br />
                         break;
                     case "customNoteFilterSettings":
                         this.prompt = new CustomFilterPrompt(this._doc, this, true);
+                        break;
+                    case "customSongEQFilterSettings":
+                        this.prompt = new CustomFilterPrompt(this._doc, this, false, true);
                         break;
                     case "harmonicsSettings":
                         this.prompt = new HarmonicsEditorPrompt(this._doc, this);
@@ -67427,55 +68449,79 @@ You should be redirected to the song at:<br /><br />
                 this._doc.record(new ChangePreset(this._doc, parseInt(preset)));
             }
         }
-    }
-    SongEditor._styleElement = document.head.appendChild(HTML.style({ type: "text/css" }));
-    SongEditor._setLoopIcon = {
-        "1": `
-        .songLoopButton::before {
-              mask-image: var(--loop-within-bar-symbol);
-              -webkit-mask-image: var(--loop-within-bar-symbol);
+        notify(message) {
+            this._notifierPopup.lastElementChild.innerText = message;
+            this._notifierPopup.classList.add("show");
+        }
+        closeNotif() {
+            this._notifierPopup.classList.remove("show");
+        }
+        effectRowsDisplay() {
+            const effectRows = document.getElementsByClassName("effectRow");
+            for (let i = 0; i < effectRows.length; i++) {
+                effectRows[i].className = this._doc.prefs.newEffectMenu ? "effectRow effectExt" : "effectRow";
             }
-        `,
-        "2": `
-        .songLoopButton::before {
-            mask-image: var(--loop-full-song-symbol);
-            -webkit-mask-image: var(--loop-full-song-symbol);
-          }
-        `,
-        "3": `
-        .songLoopButton::before {
-            mask-image: var(--dont-loop-symbol);
-            -webkit-mask-image: var(--dont-loop-symbol);
-          }
-        `,
-    };
+        }
+    }
     SongEditor.mobileUI = {
         "landscape": `
+
+            #beepboxEditorContainer {
+            padding: 0 !important;
+            min-height: unset;
+            }
+
+            .mobileButtonContainer {
+                flex-direction: row;
+            }
+
+            .beepboxEditor {
+                display: flex;
+                justify-content: space-between;
+                max-height: 100dvh;
+                overflow-y: hidden;
+            }
+
+            .instrument-settings-area {
+            height: 100%
+            }
+
+            .settings-area {
+            flex: 1;
+            overflow-y: scroll;
+            display: flex;
+            flex-direction: column;
+            }
+
+            .beepboxEditor .song-settings-area {
+                overflow-y: unset;
+            }
+
+            .beepboxEditor .instrument-settings-area {
+                overflow-y: unset;
+            }
+
             .mobileMenu {
-                right: 0 !important;
-                left: unset !important;
-                height: 100vh !important;
-                width: 15vw !important;
+                height: 100dvh !important;
+                width: 64px !important;
 
                 display: flex;
                 flex-direction: column;
             }
 
             .pattern-area {
-                width: 74vw !important;
-                height: 100vh !important;
-                max-height: 100vh !important;
-            }
-
-            #beepboxEditorContainer {
-                max-width: 100vw !important;
+                height: 100dvh !important;
+                max-height: 100dvh !important;
+                width: 0 !important;
+                flex-grow: 1;
+                max-height: unset !important;
             }
 
             .play-pause-area2 {
-                height: 100vh !important;
+                height: 100dvh !important;
                 width: 4vw !important;
                 bottom: 0 !important;
-                right: 16vw !important;
+                right: 16dvw !important;
                 left: unset !important;
             }
 
@@ -67488,15 +68534,8 @@ You should be redirected to the song at:<br /><br />
                 flex: 1;
             }
 
-            .settings-area {
-                grid-template-columns: 33% 34% 33% !important;
-                grid-template-rows: min-content min-content min-content min-content 1fr !important;
-                grid-template-areas: "version-area version-area version-area" "play-pause-area menu-area instrument-settings-area" "play-pause-area menu-area instrument-settings-area" "song-settings-area song-settings-area instrument-settings-area" "song-settings-area song-settings-area instrument-settings-area" !important;
-                width: 78vw !important;
-            }
-
             .track-area {
-                width: 78vw !important;
+                width: 78dvw !important;
             }
 
             .mobilePatternButton, .mobileTrackButton, .mobileSettingsButton {
@@ -67504,41 +68543,74 @@ You should be redirected to the song at:<br /><br />
                 flex: 1;
             }
 
+            .focused {
+                background: var(--ui-widget-focus) !important;
+            }
+
         `,
         "portrait": `
+
+            .beepboxEditor button, button,
+            .beepboxEditor select, select {
+                border-image-source: unset !important;
+            }
+
+            #beepboxEditorContainer {
+                max-height: unset !important;
+            }
+
+            .beepboxEditor {
+                display: flex !important;
+                height: 100dvh;
+                flex-direction: column;
+                justify-content: space-between;
+                gap: 5px;
+            }
 
             .play-pause-area2 {
                 height: unset !important;
                 width: 100% !important
-                bottom: 16vh !important;
+                bottom: 16dvh !important;
                 right: unset !important;
                 left: 0 !important;
             }
 
-            .mobileMenu {
-                right: unset !important;
-                left: unset !important;
-                height: 15vh !important;
-                width: 100vw !important;
-                bottom: 0 !important;
+            .mobileButtonContainer {
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+            }
 
+            .mobileMenu {
                 display: flex;
                 flex-direction: row;
+                height: 64px;
+                width: 100dvw
             }
-
+            
             .pattern-area {
-                width: 91vw !important;
-                height: 70vh !important;
-                max-height: 75vh;
+                height: 0 !important;
+                flex-grow: 1;
+                max-height: unset !important;
             }
 
-            #beepboxEditorContainer {
-                max-width: 710px !important;
+            .focused {
+                background: var(--ui-widget-focus) !important;
+            }
+
+            .settings-area {
+                display: flex;
+                flex-direction: column;
+                height: 0 !important;
+                flex-grow: 1;
+                max-height: unset !important;
+                overflow-y: scroll;
+                width: unset !important;
             }
 
             .playback-bar-controls2 {
                 flex-direction: row !important;
-                height: 3vh;
+                height: 3dvh;
             }
             
             .mobilePlayButton, .mobilePauseButton, .mobilePrevBarButton, .mobileNextBarButton {
@@ -67546,15 +68618,8 @@ You should be redirected to the song at:<br /><br />
                 flex: 1;
             }
 
-            .settings-area {
-                grid-template-columns: 50% 50% !important;
-                grid-template-rows: min-content min-content min-content min-content 1fr !important;
-                grid-template-areas: "version-area version-area" "play-pause-area instrument-settings-area" "play-pause-area instrument-settings-area" "menu-area instrument-settings-area" "song-settings-area instrument-settings-area" !important;
-                width: 96vw !important;
-            }
-
             .track-area {
-                width: 98vw !important;
+                width: 98dvw !important;
             }
 
             .mobilePatternButton, .mobileTrackButton, .mobileSettingsButton {
@@ -68886,12 +69951,18 @@ You should be redirected to the song at:<br /><br />
             this.oldModNotes = window.localStorage.getItem("oldModNotes") == "true";
             this.selectionCounter = window.localStorage.getItem("selectionCounter") != "false";
             this.promptSongDetails = window.localStorage.getItem("promptSongDetails") != "false";
+            this.newEffectMenu = window.localStorage.getItem("newEffectMenu") == "true";
             this.keyboardLayout = window.localStorage.getItem("keyboardLayout") || "wickiHayden";
             this.bassOffset = (+window.localStorage.getItem("bassOffset")) || 0;
             this.layout = window.localStorage.getItem("layout") || "small";
             this.colorTheme = window.localStorage.getItem("colorTheme") || "AbyssBox Classic";
             this.customTheme = window.localStorage.getItem("customTheme");
             this.customTheme2 = window.localStorage.getItem("customTheme2");
+            this.shortenerStrategySelect = window.localStorage.getItem("shortenerStrategySelect") || "wackybox";
+            if (this.shortenerStrategySelect == "tinyurl") {
+                window.localStorage.setItem("shortenerStrategySelect", "wackybox");
+                this.shortenerStrategySelect = "wackybox";
+            }
             this.visibleOctaves = (window.localStorage.getItem("visibleOctaves") >>> 0) || Preferences.defaultVisibleOctaves;
             const defaultScale = Config.scales.dictionary[window.localStorage.getItem("defaultScale")];
             this.defaultScale = (defaultScale != undefined) ? defaultScale.index : 0;
@@ -68941,6 +70012,7 @@ You should be redirected to the song at:<br /><br />
             window.localStorage.setItem("notesFlashWhenPlayed", this.notesFlashWhenPlayed ? "true" : "false");
             window.localStorage.setItem("selectionCounter", this.selectionCounter ? "true" : "false");
             window.localStorage.setItem("promptSongDetails", this.promptSongDetails ? "true" : "false");
+            window.localStorage.setItem("newEffectMenu", this.newEffectMenu ? "true" : "false");
             window.localStorage.setItem("keyboardLayout", this.keyboardLayout);
             window.localStorage.setItem("bassOffset", String(this.bassOffset));
             window.localStorage.setItem("layout", this.layout);
@@ -68955,6 +70027,7 @@ You should be redirected to the song at:<br /><br />
             window.localStorage.setItem("volume", String(this.volume));
             window.localStorage.setItem("visibleOctaves", String(this.visibleOctaves));
             window.localStorage.setItem("closePromptByClickoff", this.closePromptByClickoff ? "true" : "false");
+            window.localStorage.setItem("shortenerStrategySelect", this.shortenerStrategySelect);
             window.localStorage.setItem("frostedGlassBackground", this.frostedGlassBackground ? "true" : "false");
             window.localStorage.setItem("displayShortcutButtons", this.displayShortcutButtons ? "true" : "false");
             window.localStorage.setItem("oldMobileLayout", this.oldMobileLayout ? "true" : "false");
@@ -69415,6 +70488,6114 @@ You should be redirected to the song at:<br /><br />
         }
     }
     SongDocument._maximumUndoHistory = 300;
+
+    /*!
+     * Select2 4.0.13
+     * https://select2.github.io
+     *
+     * Released under the MIT license
+     * https://github.com/select2/select2/blob/master/LICENSE.md
+     */
+    (function (factory) {
+      if (typeof define === 'function' && define.amd) {
+        // AMD. Register as an anonymous module.
+        define(['jquery'], factory);
+      } else if (typeof module === 'object' && module.exports) {
+        // Node/CommonJS
+        module.exports = function (root, jQuery) {
+          if (jQuery === undefined) {
+            // require('jQuery') returns a factory that requires window to
+            // build a jQuery instance, we normalize how we use modules
+            // that require this pattern but the window provided is a noop
+            // if it's defined (how jquery works)
+            if (typeof window !== 'undefined') {
+              jQuery = require('jquery');
+            }
+            else {
+              jQuery = require('jquery')(root);
+            }
+          }
+          factory(jQuery);
+          return jQuery;
+        };
+      } else {
+        // Browser globals
+        factory(jQuery);
+      }
+    } (function (jQuery) {
+      // This is needed so we can catch the AMD loader configuration and use it
+      // The inner file should be wrapped (by `banner.start.js`) in a function that
+      // returns the AMD loader references.
+      var S2 =(function () {
+      // Restore the Select2 AMD loader so it can be used
+      // Needed mostly in the language files, where the loader is not inserted
+      if (jQuery && jQuery.fn && jQuery.fn.select2 && jQuery.fn.select2.amd) {
+        var S2 = jQuery.fn.select2.amd;
+      }
+    var S2;(function () { if (!S2 || !S2.requirejs) {
+    if (!S2) { S2 = {}; } else { require = S2; }
+    /**
+     * @license almond 0.3.3 Copyright jQuery Foundation and other contributors.
+     * Released under MIT license, http://github.com/requirejs/almond/LICENSE
+     */
+    //Going sloppy to avoid 'use strict' string cost, but strict practices should
+    //be followed.
+    /*global setTimeout: false */
+
+    var requirejs, require, define;
+    (function (undef) {
+        var main, req, makeMap, handlers,
+            defined = {},
+            waiting = {},
+            config = {},
+            defining = {},
+            hasOwn = Object.prototype.hasOwnProperty,
+            aps = [].slice,
+            jsSuffixRegExp = /\.js$/;
+
+        function hasProp(obj, prop) {
+            return hasOwn.call(obj, prop);
+        }
+
+        /**
+         * Given a relative module name, like ./something, normalize it to
+         * a real name that can be mapped to a path.
+         * @param {String} name the relative name
+         * @param {String} baseName a real name that the name arg is relative
+         * to.
+         * @returns {String} normalized name
+         */
+        function normalize(name, baseName) {
+            var nameParts, nameSegment, mapValue, foundMap, lastIndex,
+                foundI, foundStarMap, starI, i, j, part, normalizedBaseParts,
+                baseParts = baseName && baseName.split("/"),
+                map = config.map,
+                starMap = (map && map['*']) || {};
+
+            //Adjust any relative paths.
+            if (name) {
+                name = name.split('/');
+                lastIndex = name.length - 1;
+
+                // If wanting node ID compatibility, strip .js from end
+                // of IDs. Have to do this here, and not in nameToUrl
+                // because node allows either .js or non .js to map
+                // to same file.
+                if (config.nodeIdCompat && jsSuffixRegExp.test(name[lastIndex])) {
+                    name[lastIndex] = name[lastIndex].replace(jsSuffixRegExp, '');
+                }
+
+                // Starts with a '.' so need the baseName
+                if (name[0].charAt(0) === '.' && baseParts) {
+                    //Convert baseName to array, and lop off the last part,
+                    //so that . matches that 'directory' and not name of the baseName's
+                    //module. For instance, baseName of 'one/two/three', maps to
+                    //'one/two/three.js', but we want the directory, 'one/two' for
+                    //this normalization.
+                    normalizedBaseParts = baseParts.slice(0, baseParts.length - 1);
+                    name = normalizedBaseParts.concat(name);
+                }
+
+                //start trimDots
+                for (i = 0; i < name.length; i++) {
+                    part = name[i];
+                    if (part === '.') {
+                        name.splice(i, 1);
+                        i -= 1;
+                    } else if (part === '..') {
+                        // If at the start, or previous value is still ..,
+                        // keep them so that when converted to a path it may
+                        // still work when converted to a path, even though
+                        // as an ID it is less than ideal. In larger point
+                        // releases, may be better to just kick out an error.
+                        if (i === 0 || (i === 1 && name[2] === '..') || name[i - 1] === '..') {
+                            continue;
+                        } else if (i > 0) {
+                            name.splice(i - 1, 2);
+                            i -= 2;
+                        }
+                    }
+                }
+                //end trimDots
+
+                name = name.join('/');
+            }
+
+            //Apply map config if available.
+            if ((baseParts || starMap) && map) {
+                nameParts = name.split('/');
+
+                for (i = nameParts.length; i > 0; i -= 1) {
+                    nameSegment = nameParts.slice(0, i).join("/");
+
+                    if (baseParts) {
+                        //Find the longest baseName segment match in the config.
+                        //So, do joins on the biggest to smallest lengths of baseParts.
+                        for (j = baseParts.length; j > 0; j -= 1) {
+                            mapValue = map[baseParts.slice(0, j).join('/')];
+
+                            //baseName segment has  config, find if it has one for
+                            //this name.
+                            if (mapValue) {
+                                mapValue = mapValue[nameSegment];
+                                if (mapValue) {
+                                    //Match, update name to the new value.
+                                    foundMap = mapValue;
+                                    foundI = i;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    if (foundMap) {
+                        break;
+                    }
+
+                    //Check for a star map match, but just hold on to it,
+                    //if there is a shorter segment match later in a matching
+                    //config, then favor over this star map.
+                    if (!foundStarMap && starMap && starMap[nameSegment]) {
+                        foundStarMap = starMap[nameSegment];
+                        starI = i;
+                    }
+                }
+
+                if (!foundMap && foundStarMap) {
+                    foundMap = foundStarMap;
+                    foundI = starI;
+                }
+
+                if (foundMap) {
+                    nameParts.splice(0, foundI, foundMap);
+                    name = nameParts.join('/');
+                }
+            }
+
+            return name;
+        }
+
+        function makeRequire(relName, forceSync) {
+            return function () {
+                //A version of a require function that passes a moduleName
+                //value for items that may need to
+                //look up paths relative to the moduleName
+                var args = aps.call(arguments, 0);
+
+                //If first arg is not require('string'), and there is only
+                //one arg, it is the array form without a callback. Insert
+                //a null so that the following concat is correct.
+                if (typeof args[0] !== 'string' && args.length === 1) {
+                    args.push(null);
+                }
+                return req.apply(undef, args.concat([relName, forceSync]));
+            };
+        }
+
+        function makeNormalize(relName) {
+            return function (name) {
+                return normalize(name, relName);
+            };
+        }
+
+        function makeLoad(depName) {
+            return function (value) {
+                defined[depName] = value;
+            };
+        }
+
+        function callDep(name) {
+            if (hasProp(waiting, name)) {
+                var args = waiting[name];
+                delete waiting[name];
+                defining[name] = true;
+                main.apply(undef, args);
+            }
+
+            if (!hasProp(defined, name) && !hasProp(defining, name)) {
+                throw new Error('No ' + name);
+            }
+            return defined[name];
+        }
+
+        //Turns a plugin!resource to [plugin, resource]
+        //with the plugin being undefined if the name
+        //did not have a plugin prefix.
+        function splitPrefix(name) {
+            var prefix,
+                index = name ? name.indexOf('!') : -1;
+            if (index > -1) {
+                prefix = name.substring(0, index);
+                name = name.substring(index + 1, name.length);
+            }
+            return [prefix, name];
+        }
+
+        //Creates a parts array for a relName where first part is plugin ID,
+        //second part is resource ID. Assumes relName has already been normalized.
+        function makeRelParts(relName) {
+            return relName ? splitPrefix(relName) : [];
+        }
+
+        /**
+         * Makes a name map, normalizing the name, and using a plugin
+         * for normalization if necessary. Grabs a ref to plugin
+         * too, as an optimization.
+         */
+        makeMap = function (name, relParts) {
+            var plugin,
+                parts = splitPrefix(name),
+                prefix = parts[0],
+                relResourceName = relParts[1];
+
+            name = parts[1];
+
+            if (prefix) {
+                prefix = normalize(prefix, relResourceName);
+                plugin = callDep(prefix);
+            }
+
+            //Normalize according
+            if (prefix) {
+                if (plugin && plugin.normalize) {
+                    name = plugin.normalize(name, makeNormalize(relResourceName));
+                } else {
+                    name = normalize(name, relResourceName);
+                }
+            } else {
+                name = normalize(name, relResourceName);
+                parts = splitPrefix(name);
+                prefix = parts[0];
+                name = parts[1];
+                if (prefix) {
+                    plugin = callDep(prefix);
+                }
+            }
+
+            //Using ridiculous property names for space reasons
+            return {
+                f: prefix ? prefix + '!' + name : name, //fullName
+                n: name,
+                pr: prefix,
+                p: plugin
+            };
+        };
+
+        function makeConfig(name) {
+            return function () {
+                return (config && config.config && config.config[name]) || {};
+            };
+        }
+
+        handlers = {
+            require: function (name) {
+                return makeRequire(name);
+            },
+            exports: function (name) {
+                var e = defined[name];
+                if (typeof e !== 'undefined') {
+                    return e;
+                } else {
+                    return (defined[name] = {});
+                }
+            },
+            module: function (name) {
+                return {
+                    id: name,
+                    uri: '',
+                    exports: defined[name],
+                    config: makeConfig(name)
+                };
+            }
+        };
+
+        main = function (name, deps, callback, relName) {
+            var cjsModule, depName, ret, map, i, relParts,
+                args = [],
+                callbackType = typeof callback,
+                usingExports;
+
+            //Use name if no relName
+            relName = relName || name;
+            relParts = makeRelParts(relName);
+
+            //Call the callback to define the module, if necessary.
+            if (callbackType === 'undefined' || callbackType === 'function') {
+                //Pull out the defined dependencies and pass the ordered
+                //values to the callback.
+                //Default to [require, exports, module] if no deps
+                deps = !deps.length && callback.length ? ['require', 'exports', 'module'] : deps;
+                for (i = 0; i < deps.length; i += 1) {
+                    map = makeMap(deps[i], relParts);
+                    depName = map.f;
+
+                    //Fast path CommonJS standard dependencies.
+                    if (depName === "require") {
+                        args[i] = handlers.require(name);
+                    } else if (depName === "exports") {
+                        //CommonJS module spec 1.1
+                        args[i] = handlers.exports(name);
+                        usingExports = true;
+                    } else if (depName === "module") {
+                        //CommonJS module spec 1.1
+                        cjsModule = args[i] = handlers.module(name);
+                    } else if (hasProp(defined, depName) ||
+                               hasProp(waiting, depName) ||
+                               hasProp(defining, depName)) {
+                        args[i] = callDep(depName);
+                    } else if (map.p) {
+                        map.p.load(map.n, makeRequire(relName, true), makeLoad(depName), {});
+                        args[i] = defined[depName];
+                    } else {
+                        throw new Error(name + ' missing ' + depName);
+                    }
+                }
+
+                ret = callback ? callback.apply(defined[name], args) : undefined;
+
+                if (name) {
+                    //If setting exports via "module" is in play,
+                    //favor that over return value and exports. After that,
+                    //favor a non-undefined return value over exports use.
+                    if (cjsModule && cjsModule.exports !== undef &&
+                            cjsModule.exports !== defined[name]) {
+                        defined[name] = cjsModule.exports;
+                    } else if (ret !== undef || !usingExports) {
+                        //Use the return value from the function.
+                        defined[name] = ret;
+                    }
+                }
+            } else if (name) {
+                //May just be an object definition for the module. Only
+                //worry about defining if have a module name.
+                defined[name] = callback;
+            }
+        };
+
+        requirejs = require = req = function (deps, callback, relName, forceSync, alt) {
+            if (typeof deps === "string") {
+                if (handlers[deps]) {
+                    //callback in this case is really relName
+                    return handlers[deps](callback);
+                }
+                //Just return the module wanted. In this scenario, the
+                //deps arg is the module name, and second arg (if passed)
+                //is just the relName.
+                //Normalize module name, if it contains . or ..
+                return callDep(makeMap(deps, makeRelParts(callback)).f);
+            } else if (!deps.splice) {
+                //deps is a config object, not an array.
+                config = deps;
+                if (config.deps) {
+                    req(config.deps, config.callback);
+                }
+                if (!callback) {
+                    return;
+                }
+
+                if (callback.splice) {
+                    //callback is an array, which means it is a dependency list.
+                    //Adjust args if there are dependencies
+                    deps = callback;
+                    callback = relName;
+                    relName = null;
+                } else {
+                    deps = undef;
+                }
+            }
+
+            //Support require(['a'])
+            callback = callback || function () {};
+
+            //If relName is a function, it is an errback handler,
+            //so remove it.
+            if (typeof relName === 'function') {
+                relName = forceSync;
+                forceSync = alt;
+            }
+
+            //Simulate async callback;
+            if (forceSync) {
+                main(undef, deps, callback, relName);
+            } else {
+                //Using a non-zero value because of concern for what old browsers
+                //do, and latest browsers "upgrade" to 4 if lower value is used:
+                //http://www.whatwg.org/specs/web-apps/current-work/multipage/timers.html#dom-windowtimers-settimeout:
+                //If want a value immediately, use require('id') instead -- something
+                //that works in almond on the global level, but not guaranteed and
+                //unlikely to work in other AMD implementations.
+                setTimeout(function () {
+                    main(undef, deps, callback, relName);
+                }, 4);
+            }
+
+            return req;
+        };
+
+        /**
+         * Just drops the config on the floor, but returns req in case
+         * the config return value is used.
+         */
+        req.config = function (cfg) {
+            return req(cfg);
+        };
+
+        /**
+         * Expose module registry for debugging and tooling
+         */
+        requirejs._defined = defined;
+
+        define = function (name, deps, callback) {
+            if (typeof name !== 'string') {
+                throw new Error('See almond README: incorrect module build, no module name');
+            }
+
+            //This module may not have dependencies
+            if (!deps.splice) {
+                //deps is not an array, so probably means
+                //an object literal or factory function for
+                //the value. Adjust args.
+                callback = deps;
+                deps = [];
+            }
+
+            if (!hasProp(defined, name) && !hasProp(waiting, name)) {
+                waiting[name] = [name, deps, callback];
+            }
+        };
+
+        define.amd = {
+            jQuery: true
+        };
+    }());
+
+    S2.requirejs = requirejs;S2.require = require;S2.define = define;
+    }
+    }());
+    S2.define("almond", function(){});
+
+    /* global jQuery:false, $:false */
+    S2.define('jquery',[],function () {
+      var _$ = jQuery || $;
+
+      if (_$ == null && console && console.error) {
+        console.error(
+          'Select2: An instance of jQuery or a jQuery-compatible library was not ' +
+          'found. Make sure that you are including jQuery before Select2 on your ' +
+          'web page.'
+        );
+      }
+
+      return _$;
+    });
+
+    S2.define('select2/utils',[
+      'jquery'
+    ], function ($) {
+      var Utils = {};
+
+      Utils.Extend = function (ChildClass, SuperClass) {
+        var __hasProp = {}.hasOwnProperty;
+
+        function BaseConstructor () {
+          this.constructor = ChildClass;
+        }
+
+        for (var key in SuperClass) {
+          if (__hasProp.call(SuperClass, key)) {
+            ChildClass[key] = SuperClass[key];
+          }
+        }
+
+        BaseConstructor.prototype = SuperClass.prototype;
+        ChildClass.prototype = new BaseConstructor();
+        ChildClass.__super__ = SuperClass.prototype;
+
+        return ChildClass;
+      };
+
+      function getMethods (theClass) {
+        var proto = theClass.prototype;
+
+        var methods = [];
+
+        for (var methodName in proto) {
+          var m = proto[methodName];
+
+          if (typeof m !== 'function') {
+            continue;
+          }
+
+          if (methodName === 'constructor') {
+            continue;
+          }
+
+          methods.push(methodName);
+        }
+
+        return methods;
+      }
+
+      Utils.Decorate = function (SuperClass, DecoratorClass) {
+        var decoratedMethods = getMethods(DecoratorClass);
+        var superMethods = getMethods(SuperClass);
+
+        function DecoratedClass () {
+          var unshift = Array.prototype.unshift;
+
+          var argCount = DecoratorClass.prototype.constructor.length;
+
+          var calledConstructor = SuperClass.prototype.constructor;
+
+          if (argCount > 0) {
+            unshift.call(arguments, SuperClass.prototype.constructor);
+
+            calledConstructor = DecoratorClass.prototype.constructor;
+          }
+
+          calledConstructor.apply(this, arguments);
+        }
+
+        DecoratorClass.displayName = SuperClass.displayName;
+
+        function ctr () {
+          this.constructor = DecoratedClass;
+        }
+
+        DecoratedClass.prototype = new ctr();
+
+        for (var m = 0; m < superMethods.length; m++) {
+          var superMethod = superMethods[m];
+
+          DecoratedClass.prototype[superMethod] =
+            SuperClass.prototype[superMethod];
+        }
+
+        var calledMethod = function (methodName) {
+          // Stub out the original method if it's not decorating an actual method
+          var originalMethod = function () {};
+
+          if (methodName in DecoratedClass.prototype) {
+            originalMethod = DecoratedClass.prototype[methodName];
+          }
+
+          var decoratedMethod = DecoratorClass.prototype[methodName];
+
+          return function () {
+            var unshift = Array.prototype.unshift;
+
+            unshift.call(arguments, originalMethod);
+
+            return decoratedMethod.apply(this, arguments);
+          };
+        };
+
+        for (var d = 0; d < decoratedMethods.length; d++) {
+          var decoratedMethod = decoratedMethods[d];
+
+          DecoratedClass.prototype[decoratedMethod] = calledMethod(decoratedMethod);
+        }
+
+        return DecoratedClass;
+      };
+
+      var Observable = function () {
+        this.listeners = {};
+      };
+
+      Observable.prototype.on = function (event, callback) {
+        this.listeners = this.listeners || {};
+
+        if (event in this.listeners) {
+          this.listeners[event].push(callback);
+        } else {
+          this.listeners[event] = [callback];
+        }
+      };
+
+      Observable.prototype.trigger = function (event) {
+        var slice = Array.prototype.slice;
+        var params = slice.call(arguments, 1);
+
+        this.listeners = this.listeners || {};
+
+        // Params should always come in as an array
+        if (params == null) {
+          params = [];
+        }
+
+        // If there are no arguments to the event, use a temporary object
+        if (params.length === 0) {
+          params.push({});
+        }
+
+        // Set the `_type` of the first object to the event
+        params[0]._type = event;
+
+        if (event in this.listeners) {
+          this.invoke(this.listeners[event], slice.call(arguments, 1));
+        }
+
+        if ('*' in this.listeners) {
+          this.invoke(this.listeners['*'], arguments);
+        }
+      };
+
+      Observable.prototype.invoke = function (listeners, params) {
+        for (var i = 0, len = listeners.length; i < len; i++) {
+          listeners[i].apply(this, params);
+        }
+      };
+
+      Utils.Observable = Observable;
+
+      Utils.generateChars = function (length) {
+        var chars = '';
+
+        for (var i = 0; i < length; i++) {
+          var randomChar = Math.floor(Math.random() * 36);
+          chars += randomChar.toString(36);
+        }
+
+        return chars;
+      };
+
+      Utils.bind = function (func, context) {
+        return function () {
+          func.apply(context, arguments);
+        };
+      };
+
+      Utils._convertData = function (data) {
+        for (var originalKey in data) {
+          var keys = originalKey.split('-');
+
+          var dataLevel = data;
+
+          if (keys.length === 1) {
+            continue;
+          }
+
+          for (var k = 0; k < keys.length; k++) {
+            var key = keys[k];
+
+            // Lowercase the first letter
+            // By default, dash-separated becomes camelCase
+            key = key.substring(0, 1).toLowerCase() + key.substring(1);
+
+            if (!(key in dataLevel)) {
+              dataLevel[key] = {};
+            }
+
+            if (k == keys.length - 1) {
+              dataLevel[key] = data[originalKey];
+            }
+
+            dataLevel = dataLevel[key];
+          }
+
+          delete data[originalKey];
+        }
+
+        return data;
+      };
+
+      Utils.hasScroll = function (index, el) {
+        // Adapted from the function created by @ShadowScripter
+        // and adapted by @BillBarry on the Stack Exchange Code Review website.
+        // The original code can be found at
+        // http://codereview.stackexchange.com/q/13338
+        // and was designed to be used with the Sizzle selector engine.
+
+        var $el = $(el);
+        var overflowX = el.style.overflowX;
+        var overflowY = el.style.overflowY;
+
+        //Check both x and y declarations
+        if (overflowX === overflowY &&
+            (overflowY === 'hidden' || overflowY === 'visible')) {
+          return false;
+        }
+
+        if (overflowX === 'scroll' || overflowY === 'scroll') {
+          return true;
+        }
+
+        return ($el.innerHeight() < el.scrollHeight ||
+          $el.innerWidth() < el.scrollWidth);
+      };
+
+      Utils.escapeMarkup = function (markup) {
+        var replaceMap = {
+          '\\': '&#92;',
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          '\'': '&#39;',
+          '/': '&#47;'
+        };
+
+        // Do not try to escape the markup if it's not a string
+        if (typeof markup !== 'string') {
+          return markup;
+        }
+
+        return String(markup).replace(/[&<>"'\/\\]/g, function (match) {
+          return replaceMap[match];
+        });
+      };
+
+      // Append an array of jQuery nodes to a given element.
+      Utils.appendMany = function ($element, $nodes) {
+        // jQuery 1.7.x does not support $.fn.append() with an array
+        // Fall back to a jQuery object collection using $.fn.add()
+        if ($.fn.jquery.substr(0, 3) === '1.7') {
+          var $jqNodes = $();
+
+          $.map($nodes, function (node) {
+            $jqNodes = $jqNodes.add(node);
+          });
+
+          $nodes = $jqNodes;
+        }
+
+        $element.append($nodes);
+      };
+
+      // Cache objects in Utils.__cache instead of $.data (see #4346)
+      Utils.__cache = {};
+
+      var id = 0;
+      Utils.GetUniqueElementId = function (element) {
+        // Get a unique element Id. If element has no id,
+        // creates a new unique number, stores it in the id
+        // attribute and returns the new id.
+        // If an id already exists, it simply returns it.
+
+        var select2Id = element.getAttribute('data-select2-id');
+        if (select2Id == null) {
+          // If element has id, use it.
+          if (element.id) {
+            select2Id = element.id;
+            element.setAttribute('data-select2-id', select2Id);
+          } else {
+            element.setAttribute('data-select2-id', ++id);
+            select2Id = id.toString();
+          }
+        }
+        return select2Id;
+      };
+
+      Utils.StoreData = function (element, name, value) {
+        // Stores an item in the cache for a specified element.
+        // name is the cache key.
+        var id = Utils.GetUniqueElementId(element);
+        if (!Utils.__cache[id]) {
+          Utils.__cache[id] = {};
+        }
+
+        Utils.__cache[id][name] = value;
+      };
+
+      Utils.GetData = function (element, name) {
+        // Retrieves a value from the cache by its key (name)
+        // name is optional. If no name specified, return
+        // all cache items for the specified element.
+        // and for a specified element.
+        var id = Utils.GetUniqueElementId(element);
+        if (name) {
+          if (Utils.__cache[id]) {
+            if (Utils.__cache[id][name] != null) {
+              return Utils.__cache[id][name];
+            }
+            return $(element).data(name); // Fallback to HTML5 data attribs.
+          }
+          return $(element).data(name); // Fallback to HTML5 data attribs.
+        } else {
+          return Utils.__cache[id];
+        }
+      };
+
+      Utils.RemoveData = function (element) {
+        // Removes all cached items for a specified element.
+        var id = Utils.GetUniqueElementId(element);
+        if (Utils.__cache[id] != null) {
+          delete Utils.__cache[id];
+        }
+
+        element.removeAttribute('data-select2-id');
+      };
+
+      return Utils;
+    });
+
+    S2.define('select2/results',[
+      'jquery',
+      './utils'
+    ], function ($, Utils) {
+      function Results ($element, options, dataAdapter) {
+        this.$element = $element;
+        this.data = dataAdapter;
+        this.options = options;
+
+        Results.__super__.constructor.call(this);
+      }
+
+      Utils.Extend(Results, Utils.Observable);
+
+      Results.prototype.render = function () {
+        var $results = $(
+          '<ul class="select2-results__options" role="listbox"></ul>'
+        );
+
+        if (this.options.get('multiple')) {
+          $results.attr('aria-multiselectable', 'true');
+        }
+
+        this.$results = $results;
+
+        return $results;
+      };
+
+      Results.prototype.clear = function () {
+        this.$results.empty();
+      };
+
+      Results.prototype.displayMessage = function (params) {
+        var escapeMarkup = this.options.get('escapeMarkup');
+
+        this.clear();
+        this.hideLoading();
+
+        var $message = $(
+          '<li role="alert" aria-live="assertive"' +
+          ' class="select2-results__option"></li>'
+        );
+
+        var message = this.options.get('translations').get(params.message);
+
+        $message.append(
+          escapeMarkup(
+            message(params.args)
+          )
+        );
+
+        $message[0].className += ' select2-results__message';
+
+        this.$results.append($message);
+      };
+
+      Results.prototype.hideMessages = function () {
+        this.$results.find('.select2-results__message').remove();
+      };
+
+      Results.prototype.append = function (data) {
+        this.hideLoading();
+
+        var $options = [];
+
+        if (data.results == null || data.results.length === 0) {
+          if (this.$results.children().length === 0) {
+            this.trigger('results:message', {
+              message: 'noResults'
+            });
+          }
+
+          return;
+        }
+
+        data.results = this.sort(data.results);
+
+        for (var d = 0; d < data.results.length; d++) {
+          var item = data.results[d];
+
+          var $option = this.option(item);
+
+          $options.push($option);
+        }
+
+        this.$results.append($options);
+      };
+
+      Results.prototype.position = function ($results, $dropdown) {
+        var $resultsContainer = $dropdown.find('.select2-results');
+        $resultsContainer.append($results);
+      };
+
+      Results.prototype.sort = function (data) {
+        var sorter = this.options.get('sorter');
+
+        return sorter(data);
+      };
+
+      Results.prototype.highlightFirstItem = function () {
+        var $options = this.$results
+          .find('.select2-results__option[aria-selected]');
+
+        var $selected = $options.filter('[aria-selected=true]');
+
+        // Check if there are any selected options
+        if ($selected.length > 0) {
+          // If there are selected options, highlight the first
+          $selected.first().trigger('mouseenter');
+        } else {
+          // If there are no selected options, highlight the first option
+          // in the dropdown
+          $options.first().trigger('mouseenter');
+        }
+
+        this.ensureHighlightVisible();
+      };
+
+      Results.prototype.setClasses = function () {
+        var self = this;
+
+        this.data.current(function (selected) {
+          var selectedIds = $.map(selected, function (s) {
+            return s.id.toString();
+          });
+
+          var $options = self.$results
+            .find('.select2-results__option[aria-selected]');
+
+          $options.each(function () {
+            var $option = $(this);
+
+            var item = Utils.GetData(this, 'data');
+
+            // id needs to be converted to a string when comparing
+            var id = '' + item.id;
+
+            if ((item.element != null && item.element.selected) ||
+                (item.element == null && $.inArray(id, selectedIds) > -1)) {
+              $option.attr('aria-selected', 'true');
+            } else {
+              $option.attr('aria-selected', 'false');
+            }
+          });
+
+        });
+      };
+
+      Results.prototype.showLoading = function (params) {
+        this.hideLoading();
+
+        var loadingMore = this.options.get('translations').get('searching');
+
+        var loading = {
+          disabled: true,
+          loading: true,
+          text: loadingMore(params)
+        };
+        var $loading = this.option(loading);
+        $loading.className += ' loading-results';
+
+        this.$results.prepend($loading);
+      };
+
+      Results.prototype.hideLoading = function () {
+        this.$results.find('.loading-results').remove();
+      };
+
+      Results.prototype.option = function (data) {
+        var option = document.createElement('li');
+        option.className = 'select2-results__option';
+
+        var attrs = {
+          'role': 'option',
+          'aria-selected': 'false'
+        };
+
+        var matches = window.Element.prototype.matches ||
+          window.Element.prototype.msMatchesSelector ||
+          window.Element.prototype.webkitMatchesSelector;
+
+        if ((data.element != null && matches.call(data.element, ':disabled')) ||
+            (data.element == null && data.disabled)) {
+          delete attrs['aria-selected'];
+          attrs['aria-disabled'] = 'true';
+        }
+
+        if (data.id == null) {
+          delete attrs['aria-selected'];
+        }
+
+        if (data._resultId != null) {
+          option.id = data._resultId;
+        }
+
+        if (data.title) {
+          option.title = data.title;
+        }
+
+        if (data.children) {
+          attrs.role = 'group';
+          attrs['aria-label'] = data.text;
+          delete attrs['aria-selected'];
+        }
+
+        for (var attr in attrs) {
+          var val = attrs[attr];
+
+          option.setAttribute(attr, val);
+        }
+
+        if (data.children) {
+          var $option = $(option);
+
+          var label = document.createElement('strong');
+          label.className = 'select2-results__group';
+
+          $(label);
+          this.template(data, label);
+
+          var $children = [];
+
+          for (var c = 0; c < data.children.length; c++) {
+            var child = data.children[c];
+
+            var $child = this.option(child);
+
+            $children.push($child);
+          }
+
+          var $childrenContainer = $('<ul></ul>', {
+            'class': 'select2-results__options select2-results__options--nested'
+          });
+
+          $childrenContainer.append($children);
+
+          $option.append(label);
+          $option.append($childrenContainer);
+        } else {
+          this.template(data, option);
+        }
+
+        Utils.StoreData(option, 'data', data);
+
+        return option;
+      };
+
+      Results.prototype.bind = function (container, $container) {
+        var self = this;
+
+        var id = container.id + '-results';
+
+        this.$results.attr('id', id);
+
+        container.on('results:all', function (params) {
+          self.clear();
+          self.append(params.data);
+
+          if (container.isOpen()) {
+            self.setClasses();
+            self.highlightFirstItem();
+          }
+        });
+
+        container.on('results:append', function (params) {
+          self.append(params.data);
+
+          if (container.isOpen()) {
+            self.setClasses();
+          }
+        });
+
+        container.on('query', function (params) {
+          self.hideMessages();
+          self.showLoading(params);
+        });
+
+        container.on('select', function () {
+          if (!container.isOpen()) {
+            return;
+          }
+
+          self.setClasses();
+
+          if (self.options.get('scrollAfterSelect')) {
+            self.highlightFirstItem();
+          }
+        });
+
+        container.on('unselect', function () {
+          if (!container.isOpen()) {
+            return;
+          }
+
+          self.setClasses();
+
+          if (self.options.get('scrollAfterSelect')) {
+            self.highlightFirstItem();
+          }
+        });
+
+        container.on('open', function () {
+          // When the dropdown is open, aria-expended="true"
+          self.$results.attr('aria-expanded', 'true');
+          self.$results.attr('aria-hidden', 'false');
+
+          self.setClasses();
+          self.ensureHighlightVisible();
+        });
+
+        container.on('close', function () {
+          // When the dropdown is closed, aria-expended="false"
+          self.$results.attr('aria-expanded', 'false');
+          self.$results.attr('aria-hidden', 'true');
+          self.$results.removeAttr('aria-activedescendant');
+        });
+
+        container.on('results:toggle', function () {
+          var $highlighted = self.getHighlightedResults();
+
+          if ($highlighted.length === 0) {
+            return;
+          }
+
+          $highlighted.trigger('mouseup');
+        });
+
+        container.on('results:select', function () {
+          var $highlighted = self.getHighlightedResults();
+
+          if ($highlighted.length === 0) {
+            return;
+          }
+
+          var data = Utils.GetData($highlighted[0], 'data');
+
+          if ($highlighted.attr('aria-selected') == 'true') {
+            self.trigger('close', {});
+          } else {
+            self.trigger('select', {
+              data: data
+            });
+          }
+        });
+
+        container.on('results:previous', function () {
+          var $highlighted = self.getHighlightedResults();
+
+          var $options = self.$results.find('[aria-selected]');
+
+          var currentIndex = $options.index($highlighted);
+
+          // If we are already at the top, don't move further
+          // If no options, currentIndex will be -1
+          if (currentIndex <= 0) {
+            return;
+          }
+
+          var nextIndex = currentIndex - 1;
+
+          // If none are highlighted, highlight the first
+          if ($highlighted.length === 0) {
+            nextIndex = 0;
+          }
+
+          var $next = $options.eq(nextIndex);
+
+          $next.trigger('mouseenter');
+
+          var currentOffset = self.$results.offset().top;
+          var nextTop = $next.offset().top;
+          var nextOffset = self.$results.scrollTop() + (nextTop - currentOffset);
+
+          if (nextIndex === 0) {
+            self.$results.scrollTop(0);
+          } else if (nextTop - currentOffset < 0) {
+            self.$results.scrollTop(nextOffset);
+          }
+        });
+
+        container.on('results:next', function () {
+          var $highlighted = self.getHighlightedResults();
+
+          var $options = self.$results.find('[aria-selected]');
+
+          var currentIndex = $options.index($highlighted);
+
+          var nextIndex = currentIndex + 1;
+
+          // If we are at the last option, stay there
+          if (nextIndex >= $options.length) {
+            return;
+          }
+
+          var $next = $options.eq(nextIndex);
+
+          $next.trigger('mouseenter');
+
+          var currentOffset = self.$results.offset().top +
+            self.$results.outerHeight(false);
+          var nextBottom = $next.offset().top + $next.outerHeight(false);
+          var nextOffset = self.$results.scrollTop() + nextBottom - currentOffset;
+
+          if (nextIndex === 0) {
+            self.$results.scrollTop(0);
+          } else if (nextBottom > currentOffset) {
+            self.$results.scrollTop(nextOffset);
+          }
+        });
+
+        container.on('results:focus', function (params) {
+          params.element.addClass('select2-results__option--highlighted');
+        });
+
+        container.on('results:message', function (params) {
+          self.displayMessage(params);
+        });
+
+        if ($.fn.mousewheel) {
+          this.$results.on('mousewheel', function (e) {
+            var top = self.$results.scrollTop();
+
+            var bottom = self.$results.get(0).scrollHeight - top + e.deltaY;
+
+            var isAtTop = e.deltaY > 0 && top - e.deltaY <= 0;
+            var isAtBottom = e.deltaY < 0 && bottom <= self.$results.height();
+
+            if (isAtTop) {
+              self.$results.scrollTop(0);
+
+              e.preventDefault();
+              e.stopPropagation();
+            } else if (isAtBottom) {
+              self.$results.scrollTop(
+                self.$results.get(0).scrollHeight - self.$results.height()
+              );
+
+              e.preventDefault();
+              e.stopPropagation();
+            }
+          });
+        }
+
+        this.$results.on('mouseup', '.select2-results__option[aria-selected]',
+          function (evt) {
+          var $this = $(this);
+
+          var data = Utils.GetData(this, 'data');
+
+          if ($this.attr('aria-selected') === 'true') {
+            if (self.options.get('multiple')) {
+              self.trigger('unselect', {
+                originalEvent: evt,
+                data: data
+              });
+            } else {
+              self.trigger('close', {});
+            }
+
+            return;
+          }
+
+          self.trigger('select', {
+            originalEvent: evt,
+            data: data
+          });
+        });
+
+        this.$results.on('mouseenter', '.select2-results__option[aria-selected]',
+          function (evt) {
+          var data = Utils.GetData(this, 'data');
+
+          self.getHighlightedResults()
+              .removeClass('select2-results__option--highlighted');
+
+          self.trigger('results:focus', {
+            data: data,
+            element: $(this)
+          });
+        });
+      };
+
+      Results.prototype.getHighlightedResults = function () {
+        var $highlighted = this.$results
+        .find('.select2-results__option--highlighted');
+
+        return $highlighted;
+      };
+
+      Results.prototype.destroy = function () {
+        this.$results.remove();
+      };
+
+      Results.prototype.ensureHighlightVisible = function () {
+        var $highlighted = this.getHighlightedResults();
+
+        if ($highlighted.length === 0) {
+          return;
+        }
+
+        var $options = this.$results.find('[aria-selected]');
+
+        var currentIndex = $options.index($highlighted);
+
+        var currentOffset = this.$results.offset().top;
+        var nextTop = $highlighted.offset().top;
+        var nextOffset = this.$results.scrollTop() + (nextTop - currentOffset);
+
+        var offsetDelta = nextTop - currentOffset;
+        nextOffset -= $highlighted.outerHeight(false) * 2;
+
+        if (currentIndex <= 2) {
+          this.$results.scrollTop(0);
+        } else if (offsetDelta > this.$results.outerHeight() || offsetDelta < 0) {
+          this.$results.scrollTop(nextOffset);
+        }
+      };
+
+      Results.prototype.template = function (result, container) {
+        var template = this.options.get('templateResult');
+        var escapeMarkup = this.options.get('escapeMarkup');
+
+        var content = template(result, container);
+
+        if (content == null) {
+          container.style.display = 'none';
+        } else if (typeof content === 'string') {
+          container.innerHTML = escapeMarkup(content);
+        } else {
+          $(container).append(content);
+        }
+      };
+
+      return Results;
+    });
+
+    S2.define('select2/keys',[
+
+    ], function () {
+      var KEYS = {
+        BACKSPACE: 8,
+        TAB: 9,
+        ENTER: 13,
+        SHIFT: 16,
+        CTRL: 17,
+        ALT: 18,
+        ESC: 27,
+        SPACE: 32,
+        PAGE_UP: 33,
+        PAGE_DOWN: 34,
+        END: 35,
+        HOME: 36,
+        LEFT: 37,
+        UP: 38,
+        RIGHT: 39,
+        DOWN: 40,
+        DELETE: 46
+      };
+
+      return KEYS;
+    });
+
+    S2.define('select2/selection/base',[
+      'jquery',
+      '../utils',
+      '../keys'
+    ], function ($, Utils, KEYS) {
+      function BaseSelection ($element, options) {
+        this.$element = $element;
+        this.options = options;
+
+        BaseSelection.__super__.constructor.call(this);
+      }
+
+      Utils.Extend(BaseSelection, Utils.Observable);
+
+      BaseSelection.prototype.render = function () {
+        var $selection = $(
+          '<span class="select2-selection" role="combobox" ' +
+          ' aria-haspopup="true" aria-expanded="false">' +
+          '</span>'
+        );
+
+        this._tabindex = 0;
+
+        if (Utils.GetData(this.$element[0], 'old-tabindex') != null) {
+          this._tabindex = Utils.GetData(this.$element[0], 'old-tabindex');
+        } else if (this.$element.attr('tabindex') != null) {
+          this._tabindex = this.$element.attr('tabindex');
+        }
+
+        $selection.attr('title', this.$element.attr('title'));
+        $selection.attr('tabindex', this._tabindex);
+        $selection.attr('aria-disabled', 'false');
+
+        this.$selection = $selection;
+
+        return $selection;
+      };
+
+      BaseSelection.prototype.bind = function (container, $container) {
+        var self = this;
+
+        var resultsId = container.id + '-results';
+
+        this.container = container;
+
+        this.$selection.on('focus', function (evt) {
+          self.trigger('focus', evt);
+        });
+
+        this.$selection.on('blur', function (evt) {
+          self._handleBlur(evt);
+        });
+
+        this.$selection.on('keydown', function (evt) {
+          self.trigger('keypress', evt);
+
+          if (evt.which === KEYS.SPACE) {
+            evt.preventDefault();
+          }
+        });
+
+        container.on('results:focus', function (params) {
+          self.$selection.attr('aria-activedescendant', params.data._resultId);
+        });
+
+        container.on('selection:update', function (params) {
+          self.update(params.data);
+        });
+
+        container.on('open', function () {
+          // When the dropdown is open, aria-expanded="true"
+          self.$selection.attr('aria-expanded', 'true');
+          self.$selection.attr('aria-owns', resultsId);
+
+          self._attachCloseHandler(container);
+        });
+
+        container.on('close', function () {
+          // When the dropdown is closed, aria-expanded="false"
+          self.$selection.attr('aria-expanded', 'false');
+          self.$selection.removeAttr('aria-activedescendant');
+          self.$selection.removeAttr('aria-owns');
+
+          self.$selection.trigger('focus');
+
+          self._detachCloseHandler(container);
+        });
+
+        container.on('enable', function () {
+          self.$selection.attr('tabindex', self._tabindex);
+          self.$selection.attr('aria-disabled', 'false');
+        });
+
+        container.on('disable', function () {
+          self.$selection.attr('tabindex', '-1');
+          self.$selection.attr('aria-disabled', 'true');
+        });
+      };
+
+      BaseSelection.prototype._handleBlur = function (evt) {
+        var self = this;
+
+        // This needs to be delayed as the active element is the body when the tab
+        // key is pressed, possibly along with others.
+        window.setTimeout(function () {
+          // Don't trigger `blur` if the focus is still in the selection
+          if (
+            (document.activeElement == self.$selection[0]) ||
+            ($.contains(self.$selection[0], document.activeElement))
+          ) {
+            return;
+          }
+
+          self.trigger('blur', evt);
+        }, 1);
+      };
+
+      BaseSelection.prototype._attachCloseHandler = function (container) {
+
+        $(document.body).on('mousedown.select2.' + container.id, function (e) {
+          var $target = $(e.target);
+
+          var $select = $target.closest('.select2');
+
+          var $all = $('.select2.select2-container--open');
+
+          $all.each(function () {
+            if (this == $select[0]) {
+              return;
+            }
+
+            var $element = Utils.GetData(this, 'element');
+
+            $element.select2('close');
+          });
+        });
+      };
+
+      BaseSelection.prototype._detachCloseHandler = function (container) {
+        $(document.body).off('mousedown.select2.' + container.id);
+      };
+
+      BaseSelection.prototype.position = function ($selection, $container) {
+        var $selectionContainer = $container.find('.selection');
+        $selectionContainer.append($selection);
+      };
+
+      BaseSelection.prototype.destroy = function () {
+        this._detachCloseHandler(this.container);
+      };
+
+      BaseSelection.prototype.update = function (data) {
+        throw new Error('The `update` method must be defined in child classes.');
+      };
+
+      /**
+       * Helper method to abstract the "enabled" (not "disabled") state of this
+       * object.
+       *
+       * @return {true} if the instance is not disabled.
+       * @return {false} if the instance is disabled.
+       */
+      BaseSelection.prototype.isEnabled = function () {
+        return !this.isDisabled();
+      };
+
+      /**
+       * Helper method to abstract the "disabled" state of this object.
+       *
+       * @return {true} if the disabled option is true.
+       * @return {false} if the disabled option is false.
+       */
+      BaseSelection.prototype.isDisabled = function () {
+        return this.options.get('disabled');
+      };
+
+      return BaseSelection;
+    });
+
+    S2.define('select2/selection/single',[
+      'jquery',
+      './base',
+      '../utils',
+      '../keys'
+    ], function ($, BaseSelection, Utils, KEYS) {
+      function SingleSelection () {
+        SingleSelection.__super__.constructor.apply(this, arguments);
+      }
+
+      Utils.Extend(SingleSelection, BaseSelection);
+
+      SingleSelection.prototype.render = function () {
+        var $selection = SingleSelection.__super__.render.call(this);
+
+        $selection.addClass('select2-selection--single');
+
+        $selection.html(
+          '<span class="select2-selection__rendered"></span>' +
+          '<span class="select2-selection__arrow" role="presentation">' +
+            '<b role="presentation"></b>' +
+          '</span>'
+        );
+
+        return $selection;
+      };
+
+      SingleSelection.prototype.bind = function (container, $container) {
+        var self = this;
+
+        SingleSelection.__super__.bind.apply(this, arguments);
+
+        var id = container.id + '-container';
+
+        this.$selection.find('.select2-selection__rendered')
+          .attr('id', id)
+          .attr('role', 'textbox')
+          .attr('aria-readonly', 'true');
+        this.$selection.attr('aria-labelledby', id);
+
+        this.$selection.on('mousedown', function (evt) {
+          // Only respond to left clicks
+          if (evt.which !== 1) {
+            return;
+          }
+
+          self.trigger('toggle', {
+            originalEvent: evt
+          });
+        });
+
+        this.$selection.on('focus', function (evt) {
+          // User focuses on the container
+        });
+
+        this.$selection.on('blur', function (evt) {
+          // User exits the container
+        });
+
+        container.on('focus', function (evt) {
+          if (!container.isOpen()) {
+            self.$selection.trigger('focus');
+          }
+        });
+      };
+
+      SingleSelection.prototype.clear = function () {
+        var $rendered = this.$selection.find('.select2-selection__rendered');
+        $rendered.empty();
+        $rendered.removeAttr('title'); // clear tooltip on empty
+      };
+
+      SingleSelection.prototype.display = function (data, container) {
+        var template = this.options.get('templateSelection');
+        var escapeMarkup = this.options.get('escapeMarkup');
+
+        return escapeMarkup(template(data, container));
+      };
+
+      SingleSelection.prototype.selectionContainer = function () {
+        return $('<span></span>');
+      };
+
+      SingleSelection.prototype.update = function (data) {
+        if (data.length === 0) {
+          this.clear();
+          return;
+        }
+
+        var selection = data[0];
+
+        var $rendered = this.$selection.find('.select2-selection__rendered');
+        var formatted = this.display(selection, $rendered);
+
+        $rendered.empty().append(formatted);
+
+        var title = selection.title || selection.text;
+
+        if (title) {
+          $rendered.attr('title', title);
+        } else {
+          $rendered.removeAttr('title');
+        }
+      };
+
+      return SingleSelection;
+    });
+
+    S2.define('select2/selection/multiple',[
+      'jquery',
+      './base',
+      '../utils'
+    ], function ($, BaseSelection, Utils) {
+      function MultipleSelection ($element, options) {
+        MultipleSelection.__super__.constructor.apply(this, arguments);
+      }
+
+      Utils.Extend(MultipleSelection, BaseSelection);
+
+      MultipleSelection.prototype.render = function () {
+        var $selection = MultipleSelection.__super__.render.call(this);
+
+        $selection.addClass('select2-selection--multiple');
+
+        $selection.html(
+          '<ul class="select2-selection__rendered"></ul>'
+        );
+
+        return $selection;
+      };
+
+      MultipleSelection.prototype.bind = function (container, $container) {
+        var self = this;
+
+        MultipleSelection.__super__.bind.apply(this, arguments);
+
+        this.$selection.on('click', function (evt) {
+          self.trigger('toggle', {
+            originalEvent: evt
+          });
+        });
+
+        this.$selection.on(
+          'click',
+          '.select2-selection__choice__remove',
+          function (evt) {
+            // Ignore the event if it is disabled
+            if (self.isDisabled()) {
+              return;
+            }
+
+            var $remove = $(this);
+            var $selection = $remove.parent();
+
+            var data = Utils.GetData($selection[0], 'data');
+
+            self.trigger('unselect', {
+              originalEvent: evt,
+              data: data
+            });
+          }
+        );
+      };
+
+      MultipleSelection.prototype.clear = function () {
+        var $rendered = this.$selection.find('.select2-selection__rendered');
+        $rendered.empty();
+        $rendered.removeAttr('title');
+      };
+
+      MultipleSelection.prototype.display = function (data, container) {
+        var template = this.options.get('templateSelection');
+        var escapeMarkup = this.options.get('escapeMarkup');
+
+        return escapeMarkup(template(data, container));
+      };
+
+      MultipleSelection.prototype.selectionContainer = function () {
+        var $container = $(
+          '<li class="select2-selection__choice">' +
+            '<span class="select2-selection__choice__remove" role="presentation">' +
+              '&times;' +
+            '</span>' +
+          '</li>'
+        );
+
+        return $container;
+      };
+
+      MultipleSelection.prototype.update = function (data) {
+        this.clear();
+
+        if (data.length === 0) {
+          return;
+        }
+
+        var $selections = [];
+
+        for (var d = 0; d < data.length; d++) {
+          var selection = data[d];
+
+          var $selection = this.selectionContainer();
+          var formatted = this.display(selection, $selection);
+
+          $selection.append(formatted);
+
+          var title = selection.title || selection.text;
+
+          if (title) {
+            $selection.attr('title', title);
+          }
+
+          Utils.StoreData($selection[0], 'data', selection);
+
+          $selections.push($selection);
+        }
+
+        var $rendered = this.$selection.find('.select2-selection__rendered');
+
+        Utils.appendMany($rendered, $selections);
+      };
+
+      return MultipleSelection;
+    });
+
+    S2.define('select2/selection/placeholder',[
+      '../utils'
+    ], function (Utils) {
+      function Placeholder (decorated, $element, options) {
+        this.placeholder = this.normalizePlaceholder(options.get('placeholder'));
+
+        decorated.call(this, $element, options);
+      }
+
+      Placeholder.prototype.normalizePlaceholder = function (_, placeholder) {
+        if (typeof placeholder === 'string') {
+          placeholder = {
+            id: '',
+            text: placeholder
+          };
+        }
+
+        return placeholder;
+      };
+
+      Placeholder.prototype.createPlaceholder = function (decorated, placeholder) {
+        var $placeholder = this.selectionContainer();
+
+        $placeholder.html(this.display(placeholder));
+        $placeholder.addClass('select2-selection__placeholder')
+                    .removeClass('select2-selection__choice');
+
+        return $placeholder;
+      };
+
+      Placeholder.prototype.update = function (decorated, data) {
+        var singlePlaceholder = (
+          data.length == 1 && data[0].id != this.placeholder.id
+        );
+        var multipleSelections = data.length > 1;
+
+        if (multipleSelections || singlePlaceholder) {
+          return decorated.call(this, data);
+        }
+
+        this.clear();
+
+        var $placeholder = this.createPlaceholder(this.placeholder);
+
+        this.$selection.find('.select2-selection__rendered').append($placeholder);
+      };
+
+      return Placeholder;
+    });
+
+    S2.define('select2/selection/allowClear',[
+      'jquery',
+      '../keys',
+      '../utils'
+    ], function ($, KEYS, Utils) {
+      function AllowClear () { }
+
+      AllowClear.prototype.bind = function (decorated, container, $container) {
+        var self = this;
+
+        decorated.call(this, container, $container);
+
+        if (this.placeholder == null) {
+          if (this.options.get('debug') && window.console && console.error) {
+            console.error(
+              'Select2: The `allowClear` option should be used in combination ' +
+              'with the `placeholder` option.'
+            );
+          }
+        }
+
+        this.$selection.on('mousedown', '.select2-selection__clear',
+          function (evt) {
+            self._handleClear(evt);
+        });
+
+        container.on('keypress', function (evt) {
+          self._handleKeyboardClear(evt, container);
+        });
+      };
+
+      AllowClear.prototype._handleClear = function (_, evt) {
+        // Ignore the event if it is disabled
+        if (this.isDisabled()) {
+          return;
+        }
+
+        var $clear = this.$selection.find('.select2-selection__clear');
+
+        // Ignore the event if nothing has been selected
+        if ($clear.length === 0) {
+          return;
+        }
+
+        evt.stopPropagation();
+
+        var data = Utils.GetData($clear[0], 'data');
+
+        var previousVal = this.$element.val();
+        this.$element.val(this.placeholder.id);
+
+        var unselectData = {
+          data: data
+        };
+        this.trigger('clear', unselectData);
+        if (unselectData.prevented) {
+          this.$element.val(previousVal);
+          return;
+        }
+
+        for (var d = 0; d < data.length; d++) {
+          unselectData = {
+            data: data[d]
+          };
+
+          // Trigger the `unselect` event, so people can prevent it from being
+          // cleared.
+          this.trigger('unselect', unselectData);
+
+          // If the event was prevented, don't clear it out.
+          if (unselectData.prevented) {
+            this.$element.val(previousVal);
+            return;
+          }
+        }
+
+        this.$element.trigger('input').trigger('change');
+
+        this.trigger('toggle', {});
+      };
+
+      AllowClear.prototype._handleKeyboardClear = function (_, evt, container) {
+        if (container.isOpen()) {
+          return;
+        }
+
+        if (evt.which == KEYS.DELETE || evt.which == KEYS.BACKSPACE) {
+          this._handleClear(evt);
+        }
+      };
+
+      AllowClear.prototype.update = function (decorated, data) {
+        decorated.call(this, data);
+
+        if (this.$selection.find('.select2-selection__placeholder').length > 0 ||
+            data.length === 0) {
+          return;
+        }
+
+        var removeAll = this.options.get('translations').get('removeAllItems');
+
+        var $remove = $(
+          '<span class="select2-selection__clear" title="' + removeAll() +'">' +
+            '&times;' +
+          '</span>'
+        );
+        Utils.StoreData($remove[0], 'data', data);
+
+        this.$selection.find('.select2-selection__rendered').prepend($remove);
+      };
+
+      return AllowClear;
+    });
+
+    S2.define('select2/selection/search',[
+      'jquery',
+      '../utils',
+      '../keys'
+    ], function ($, Utils, KEYS) {
+      function Search (decorated, $element, options) {
+        decorated.call(this, $element, options);
+      }
+
+      Search.prototype.render = function (decorated) {
+        var $search = $(
+          '<li class="select2-search select2-search--inline">' +
+            '<input class="select2-search__field" type="search" tabindex="-1"' +
+            ' autocomplete="off" autocorrect="off" autocapitalize="none"' +
+            ' spellcheck="false" role="searchbox" aria-autocomplete="list" />' +
+          '</li>'
+        );
+
+        this.$searchContainer = $search;
+        this.$search = $search.find('input');
+
+        var $rendered = decorated.call(this);
+
+        this._transferTabIndex();
+
+        return $rendered;
+      };
+
+      Search.prototype.bind = function (decorated, container, $container) {
+        var self = this;
+
+        var resultsId = container.id + '-results';
+
+        decorated.call(this, container, $container);
+
+        container.on('open', function () {
+          self.$search.attr('aria-controls', resultsId);
+          self.$search.trigger('focus');
+        });
+
+        container.on('close', function () {
+          self.$search.val('');
+          self.$search.removeAttr('aria-controls');
+          self.$search.removeAttr('aria-activedescendant');
+          self.$search.trigger('focus');
+        });
+
+        container.on('enable', function () {
+          self.$search.prop('disabled', false);
+
+          self._transferTabIndex();
+        });
+
+        container.on('disable', function () {
+          self.$search.prop('disabled', true);
+        });
+
+        container.on('focus', function (evt) {
+          self.$search.trigger('focus');
+        });
+
+        container.on('results:focus', function (params) {
+          if (params.data._resultId) {
+            self.$search.attr('aria-activedescendant', params.data._resultId);
+          } else {
+            self.$search.removeAttr('aria-activedescendant');
+          }
+        });
+
+        this.$selection.on('focusin', '.select2-search--inline', function (evt) {
+          self.trigger('focus', evt);
+        });
+
+        this.$selection.on('focusout', '.select2-search--inline', function (evt) {
+          self._handleBlur(evt);
+        });
+
+        this.$selection.on('keydown', '.select2-search--inline', function (evt) {
+          evt.stopPropagation();
+
+          self.trigger('keypress', evt);
+
+          self._keyUpPrevented = evt.isDefaultPrevented();
+
+          var key = evt.which;
+
+          if (key === KEYS.BACKSPACE && self.$search.val() === '') {
+            var $previousChoice = self.$searchContainer
+              .prev('.select2-selection__choice');
+
+            if ($previousChoice.length > 0) {
+              var item = Utils.GetData($previousChoice[0], 'data');
+
+              self.searchRemoveChoice(item);
+
+              evt.preventDefault();
+            }
+          }
+        });
+
+        this.$selection.on('click', '.select2-search--inline', function (evt) {
+          if (self.$search.val()) {
+            evt.stopPropagation();
+          }
+        });
+
+        // Try to detect the IE version should the `documentMode` property that
+        // is stored on the document. This is only implemented in IE and is
+        // slightly cleaner than doing a user agent check.
+        // This property is not available in Edge, but Edge also doesn't have
+        // this bug.
+        var msie = document.documentMode;
+        var disableInputEvents = msie && msie <= 11;
+
+        // Workaround for browsers which do not support the `input` event
+        // This will prevent double-triggering of events for browsers which support
+        // both the `keyup` and `input` events.
+        this.$selection.on(
+          'input.searchcheck',
+          '.select2-search--inline',
+          function (evt) {
+            // IE will trigger the `input` event when a placeholder is used on a
+            // search box. To get around this issue, we are forced to ignore all
+            // `input` events in IE and keep using `keyup`.
+            if (disableInputEvents) {
+              self.$selection.off('input.search input.searchcheck');
+              return;
+            }
+
+            // Unbind the duplicated `keyup` event
+            self.$selection.off('keyup.search');
+          }
+        );
+
+        this.$selection.on(
+          'keyup.search input.search',
+          '.select2-search--inline',
+          function (evt) {
+            // IE will trigger the `input` event when a placeholder is used on a
+            // search box. To get around this issue, we are forced to ignore all
+            // `input` events in IE and keep using `keyup`.
+            if (disableInputEvents && evt.type === 'input') {
+              self.$selection.off('input.search input.searchcheck');
+              return;
+            }
+
+            var key = evt.which;
+
+            // We can freely ignore events from modifier keys
+            if (key == KEYS.SHIFT || key == KEYS.CTRL || key == KEYS.ALT) {
+              return;
+            }
+
+            // Tabbing will be handled during the `keydown` phase
+            if (key == KEYS.TAB) {
+              return;
+            }
+
+            self.handleSearch(evt);
+          }
+        );
+      };
+
+      /**
+       * This method will transfer the tabindex attribute from the rendered
+       * selection to the search box. This allows for the search box to be used as
+       * the primary focus instead of the selection container.
+       *
+       * @private
+       */
+      Search.prototype._transferTabIndex = function (decorated) {
+        this.$search.attr('tabindex', this.$selection.attr('tabindex'));
+        this.$selection.attr('tabindex', '-1');
+      };
+
+      Search.prototype.createPlaceholder = function (decorated, placeholder) {
+        this.$search.attr('placeholder', placeholder.text);
+      };
+
+      Search.prototype.update = function (decorated, data) {
+        var searchHadFocus = this.$search[0] == document.activeElement;
+
+        this.$search.attr('placeholder', '');
+
+        decorated.call(this, data);
+
+        this.$selection.find('.select2-selection__rendered')
+                       .append(this.$searchContainer);
+
+        this.resizeSearch();
+        if (searchHadFocus) {
+          this.$search.trigger('focus');
+        }
+      };
+
+      Search.prototype.handleSearch = function () {
+        this.resizeSearch();
+
+        if (!this._keyUpPrevented) {
+          var input = this.$search.val();
+
+          this.trigger('query', {
+            term: input
+          });
+        }
+
+        this._keyUpPrevented = false;
+      };
+
+      Search.prototype.searchRemoveChoice = function (decorated, item) {
+        this.trigger('unselect', {
+          data: item
+        });
+
+        this.$search.val(item.text);
+        this.handleSearch();
+      };
+
+      Search.prototype.resizeSearch = function () {
+        this.$search.css('width', '25px');
+
+        var width = '';
+
+        if (this.$search.attr('placeholder') !== '') {
+          width = this.$selection.find('.select2-selection__rendered').width();
+        } else {
+          var minimumWidth = this.$search.val().length + 1;
+
+          width = (minimumWidth * 0.75) + 'em';
+        }
+
+        this.$search.css('width', width);
+      };
+
+      return Search;
+    });
+
+    S2.define('select2/selection/eventRelay',[
+      'jquery'
+    ], function ($) {
+      function EventRelay () { }
+
+      EventRelay.prototype.bind = function (decorated, container, $container) {
+        var self = this;
+        var relayEvents = [
+          'open', 'opening',
+          'close', 'closing',
+          'select', 'selecting',
+          'unselect', 'unselecting',
+          'clear', 'clearing'
+        ];
+
+        var preventableEvents = [
+          'opening', 'closing', 'selecting', 'unselecting', 'clearing'
+        ];
+
+        decorated.call(this, container, $container);
+
+        container.on('*', function (name, params) {
+          // Ignore events that should not be relayed
+          if ($.inArray(name, relayEvents) === -1) {
+            return;
+          }
+
+          // The parameters should always be an object
+          params = params || {};
+
+          // Generate the jQuery event for the Select2 event
+          var evt = $.Event('select2:' + name, {
+            params: params
+          });
+
+          self.$element.trigger(evt);
+
+          // Only handle preventable events if it was one
+          if ($.inArray(name, preventableEvents) === -1) {
+            return;
+          }
+
+          params.prevented = evt.isDefaultPrevented();
+        });
+      };
+
+      return EventRelay;
+    });
+
+    S2.define('select2/translation',[
+      'jquery',
+      'require'
+    ], function ($, require) {
+      function Translation (dict) {
+        this.dict = dict || {};
+      }
+
+      Translation.prototype.all = function () {
+        return this.dict;
+      };
+
+      Translation.prototype.get = function (key) {
+        return this.dict[key];
+      };
+
+      Translation.prototype.extend = function (translation) {
+        this.dict = $.extend({}, translation.all(), this.dict);
+      };
+
+      // Static functions
+
+      Translation._cache = {};
+
+      Translation.loadPath = function (path) {
+        if (!(path in Translation._cache)) {
+          var translations = require(path);
+
+          Translation._cache[path] = translations;
+        }
+
+        return new Translation(Translation._cache[path]);
+      };
+
+      return Translation;
+    });
+
+    S2.define('select2/diacritics',[
+
+    ], function () {
+      var diacritics = {
+        '\u24B6': 'A',
+        '\uFF21': 'A',
+        '\u00C0': 'A',
+        '\u00C1': 'A',
+        '\u00C2': 'A',
+        '\u1EA6': 'A',
+        '\u1EA4': 'A',
+        '\u1EAA': 'A',
+        '\u1EA8': 'A',
+        '\u00C3': 'A',
+        '\u0100': 'A',
+        '\u0102': 'A',
+        '\u1EB0': 'A',
+        '\u1EAE': 'A',
+        '\u1EB4': 'A',
+        '\u1EB2': 'A',
+        '\u0226': 'A',
+        '\u01E0': 'A',
+        '\u00C4': 'A',
+        '\u01DE': 'A',
+        '\u1EA2': 'A',
+        '\u00C5': 'A',
+        '\u01FA': 'A',
+        '\u01CD': 'A',
+        '\u0200': 'A',
+        '\u0202': 'A',
+        '\u1EA0': 'A',
+        '\u1EAC': 'A',
+        '\u1EB6': 'A',
+        '\u1E00': 'A',
+        '\u0104': 'A',
+        '\u023A': 'A',
+        '\u2C6F': 'A',
+        '\uA732': 'AA',
+        '\u00C6': 'AE',
+        '\u01FC': 'AE',
+        '\u01E2': 'AE',
+        '\uA734': 'AO',
+        '\uA736': 'AU',
+        '\uA738': 'AV',
+        '\uA73A': 'AV',
+        '\uA73C': 'AY',
+        '\u24B7': 'B',
+        '\uFF22': 'B',
+        '\u1E02': 'B',
+        '\u1E04': 'B',
+        '\u1E06': 'B',
+        '\u0243': 'B',
+        '\u0182': 'B',
+        '\u0181': 'B',
+        '\u24B8': 'C',
+        '\uFF23': 'C',
+        '\u0106': 'C',
+        '\u0108': 'C',
+        '\u010A': 'C',
+        '\u010C': 'C',
+        '\u00C7': 'C',
+        '\u1E08': 'C',
+        '\u0187': 'C',
+        '\u023B': 'C',
+        '\uA73E': 'C',
+        '\u24B9': 'D',
+        '\uFF24': 'D',
+        '\u1E0A': 'D',
+        '\u010E': 'D',
+        '\u1E0C': 'D',
+        '\u1E10': 'D',
+        '\u1E12': 'D',
+        '\u1E0E': 'D',
+        '\u0110': 'D',
+        '\u018B': 'D',
+        '\u018A': 'D',
+        '\u0189': 'D',
+        '\uA779': 'D',
+        '\u01F1': 'DZ',
+        '\u01C4': 'DZ',
+        '\u01F2': 'Dz',
+        '\u01C5': 'Dz',
+        '\u24BA': 'E',
+        '\uFF25': 'E',
+        '\u00C8': 'E',
+        '\u00C9': 'E',
+        '\u00CA': 'E',
+        '\u1EC0': 'E',
+        '\u1EBE': 'E',
+        '\u1EC4': 'E',
+        '\u1EC2': 'E',
+        '\u1EBC': 'E',
+        '\u0112': 'E',
+        '\u1E14': 'E',
+        '\u1E16': 'E',
+        '\u0114': 'E',
+        '\u0116': 'E',
+        '\u00CB': 'E',
+        '\u1EBA': 'E',
+        '\u011A': 'E',
+        '\u0204': 'E',
+        '\u0206': 'E',
+        '\u1EB8': 'E',
+        '\u1EC6': 'E',
+        '\u0228': 'E',
+        '\u1E1C': 'E',
+        '\u0118': 'E',
+        '\u1E18': 'E',
+        '\u1E1A': 'E',
+        '\u0190': 'E',
+        '\u018E': 'E',
+        '\u24BB': 'F',
+        '\uFF26': 'F',
+        '\u1E1E': 'F',
+        '\u0191': 'F',
+        '\uA77B': 'F',
+        '\u24BC': 'G',
+        '\uFF27': 'G',
+        '\u01F4': 'G',
+        '\u011C': 'G',
+        '\u1E20': 'G',
+        '\u011E': 'G',
+        '\u0120': 'G',
+        '\u01E6': 'G',
+        '\u0122': 'G',
+        '\u01E4': 'G',
+        '\u0193': 'G',
+        '\uA7A0': 'G',
+        '\uA77D': 'G',
+        '\uA77E': 'G',
+        '\u24BD': 'H',
+        '\uFF28': 'H',
+        '\u0124': 'H',
+        '\u1E22': 'H',
+        '\u1E26': 'H',
+        '\u021E': 'H',
+        '\u1E24': 'H',
+        '\u1E28': 'H',
+        '\u1E2A': 'H',
+        '\u0126': 'H',
+        '\u2C67': 'H',
+        '\u2C75': 'H',
+        '\uA78D': 'H',
+        '\u24BE': 'I',
+        '\uFF29': 'I',
+        '\u00CC': 'I',
+        '\u00CD': 'I',
+        '\u00CE': 'I',
+        '\u0128': 'I',
+        '\u012A': 'I',
+        '\u012C': 'I',
+        '\u0130': 'I',
+        '\u00CF': 'I',
+        '\u1E2E': 'I',
+        '\u1EC8': 'I',
+        '\u01CF': 'I',
+        '\u0208': 'I',
+        '\u020A': 'I',
+        '\u1ECA': 'I',
+        '\u012E': 'I',
+        '\u1E2C': 'I',
+        '\u0197': 'I',
+        '\u24BF': 'J',
+        '\uFF2A': 'J',
+        '\u0134': 'J',
+        '\u0248': 'J',
+        '\u24C0': 'K',
+        '\uFF2B': 'K',
+        '\u1E30': 'K',
+        '\u01E8': 'K',
+        '\u1E32': 'K',
+        '\u0136': 'K',
+        '\u1E34': 'K',
+        '\u0198': 'K',
+        '\u2C69': 'K',
+        '\uA740': 'K',
+        '\uA742': 'K',
+        '\uA744': 'K',
+        '\uA7A2': 'K',
+        '\u24C1': 'L',
+        '\uFF2C': 'L',
+        '\u013F': 'L',
+        '\u0139': 'L',
+        '\u013D': 'L',
+        '\u1E36': 'L',
+        '\u1E38': 'L',
+        '\u013B': 'L',
+        '\u1E3C': 'L',
+        '\u1E3A': 'L',
+        '\u0141': 'L',
+        '\u023D': 'L',
+        '\u2C62': 'L',
+        '\u2C60': 'L',
+        '\uA748': 'L',
+        '\uA746': 'L',
+        '\uA780': 'L',
+        '\u01C7': 'LJ',
+        '\u01C8': 'Lj',
+        '\u24C2': 'M',
+        '\uFF2D': 'M',
+        '\u1E3E': 'M',
+        '\u1E40': 'M',
+        '\u1E42': 'M',
+        '\u2C6E': 'M',
+        '\u019C': 'M',
+        '\u24C3': 'N',
+        '\uFF2E': 'N',
+        '\u01F8': 'N',
+        '\u0143': 'N',
+        '\u00D1': 'N',
+        '\u1E44': 'N',
+        '\u0147': 'N',
+        '\u1E46': 'N',
+        '\u0145': 'N',
+        '\u1E4A': 'N',
+        '\u1E48': 'N',
+        '\u0220': 'N',
+        '\u019D': 'N',
+        '\uA790': 'N',
+        '\uA7A4': 'N',
+        '\u01CA': 'NJ',
+        '\u01CB': 'Nj',
+        '\u24C4': 'O',
+        '\uFF2F': 'O',
+        '\u00D2': 'O',
+        '\u00D3': 'O',
+        '\u00D4': 'O',
+        '\u1ED2': 'O',
+        '\u1ED0': 'O',
+        '\u1ED6': 'O',
+        '\u1ED4': 'O',
+        '\u00D5': 'O',
+        '\u1E4C': 'O',
+        '\u022C': 'O',
+        '\u1E4E': 'O',
+        '\u014C': 'O',
+        '\u1E50': 'O',
+        '\u1E52': 'O',
+        '\u014E': 'O',
+        '\u022E': 'O',
+        '\u0230': 'O',
+        '\u00D6': 'O',
+        '\u022A': 'O',
+        '\u1ECE': 'O',
+        '\u0150': 'O',
+        '\u01D1': 'O',
+        '\u020C': 'O',
+        '\u020E': 'O',
+        '\u01A0': 'O',
+        '\u1EDC': 'O',
+        '\u1EDA': 'O',
+        '\u1EE0': 'O',
+        '\u1EDE': 'O',
+        '\u1EE2': 'O',
+        '\u1ECC': 'O',
+        '\u1ED8': 'O',
+        '\u01EA': 'O',
+        '\u01EC': 'O',
+        '\u00D8': 'O',
+        '\u01FE': 'O',
+        '\u0186': 'O',
+        '\u019F': 'O',
+        '\uA74A': 'O',
+        '\uA74C': 'O',
+        '\u0152': 'OE',
+        '\u01A2': 'OI',
+        '\uA74E': 'OO',
+        '\u0222': 'OU',
+        '\u24C5': 'P',
+        '\uFF30': 'P',
+        '\u1E54': 'P',
+        '\u1E56': 'P',
+        '\u01A4': 'P',
+        '\u2C63': 'P',
+        '\uA750': 'P',
+        '\uA752': 'P',
+        '\uA754': 'P',
+        '\u24C6': 'Q',
+        '\uFF31': 'Q',
+        '\uA756': 'Q',
+        '\uA758': 'Q',
+        '\u024A': 'Q',
+        '\u24C7': 'R',
+        '\uFF32': 'R',
+        '\u0154': 'R',
+        '\u1E58': 'R',
+        '\u0158': 'R',
+        '\u0210': 'R',
+        '\u0212': 'R',
+        '\u1E5A': 'R',
+        '\u1E5C': 'R',
+        '\u0156': 'R',
+        '\u1E5E': 'R',
+        '\u024C': 'R',
+        '\u2C64': 'R',
+        '\uA75A': 'R',
+        '\uA7A6': 'R',
+        '\uA782': 'R',
+        '\u24C8': 'S',
+        '\uFF33': 'S',
+        '\u1E9E': 'S',
+        '\u015A': 'S',
+        '\u1E64': 'S',
+        '\u015C': 'S',
+        '\u1E60': 'S',
+        '\u0160': 'S',
+        '\u1E66': 'S',
+        '\u1E62': 'S',
+        '\u1E68': 'S',
+        '\u0218': 'S',
+        '\u015E': 'S',
+        '\u2C7E': 'S',
+        '\uA7A8': 'S',
+        '\uA784': 'S',
+        '\u24C9': 'T',
+        '\uFF34': 'T',
+        '\u1E6A': 'T',
+        '\u0164': 'T',
+        '\u1E6C': 'T',
+        '\u021A': 'T',
+        '\u0162': 'T',
+        '\u1E70': 'T',
+        '\u1E6E': 'T',
+        '\u0166': 'T',
+        '\u01AC': 'T',
+        '\u01AE': 'T',
+        '\u023E': 'T',
+        '\uA786': 'T',
+        '\uA728': 'TZ',
+        '\u24CA': 'U',
+        '\uFF35': 'U',
+        '\u00D9': 'U',
+        '\u00DA': 'U',
+        '\u00DB': 'U',
+        '\u0168': 'U',
+        '\u1E78': 'U',
+        '\u016A': 'U',
+        '\u1E7A': 'U',
+        '\u016C': 'U',
+        '\u00DC': 'U',
+        '\u01DB': 'U',
+        '\u01D7': 'U',
+        '\u01D5': 'U',
+        '\u01D9': 'U',
+        '\u1EE6': 'U',
+        '\u016E': 'U',
+        '\u0170': 'U',
+        '\u01D3': 'U',
+        '\u0214': 'U',
+        '\u0216': 'U',
+        '\u01AF': 'U',
+        '\u1EEA': 'U',
+        '\u1EE8': 'U',
+        '\u1EEE': 'U',
+        '\u1EEC': 'U',
+        '\u1EF0': 'U',
+        '\u1EE4': 'U',
+        '\u1E72': 'U',
+        '\u0172': 'U',
+        '\u1E76': 'U',
+        '\u1E74': 'U',
+        '\u0244': 'U',
+        '\u24CB': 'V',
+        '\uFF36': 'V',
+        '\u1E7C': 'V',
+        '\u1E7E': 'V',
+        '\u01B2': 'V',
+        '\uA75E': 'V',
+        '\u0245': 'V',
+        '\uA760': 'VY',
+        '\u24CC': 'W',
+        '\uFF37': 'W',
+        '\u1E80': 'W',
+        '\u1E82': 'W',
+        '\u0174': 'W',
+        '\u1E86': 'W',
+        '\u1E84': 'W',
+        '\u1E88': 'W',
+        '\u2C72': 'W',
+        '\u24CD': 'X',
+        '\uFF38': 'X',
+        '\u1E8A': 'X',
+        '\u1E8C': 'X',
+        '\u24CE': 'Y',
+        '\uFF39': 'Y',
+        '\u1EF2': 'Y',
+        '\u00DD': 'Y',
+        '\u0176': 'Y',
+        '\u1EF8': 'Y',
+        '\u0232': 'Y',
+        '\u1E8E': 'Y',
+        '\u0178': 'Y',
+        '\u1EF6': 'Y',
+        '\u1EF4': 'Y',
+        '\u01B3': 'Y',
+        '\u024E': 'Y',
+        '\u1EFE': 'Y',
+        '\u24CF': 'Z',
+        '\uFF3A': 'Z',
+        '\u0179': 'Z',
+        '\u1E90': 'Z',
+        '\u017B': 'Z',
+        '\u017D': 'Z',
+        '\u1E92': 'Z',
+        '\u1E94': 'Z',
+        '\u01B5': 'Z',
+        '\u0224': 'Z',
+        '\u2C7F': 'Z',
+        '\u2C6B': 'Z',
+        '\uA762': 'Z',
+        '\u24D0': 'a',
+        '\uFF41': 'a',
+        '\u1E9A': 'a',
+        '\u00E0': 'a',
+        '\u00E1': 'a',
+        '\u00E2': 'a',
+        '\u1EA7': 'a',
+        '\u1EA5': 'a',
+        '\u1EAB': 'a',
+        '\u1EA9': 'a',
+        '\u00E3': 'a',
+        '\u0101': 'a',
+        '\u0103': 'a',
+        '\u1EB1': 'a',
+        '\u1EAF': 'a',
+        '\u1EB5': 'a',
+        '\u1EB3': 'a',
+        '\u0227': 'a',
+        '\u01E1': 'a',
+        '\u00E4': 'a',
+        '\u01DF': 'a',
+        '\u1EA3': 'a',
+        '\u00E5': 'a',
+        '\u01FB': 'a',
+        '\u01CE': 'a',
+        '\u0201': 'a',
+        '\u0203': 'a',
+        '\u1EA1': 'a',
+        '\u1EAD': 'a',
+        '\u1EB7': 'a',
+        '\u1E01': 'a',
+        '\u0105': 'a',
+        '\u2C65': 'a',
+        '\u0250': 'a',
+        '\uA733': 'aa',
+        '\u00E6': 'ae',
+        '\u01FD': 'ae',
+        '\u01E3': 'ae',
+        '\uA735': 'ao',
+        '\uA737': 'au',
+        '\uA739': 'av',
+        '\uA73B': 'av',
+        '\uA73D': 'ay',
+        '\u24D1': 'b',
+        '\uFF42': 'b',
+        '\u1E03': 'b',
+        '\u1E05': 'b',
+        '\u1E07': 'b',
+        '\u0180': 'b',
+        '\u0183': 'b',
+        '\u0253': 'b',
+        '\u24D2': 'c',
+        '\uFF43': 'c',
+        '\u0107': 'c',
+        '\u0109': 'c',
+        '\u010B': 'c',
+        '\u010D': 'c',
+        '\u00E7': 'c',
+        '\u1E09': 'c',
+        '\u0188': 'c',
+        '\u023C': 'c',
+        '\uA73F': 'c',
+        '\u2184': 'c',
+        '\u24D3': 'd',
+        '\uFF44': 'd',
+        '\u1E0B': 'd',
+        '\u010F': 'd',
+        '\u1E0D': 'd',
+        '\u1E11': 'd',
+        '\u1E13': 'd',
+        '\u1E0F': 'd',
+        '\u0111': 'd',
+        '\u018C': 'd',
+        '\u0256': 'd',
+        '\u0257': 'd',
+        '\uA77A': 'd',
+        '\u01F3': 'dz',
+        '\u01C6': 'dz',
+        '\u24D4': 'e',
+        '\uFF45': 'e',
+        '\u00E8': 'e',
+        '\u00E9': 'e',
+        '\u00EA': 'e',
+        '\u1EC1': 'e',
+        '\u1EBF': 'e',
+        '\u1EC5': 'e',
+        '\u1EC3': 'e',
+        '\u1EBD': 'e',
+        '\u0113': 'e',
+        '\u1E15': 'e',
+        '\u1E17': 'e',
+        '\u0115': 'e',
+        '\u0117': 'e',
+        '\u00EB': 'e',
+        '\u1EBB': 'e',
+        '\u011B': 'e',
+        '\u0205': 'e',
+        '\u0207': 'e',
+        '\u1EB9': 'e',
+        '\u1EC7': 'e',
+        '\u0229': 'e',
+        '\u1E1D': 'e',
+        '\u0119': 'e',
+        '\u1E19': 'e',
+        '\u1E1B': 'e',
+        '\u0247': 'e',
+        '\u025B': 'e',
+        '\u01DD': 'e',
+        '\u24D5': 'f',
+        '\uFF46': 'f',
+        '\u1E1F': 'f',
+        '\u0192': 'f',
+        '\uA77C': 'f',
+        '\u24D6': 'g',
+        '\uFF47': 'g',
+        '\u01F5': 'g',
+        '\u011D': 'g',
+        '\u1E21': 'g',
+        '\u011F': 'g',
+        '\u0121': 'g',
+        '\u01E7': 'g',
+        '\u0123': 'g',
+        '\u01E5': 'g',
+        '\u0260': 'g',
+        '\uA7A1': 'g',
+        '\u1D79': 'g',
+        '\uA77F': 'g',
+        '\u24D7': 'h',
+        '\uFF48': 'h',
+        '\u0125': 'h',
+        '\u1E23': 'h',
+        '\u1E27': 'h',
+        '\u021F': 'h',
+        '\u1E25': 'h',
+        '\u1E29': 'h',
+        '\u1E2B': 'h',
+        '\u1E96': 'h',
+        '\u0127': 'h',
+        '\u2C68': 'h',
+        '\u2C76': 'h',
+        '\u0265': 'h',
+        '\u0195': 'hv',
+        '\u24D8': 'i',
+        '\uFF49': 'i',
+        '\u00EC': 'i',
+        '\u00ED': 'i',
+        '\u00EE': 'i',
+        '\u0129': 'i',
+        '\u012B': 'i',
+        '\u012D': 'i',
+        '\u00EF': 'i',
+        '\u1E2F': 'i',
+        '\u1EC9': 'i',
+        '\u01D0': 'i',
+        '\u0209': 'i',
+        '\u020B': 'i',
+        '\u1ECB': 'i',
+        '\u012F': 'i',
+        '\u1E2D': 'i',
+        '\u0268': 'i',
+        '\u0131': 'i',
+        '\u24D9': 'j',
+        '\uFF4A': 'j',
+        '\u0135': 'j',
+        '\u01F0': 'j',
+        '\u0249': 'j',
+        '\u24DA': 'k',
+        '\uFF4B': 'k',
+        '\u1E31': 'k',
+        '\u01E9': 'k',
+        '\u1E33': 'k',
+        '\u0137': 'k',
+        '\u1E35': 'k',
+        '\u0199': 'k',
+        '\u2C6A': 'k',
+        '\uA741': 'k',
+        '\uA743': 'k',
+        '\uA745': 'k',
+        '\uA7A3': 'k',
+        '\u24DB': 'l',
+        '\uFF4C': 'l',
+        '\u0140': 'l',
+        '\u013A': 'l',
+        '\u013E': 'l',
+        '\u1E37': 'l',
+        '\u1E39': 'l',
+        '\u013C': 'l',
+        '\u1E3D': 'l',
+        '\u1E3B': 'l',
+        '\u017F': 'l',
+        '\u0142': 'l',
+        '\u019A': 'l',
+        '\u026B': 'l',
+        '\u2C61': 'l',
+        '\uA749': 'l',
+        '\uA781': 'l',
+        '\uA747': 'l',
+        '\u01C9': 'lj',
+        '\u24DC': 'm',
+        '\uFF4D': 'm',
+        '\u1E3F': 'm',
+        '\u1E41': 'm',
+        '\u1E43': 'm',
+        '\u0271': 'm',
+        '\u026F': 'm',
+        '\u24DD': 'n',
+        '\uFF4E': 'n',
+        '\u01F9': 'n',
+        '\u0144': 'n',
+        '\u00F1': 'n',
+        '\u1E45': 'n',
+        '\u0148': 'n',
+        '\u1E47': 'n',
+        '\u0146': 'n',
+        '\u1E4B': 'n',
+        '\u1E49': 'n',
+        '\u019E': 'n',
+        '\u0272': 'n',
+        '\u0149': 'n',
+        '\uA791': 'n',
+        '\uA7A5': 'n',
+        '\u01CC': 'nj',
+        '\u24DE': 'o',
+        '\uFF4F': 'o',
+        '\u00F2': 'o',
+        '\u00F3': 'o',
+        '\u00F4': 'o',
+        '\u1ED3': 'o',
+        '\u1ED1': 'o',
+        '\u1ED7': 'o',
+        '\u1ED5': 'o',
+        '\u00F5': 'o',
+        '\u1E4D': 'o',
+        '\u022D': 'o',
+        '\u1E4F': 'o',
+        '\u014D': 'o',
+        '\u1E51': 'o',
+        '\u1E53': 'o',
+        '\u014F': 'o',
+        '\u022F': 'o',
+        '\u0231': 'o',
+        '\u00F6': 'o',
+        '\u022B': 'o',
+        '\u1ECF': 'o',
+        '\u0151': 'o',
+        '\u01D2': 'o',
+        '\u020D': 'o',
+        '\u020F': 'o',
+        '\u01A1': 'o',
+        '\u1EDD': 'o',
+        '\u1EDB': 'o',
+        '\u1EE1': 'o',
+        '\u1EDF': 'o',
+        '\u1EE3': 'o',
+        '\u1ECD': 'o',
+        '\u1ED9': 'o',
+        '\u01EB': 'o',
+        '\u01ED': 'o',
+        '\u00F8': 'o',
+        '\u01FF': 'o',
+        '\u0254': 'o',
+        '\uA74B': 'o',
+        '\uA74D': 'o',
+        '\u0275': 'o',
+        '\u0153': 'oe',
+        '\u01A3': 'oi',
+        '\u0223': 'ou',
+        '\uA74F': 'oo',
+        '\u24DF': 'p',
+        '\uFF50': 'p',
+        '\u1E55': 'p',
+        '\u1E57': 'p',
+        '\u01A5': 'p',
+        '\u1D7D': 'p',
+        '\uA751': 'p',
+        '\uA753': 'p',
+        '\uA755': 'p',
+        '\u24E0': 'q',
+        '\uFF51': 'q',
+        '\u024B': 'q',
+        '\uA757': 'q',
+        '\uA759': 'q',
+        '\u24E1': 'r',
+        '\uFF52': 'r',
+        '\u0155': 'r',
+        '\u1E59': 'r',
+        '\u0159': 'r',
+        '\u0211': 'r',
+        '\u0213': 'r',
+        '\u1E5B': 'r',
+        '\u1E5D': 'r',
+        '\u0157': 'r',
+        '\u1E5F': 'r',
+        '\u024D': 'r',
+        '\u027D': 'r',
+        '\uA75B': 'r',
+        '\uA7A7': 'r',
+        '\uA783': 'r',
+        '\u24E2': 's',
+        '\uFF53': 's',
+        '\u00DF': 's',
+        '\u015B': 's',
+        '\u1E65': 's',
+        '\u015D': 's',
+        '\u1E61': 's',
+        '\u0161': 's',
+        '\u1E67': 's',
+        '\u1E63': 's',
+        '\u1E69': 's',
+        '\u0219': 's',
+        '\u015F': 's',
+        '\u023F': 's',
+        '\uA7A9': 's',
+        '\uA785': 's',
+        '\u1E9B': 's',
+        '\u24E3': 't',
+        '\uFF54': 't',
+        '\u1E6B': 't',
+        '\u1E97': 't',
+        '\u0165': 't',
+        '\u1E6D': 't',
+        '\u021B': 't',
+        '\u0163': 't',
+        '\u1E71': 't',
+        '\u1E6F': 't',
+        '\u0167': 't',
+        '\u01AD': 't',
+        '\u0288': 't',
+        '\u2C66': 't',
+        '\uA787': 't',
+        '\uA729': 'tz',
+        '\u24E4': 'u',
+        '\uFF55': 'u',
+        '\u00F9': 'u',
+        '\u00FA': 'u',
+        '\u00FB': 'u',
+        '\u0169': 'u',
+        '\u1E79': 'u',
+        '\u016B': 'u',
+        '\u1E7B': 'u',
+        '\u016D': 'u',
+        '\u00FC': 'u',
+        '\u01DC': 'u',
+        '\u01D8': 'u',
+        '\u01D6': 'u',
+        '\u01DA': 'u',
+        '\u1EE7': 'u',
+        '\u016F': 'u',
+        '\u0171': 'u',
+        '\u01D4': 'u',
+        '\u0215': 'u',
+        '\u0217': 'u',
+        '\u01B0': 'u',
+        '\u1EEB': 'u',
+        '\u1EE9': 'u',
+        '\u1EEF': 'u',
+        '\u1EED': 'u',
+        '\u1EF1': 'u',
+        '\u1EE5': 'u',
+        '\u1E73': 'u',
+        '\u0173': 'u',
+        '\u1E77': 'u',
+        '\u1E75': 'u',
+        '\u0289': 'u',
+        '\u24E5': 'v',
+        '\uFF56': 'v',
+        '\u1E7D': 'v',
+        '\u1E7F': 'v',
+        '\u028B': 'v',
+        '\uA75F': 'v',
+        '\u028C': 'v',
+        '\uA761': 'vy',
+        '\u24E6': 'w',
+        '\uFF57': 'w',
+        '\u1E81': 'w',
+        '\u1E83': 'w',
+        '\u0175': 'w',
+        '\u1E87': 'w',
+        '\u1E85': 'w',
+        '\u1E98': 'w',
+        '\u1E89': 'w',
+        '\u2C73': 'w',
+        '\u24E7': 'x',
+        '\uFF58': 'x',
+        '\u1E8B': 'x',
+        '\u1E8D': 'x',
+        '\u24E8': 'y',
+        '\uFF59': 'y',
+        '\u1EF3': 'y',
+        '\u00FD': 'y',
+        '\u0177': 'y',
+        '\u1EF9': 'y',
+        '\u0233': 'y',
+        '\u1E8F': 'y',
+        '\u00FF': 'y',
+        '\u1EF7': 'y',
+        '\u1E99': 'y',
+        '\u1EF5': 'y',
+        '\u01B4': 'y',
+        '\u024F': 'y',
+        '\u1EFF': 'y',
+        '\u24E9': 'z',
+        '\uFF5A': 'z',
+        '\u017A': 'z',
+        '\u1E91': 'z',
+        '\u017C': 'z',
+        '\u017E': 'z',
+        '\u1E93': 'z',
+        '\u1E95': 'z',
+        '\u01B6': 'z',
+        '\u0225': 'z',
+        '\u0240': 'z',
+        '\u2C6C': 'z',
+        '\uA763': 'z',
+        '\u0386': '\u0391',
+        '\u0388': '\u0395',
+        '\u0389': '\u0397',
+        '\u038A': '\u0399',
+        '\u03AA': '\u0399',
+        '\u038C': '\u039F',
+        '\u038E': '\u03A5',
+        '\u03AB': '\u03A5',
+        '\u038F': '\u03A9',
+        '\u03AC': '\u03B1',
+        '\u03AD': '\u03B5',
+        '\u03AE': '\u03B7',
+        '\u03AF': '\u03B9',
+        '\u03CA': '\u03B9',
+        '\u0390': '\u03B9',
+        '\u03CC': '\u03BF',
+        '\u03CD': '\u03C5',
+        '\u03CB': '\u03C5',
+        '\u03B0': '\u03C5',
+        '\u03CE': '\u03C9',
+        '\u03C2': '\u03C3',
+        '\u2019': '\''
+      };
+
+      return diacritics;
+    });
+
+    S2.define('select2/data/base',[
+      '../utils'
+    ], function (Utils) {
+      function BaseAdapter ($element, options) {
+        BaseAdapter.__super__.constructor.call(this);
+      }
+
+      Utils.Extend(BaseAdapter, Utils.Observable);
+
+      BaseAdapter.prototype.current = function (callback) {
+        throw new Error('The `current` method must be defined in child classes.');
+      };
+
+      BaseAdapter.prototype.query = function (params, callback) {
+        throw new Error('The `query` method must be defined in child classes.');
+      };
+
+      BaseAdapter.prototype.bind = function (container, $container) {
+        // Can be implemented in subclasses
+      };
+
+      BaseAdapter.prototype.destroy = function () {
+        // Can be implemented in subclasses
+      };
+
+      BaseAdapter.prototype.generateResultId = function (container, data) {
+        var id = container.id + '-result-';
+
+        id += Utils.generateChars(4);
+
+        if (data.id != null) {
+          id += '-' + data.id.toString();
+        } else {
+          id += '-' + Utils.generateChars(4);
+        }
+        return id;
+      };
+
+      return BaseAdapter;
+    });
+
+    S2.define('select2/data/select',[
+      './base',
+      '../utils',
+      'jquery'
+    ], function (BaseAdapter, Utils, $) {
+      function SelectAdapter ($element, options) {
+        this.$element = $element;
+        this.options = options;
+
+        SelectAdapter.__super__.constructor.call(this);
+      }
+
+      Utils.Extend(SelectAdapter, BaseAdapter);
+
+      SelectAdapter.prototype.current = function (callback) {
+        var data = [];
+        var self = this;
+
+        this.$element.find(':selected').each(function () {
+          var $option = $(this);
+
+          var option = self.item($option);
+
+          data.push(option);
+        });
+
+        callback(data);
+      };
+
+      SelectAdapter.prototype.select = function (data) {
+        var self = this;
+
+        data.selected = true;
+
+        // If data.element is a DOM node, use it instead
+        if ($(data.element).is('option')) {
+          data.element.selected = true;
+
+          this.$element.trigger('input').trigger('change');
+
+          return;
+        }
+
+        if (this.$element.prop('multiple')) {
+          this.current(function (currentData) {
+            var val = [];
+
+            data = [data];
+            data.push.apply(data, currentData);
+
+            for (var d = 0; d < data.length; d++) {
+              var id = data[d].id;
+
+              if ($.inArray(id, val) === -1) {
+                val.push(id);
+              }
+            }
+
+            self.$element.val(val);
+            self.$element.trigger('input').trigger('change');
+          });
+        } else {
+          var val = data.id;
+
+          this.$element.val(val);
+          this.$element.trigger('input').trigger('change');
+        }
+      };
+
+      SelectAdapter.prototype.unselect = function (data) {
+        var self = this;
+
+        if (!this.$element.prop('multiple')) {
+          return;
+        }
+
+        data.selected = false;
+
+        if ($(data.element).is('option')) {
+          data.element.selected = false;
+
+          this.$element.trigger('input').trigger('change');
+
+          return;
+        }
+
+        this.current(function (currentData) {
+          var val = [];
+
+          for (var d = 0; d < currentData.length; d++) {
+            var id = currentData[d].id;
+
+            if (id !== data.id && $.inArray(id, val) === -1) {
+              val.push(id);
+            }
+          }
+
+          self.$element.val(val);
+
+          self.$element.trigger('input').trigger('change');
+        });
+      };
+
+      SelectAdapter.prototype.bind = function (container, $container) {
+        var self = this;
+
+        this.container = container;
+
+        container.on('select', function (params) {
+          self.select(params.data);
+        });
+
+        container.on('unselect', function (params) {
+          self.unselect(params.data);
+        });
+      };
+
+      SelectAdapter.prototype.destroy = function () {
+        // Remove anything added to child elements
+        this.$element.find('*').each(function () {
+          // Remove any custom data set by Select2
+          Utils.RemoveData(this);
+        });
+      };
+
+      SelectAdapter.prototype.query = function (params, callback) {
+        var data = [];
+        var self = this;
+
+        var $options = this.$element.children();
+
+        $options.each(function () {
+          var $option = $(this);
+
+          if (!$option.is('option') && !$option.is('optgroup')) {
+            return;
+          }
+
+          var option = self.item($option);
+
+          var matches = self.matches(params, option);
+
+          if (matches !== null) {
+            data.push(matches);
+          }
+        });
+
+        callback({
+          results: data
+        });
+      };
+
+      SelectAdapter.prototype.addOptions = function ($options) {
+        Utils.appendMany(this.$element, $options);
+      };
+
+      SelectAdapter.prototype.option = function (data) {
+        var option;
+
+        if (data.children) {
+          option = document.createElement('optgroup');
+          option.label = data.text;
+        } else {
+          option = document.createElement('option');
+
+          if (option.textContent !== undefined) {
+            option.textContent = data.text;
+          } else {
+            option.innerText = data.text;
+          }
+        }
+
+        if (data.id !== undefined) {
+          option.value = data.id;
+        }
+
+        if (data.disabled) {
+          option.disabled = true;
+        }
+
+        if (data.selected) {
+          option.selected = true;
+        }
+
+        if (data.title) {
+          option.title = data.title;
+        }
+
+        var $option = $(option);
+
+        var normalizedData = this._normalizeItem(data);
+        normalizedData.element = option;
+
+        // Override the option's data with the combined data
+        Utils.StoreData(option, 'data', normalizedData);
+
+        return $option;
+      };
+
+      SelectAdapter.prototype.item = function ($option) {
+        var data = {};
+
+        data = Utils.GetData($option[0], 'data');
+
+        if (data != null) {
+          return data;
+        }
+
+        if ($option.is('option')) {
+          data = {
+            id: $option.val(),
+            text: $option.text(),
+            disabled: $option.prop('disabled'),
+            selected: $option.prop('selected'),
+            title: $option.prop('title')
+          };
+        } else if ($option.is('optgroup')) {
+          data = {
+            text: $option.prop('label'),
+            children: [],
+            title: $option.prop('title')
+          };
+
+          var $children = $option.children('option');
+          var children = [];
+
+          for (var c = 0; c < $children.length; c++) {
+            var $child = $($children[c]);
+
+            var child = this.item($child);
+
+            children.push(child);
+          }
+
+          data.children = children;
+        }
+
+        data = this._normalizeItem(data);
+        data.element = $option[0];
+
+        Utils.StoreData($option[0], 'data', data);
+
+        return data;
+      };
+
+      SelectAdapter.prototype._normalizeItem = function (item) {
+        if (item !== Object(item)) {
+          item = {
+            id: item,
+            text: item
+          };
+        }
+
+        item = $.extend({}, {
+          text: ''
+        }, item);
+
+        var defaults = {
+          selected: false,
+          disabled: false
+        };
+
+        if (item.id != null) {
+          item.id = item.id.toString();
+        }
+
+        if (item.text != null) {
+          item.text = item.text.toString();
+        }
+
+        if (item._resultId == null && item.id && this.container != null) {
+          item._resultId = this.generateResultId(this.container, item);
+        }
+
+        return $.extend({}, defaults, item);
+      };
+
+      SelectAdapter.prototype.matches = function (params, data) {
+        var matcher = this.options.get('matcher');
+
+        return matcher(params, data);
+      };
+
+      return SelectAdapter;
+    });
+
+    S2.define('select2/data/array',[
+      './select',
+      '../utils',
+      'jquery'
+    ], function (SelectAdapter, Utils, $) {
+      function ArrayAdapter ($element, options) {
+        this._dataToConvert = options.get('data') || [];
+
+        ArrayAdapter.__super__.constructor.call(this, $element, options);
+      }
+
+      Utils.Extend(ArrayAdapter, SelectAdapter);
+
+      ArrayAdapter.prototype.bind = function (container, $container) {
+        ArrayAdapter.__super__.bind.call(this, container, $container);
+
+        this.addOptions(this.convertToOptions(this._dataToConvert));
+      };
+
+      ArrayAdapter.prototype.select = function (data) {
+        var $option = this.$element.find('option').filter(function (i, elm) {
+          return elm.value == data.id.toString();
+        });
+
+        if ($option.length === 0) {
+          $option = this.option(data);
+
+          this.addOptions($option);
+        }
+
+        ArrayAdapter.__super__.select.call(this, data);
+      };
+
+      ArrayAdapter.prototype.convertToOptions = function (data) {
+        var self = this;
+
+        var $existing = this.$element.find('option');
+        var existingIds = $existing.map(function () {
+          return self.item($(this)).id;
+        }).get();
+
+        var $options = [];
+
+        // Filter out all items except for the one passed in the argument
+        function onlyItem (item) {
+          return function () {
+            return $(this).val() == item.id;
+          };
+        }
+
+        for (var d = 0; d < data.length; d++) {
+          var item = this._normalizeItem(data[d]);
+
+          // Skip items which were pre-loaded, only merge the data
+          if ($.inArray(item.id, existingIds) >= 0) {
+            var $existingOption = $existing.filter(onlyItem(item));
+
+            var existingData = this.item($existingOption);
+            var newData = $.extend(true, {}, item, existingData);
+
+            var $newOption = this.option(newData);
+
+            $existingOption.replaceWith($newOption);
+
+            continue;
+          }
+
+          var $option = this.option(item);
+
+          if (item.children) {
+            var $children = this.convertToOptions(item.children);
+
+            Utils.appendMany($option, $children);
+          }
+
+          $options.push($option);
+        }
+
+        return $options;
+      };
+
+      return ArrayAdapter;
+    });
+
+    S2.define('select2/data/ajax',[
+      './array',
+      '../utils',
+      'jquery'
+    ], function (ArrayAdapter, Utils, $) {
+      function AjaxAdapter ($element, options) {
+        this.ajaxOptions = this._applyDefaults(options.get('ajax'));
+
+        if (this.ajaxOptions.processResults != null) {
+          this.processResults = this.ajaxOptions.processResults;
+        }
+
+        AjaxAdapter.__super__.constructor.call(this, $element, options);
+      }
+
+      Utils.Extend(AjaxAdapter, ArrayAdapter);
+
+      AjaxAdapter.prototype._applyDefaults = function (options) {
+        var defaults = {
+          data: function (params) {
+            return $.extend({}, params, {
+              q: params.term
+            });
+          },
+          transport: function (params, success, failure) {
+            var $request = $.ajax(params);
+
+            $request.then(success);
+            $request.fail(failure);
+
+            return $request;
+          }
+        };
+
+        return $.extend({}, defaults, options, true);
+      };
+
+      AjaxAdapter.prototype.processResults = function (results) {
+        return results;
+      };
+
+      AjaxAdapter.prototype.query = function (params, callback) {
+        var self = this;
+
+        if (this._request != null) {
+          // JSONP requests cannot always be aborted
+          if ($.isFunction(this._request.abort)) {
+            this._request.abort();
+          }
+
+          this._request = null;
+        }
+
+        var options = $.extend({
+          type: 'GET'
+        }, this.ajaxOptions);
+
+        if (typeof options.url === 'function') {
+          options.url = options.url.call(this.$element, params);
+        }
+
+        if (typeof options.data === 'function') {
+          options.data = options.data.call(this.$element, params);
+        }
+
+        function request () {
+          var $request = options.transport(options, function (data) {
+            var results = self.processResults(data, params);
+
+            if (self.options.get('debug') && window.console && console.error) {
+              // Check to make sure that the response included a `results` key.
+              if (!results || !results.results || !$.isArray(results.results)) {
+                console.error(
+                  'Select2: The AJAX results did not return an array in the ' +
+                  '`results` key of the response.'
+                );
+              }
+            }
+
+            callback(results);
+          }, function () {
+            // Attempt to detect if a request was aborted
+            // Only works if the transport exposes a status property
+            if ('status' in $request &&
+                ($request.status === 0 || $request.status === '0')) {
+              return;
+            }
+
+            self.trigger('results:message', {
+              message: 'errorLoading'
+            });
+          });
+
+          self._request = $request;
+        }
+
+        if (this.ajaxOptions.delay && params.term != null) {
+          if (this._queryTimeout) {
+            window.clearTimeout(this._queryTimeout);
+          }
+
+          this._queryTimeout = window.setTimeout(request, this.ajaxOptions.delay);
+        } else {
+          request();
+        }
+      };
+
+      return AjaxAdapter;
+    });
+
+    S2.define('select2/data/tags',[
+      'jquery'
+    ], function ($) {
+      function Tags (decorated, $element, options) {
+        var tags = options.get('tags');
+
+        var createTag = options.get('createTag');
+
+        if (createTag !== undefined) {
+          this.createTag = createTag;
+        }
+
+        var insertTag = options.get('insertTag');
+
+        if (insertTag !== undefined) {
+            this.insertTag = insertTag;
+        }
+
+        decorated.call(this, $element, options);
+
+        if ($.isArray(tags)) {
+          for (var t = 0; t < tags.length; t++) {
+            var tag = tags[t];
+            var item = this._normalizeItem(tag);
+
+            var $option = this.option(item);
+
+            this.$element.append($option);
+          }
+        }
+      }
+
+      Tags.prototype.query = function (decorated, params, callback) {
+        var self = this;
+
+        this._removeOldTags();
+
+        if (params.term == null || params.page != null) {
+          decorated.call(this, params, callback);
+          return;
+        }
+
+        function wrapper (obj, child) {
+          var data = obj.results;
+
+          for (var i = 0; i < data.length; i++) {
+            var option = data[i];
+
+            var checkChildren = (
+              option.children != null &&
+              !wrapper({
+                results: option.children
+              }, true)
+            );
+
+            var optionText = (option.text || '').toUpperCase();
+            var paramsTerm = (params.term || '').toUpperCase();
+
+            var checkText = optionText === paramsTerm;
+
+            if (checkText || checkChildren) {
+              if (child) {
+                return false;
+              }
+
+              obj.data = data;
+              callback(obj);
+
+              return;
+            }
+          }
+
+          if (child) {
+            return true;
+          }
+
+          var tag = self.createTag(params);
+
+          if (tag != null) {
+            var $option = self.option(tag);
+            $option.attr('data-select2-tag', true);
+
+            self.addOptions([$option]);
+
+            self.insertTag(data, tag);
+          }
+
+          obj.results = data;
+
+          callback(obj);
+        }
+
+        decorated.call(this, params, wrapper);
+      };
+
+      Tags.prototype.createTag = function (decorated, params) {
+        var term = $.trim(params.term);
+
+        if (term === '') {
+          return null;
+        }
+
+        return {
+          id: term,
+          text: term
+        };
+      };
+
+      Tags.prototype.insertTag = function (_, data, tag) {
+        data.unshift(tag);
+      };
+
+      Tags.prototype._removeOldTags = function (_) {
+        var $options = this.$element.find('option[data-select2-tag]');
+
+        $options.each(function () {
+          if (this.selected) {
+            return;
+          }
+
+          $(this).remove();
+        });
+      };
+
+      return Tags;
+    });
+
+    S2.define('select2/data/tokenizer',[
+      'jquery'
+    ], function ($) {
+      function Tokenizer (decorated, $element, options) {
+        var tokenizer = options.get('tokenizer');
+
+        if (tokenizer !== undefined) {
+          this.tokenizer = tokenizer;
+        }
+
+        decorated.call(this, $element, options);
+      }
+
+      Tokenizer.prototype.bind = function (decorated, container, $container) {
+        decorated.call(this, container, $container);
+
+        this.$search =  container.dropdown.$search || container.selection.$search ||
+          $container.find('.select2-search__field');
+      };
+
+      Tokenizer.prototype.query = function (decorated, params, callback) {
+        var self = this;
+
+        function createAndSelect (data) {
+          // Normalize the data object so we can use it for checks
+          var item = self._normalizeItem(data);
+
+          // Check if the data object already exists as a tag
+          // Select it if it doesn't
+          var $existingOptions = self.$element.find('option').filter(function () {
+            return $(this).val() === item.id;
+          });
+
+          // If an existing option wasn't found for it, create the option
+          if (!$existingOptions.length) {
+            var $option = self.option(item);
+            $option.attr('data-select2-tag', true);
+
+            self._removeOldTags();
+            self.addOptions([$option]);
+          }
+
+          // Select the item, now that we know there is an option for it
+          select(item);
+        }
+
+        function select (data) {
+          self.trigger('select', {
+            data: data
+          });
+        }
+
+        params.term = params.term || '';
+
+        var tokenData = this.tokenizer(params, this.options, createAndSelect);
+
+        if (tokenData.term !== params.term) {
+          // Replace the search term if we have the search box
+          if (this.$search.length) {
+            this.$search.val(tokenData.term);
+            this.$search.trigger('focus');
+          }
+
+          params.term = tokenData.term;
+        }
+
+        decorated.call(this, params, callback);
+      };
+
+      Tokenizer.prototype.tokenizer = function (_, params, options, callback) {
+        var separators = options.get('tokenSeparators') || [];
+        var term = params.term;
+        var i = 0;
+
+        var createTag = this.createTag || function (params) {
+          return {
+            id: params.term,
+            text: params.term
+          };
+        };
+
+        while (i < term.length) {
+          var termChar = term[i];
+
+          if ($.inArray(termChar, separators) === -1) {
+            i++;
+
+            continue;
+          }
+
+          var part = term.substr(0, i);
+          var partParams = $.extend({}, params, {
+            term: part
+          });
+
+          var data = createTag(partParams);
+
+          if (data == null) {
+            i++;
+            continue;
+          }
+
+          callback(data);
+
+          // Reset the term to not include the tokenized portion
+          term = term.substr(i + 1) || '';
+          i = 0;
+        }
+
+        return {
+          term: term
+        };
+      };
+
+      return Tokenizer;
+    });
+
+    S2.define('select2/data/minimumInputLength',[
+
+    ], function () {
+      function MinimumInputLength (decorated, $e, options) {
+        this.minimumInputLength = options.get('minimumInputLength');
+
+        decorated.call(this, $e, options);
+      }
+
+      MinimumInputLength.prototype.query = function (decorated, params, callback) {
+        params.term = params.term || '';
+
+        if (params.term.length < this.minimumInputLength) {
+          this.trigger('results:message', {
+            message: 'inputTooShort',
+            args: {
+              minimum: this.minimumInputLength,
+              input: params.term,
+              params: params
+            }
+          });
+
+          return;
+        }
+
+        decorated.call(this, params, callback);
+      };
+
+      return MinimumInputLength;
+    });
+
+    S2.define('select2/data/maximumInputLength',[
+
+    ], function () {
+      function MaximumInputLength (decorated, $e, options) {
+        this.maximumInputLength = options.get('maximumInputLength');
+
+        decorated.call(this, $e, options);
+      }
+
+      MaximumInputLength.prototype.query = function (decorated, params, callback) {
+        params.term = params.term || '';
+
+        if (this.maximumInputLength > 0 &&
+            params.term.length > this.maximumInputLength) {
+          this.trigger('results:message', {
+            message: 'inputTooLong',
+            args: {
+              maximum: this.maximumInputLength,
+              input: params.term,
+              params: params
+            }
+          });
+
+          return;
+        }
+
+        decorated.call(this, params, callback);
+      };
+
+      return MaximumInputLength;
+    });
+
+    S2.define('select2/data/maximumSelectionLength',[
+
+    ], function (){
+      function MaximumSelectionLength (decorated, $e, options) {
+        this.maximumSelectionLength = options.get('maximumSelectionLength');
+
+        decorated.call(this, $e, options);
+      }
+
+      MaximumSelectionLength.prototype.bind =
+        function (decorated, container, $container) {
+          var self = this;
+
+          decorated.call(this, container, $container);
+
+          container.on('select', function () {
+            self._checkIfMaximumSelected();
+          });
+      };
+
+      MaximumSelectionLength.prototype.query =
+        function (decorated, params, callback) {
+          var self = this;
+
+          this._checkIfMaximumSelected(function () {
+            decorated.call(self, params, callback);
+          });
+      };
+
+      MaximumSelectionLength.prototype._checkIfMaximumSelected =
+        function (_, successCallback) {
+          var self = this;
+
+          this.current(function (currentData) {
+            var count = currentData != null ? currentData.length : 0;
+            if (self.maximumSelectionLength > 0 &&
+              count >= self.maximumSelectionLength) {
+              self.trigger('results:message', {
+                message: 'maximumSelected',
+                args: {
+                  maximum: self.maximumSelectionLength
+                }
+              });
+              return;
+            }
+
+            if (successCallback) {
+              successCallback();
+            }
+          });
+      };
+
+      return MaximumSelectionLength;
+    });
+
+    S2.define('select2/dropdown',[
+      'jquery',
+      './utils'
+    ], function ($, Utils) {
+      function Dropdown ($element, options) {
+        this.$element = $element;
+        this.options = options;
+
+        Dropdown.__super__.constructor.call(this);
+      }
+
+      Utils.Extend(Dropdown, Utils.Observable);
+
+      Dropdown.prototype.render = function () {
+        var $dropdown = $(
+          '<span class="select2-dropdown">' +
+            '<span class="select2-results"></span>' +
+          '</span>'
+        );
+
+        $dropdown.attr('dir', this.options.get('dir'));
+
+        this.$dropdown = $dropdown;
+
+        return $dropdown;
+      };
+
+      Dropdown.prototype.bind = function () {
+        // Should be implemented in subclasses
+      };
+
+      Dropdown.prototype.position = function ($dropdown, $container) {
+        // Should be implemented in subclasses
+      };
+
+      Dropdown.prototype.destroy = function () {
+        // Remove the dropdown from the DOM
+        this.$dropdown.remove();
+      };
+
+      return Dropdown;
+    });
+
+    S2.define('select2/dropdown/search',[
+      'jquery',
+      '../utils'
+    ], function ($, Utils) {
+      function Search () { }
+
+      Search.prototype.render = function (decorated) {
+        var $rendered = decorated.call(this);
+
+        var $search = $(
+          '<span class="select2-search select2-search--dropdown">' +
+            '<input class="select2-search__field" type="search" tabindex="-1"' +
+            ' autocomplete="off" autocorrect="off" autocapitalize="none"' +
+            ' spellcheck="false" role="searchbox" aria-autocomplete="list" />' +
+          '</span>'
+        );
+
+        this.$searchContainer = $search;
+        this.$search = $search.find('input');
+
+        $rendered.prepend($search);
+
+        return $rendered;
+      };
+
+      Search.prototype.bind = function (decorated, container, $container) {
+        var self = this;
+
+        var resultsId = container.id + '-results';
+
+        decorated.call(this, container, $container);
+
+        this.$search.on('keydown', function (evt) {
+          self.trigger('keypress', evt);
+
+          self._keyUpPrevented = evt.isDefaultPrevented();
+        });
+
+        // Workaround for browsers which do not support the `input` event
+        // This will prevent double-triggering of events for browsers which support
+        // both the `keyup` and `input` events.
+        this.$search.on('input', function (evt) {
+          // Unbind the duplicated `keyup` event
+          $(this).off('keyup');
+        });
+
+        this.$search.on('keyup input', function (evt) {
+          self.handleSearch(evt);
+        });
+
+        container.on('open', function () {
+          self.$search.attr('tabindex', 0);
+          self.$search.attr('aria-controls', resultsId);
+
+          self.$search.trigger('focus');
+
+          window.setTimeout(function () {
+            self.$search.trigger('focus');
+          }, 0);
+        });
+
+        container.on('close', function () {
+          self.$search.attr('tabindex', -1);
+          self.$search.removeAttr('aria-controls');
+          self.$search.removeAttr('aria-activedescendant');
+
+          self.$search.val('');
+          self.$search.trigger('blur');
+        });
+
+        container.on('focus', function () {
+          if (!container.isOpen()) {
+            self.$search.trigger('focus');
+          }
+        });
+
+        container.on('results:all', function (params) {
+          if (params.query.term == null || params.query.term === '') {
+            var showSearch = self.showSearch(params);
+
+            if (showSearch) {
+              self.$searchContainer.removeClass('select2-search--hide');
+            } else {
+              self.$searchContainer.addClass('select2-search--hide');
+            }
+          }
+        });
+
+        container.on('results:focus', function (params) {
+          if (params.data._resultId) {
+            self.$search.attr('aria-activedescendant', params.data._resultId);
+          } else {
+            self.$search.removeAttr('aria-activedescendant');
+          }
+        });
+      };
+
+      Search.prototype.handleSearch = function (evt) {
+        if (!this._keyUpPrevented) {
+          var input = this.$search.val();
+
+          this.trigger('query', {
+            term: input
+          });
+        }
+
+        this._keyUpPrevented = false;
+      };
+
+      Search.prototype.showSearch = function (_, params) {
+        return true;
+      };
+
+      return Search;
+    });
+
+    S2.define('select2/dropdown/hidePlaceholder',[
+
+    ], function () {
+      function HidePlaceholder (decorated, $element, options, dataAdapter) {
+        this.placeholder = this.normalizePlaceholder(options.get('placeholder'));
+
+        decorated.call(this, $element, options, dataAdapter);
+      }
+
+      HidePlaceholder.prototype.append = function (decorated, data) {
+        data.results = this.removePlaceholder(data.results);
+
+        decorated.call(this, data);
+      };
+
+      HidePlaceholder.prototype.normalizePlaceholder = function (_, placeholder) {
+        if (typeof placeholder === 'string') {
+          placeholder = {
+            id: '',
+            text: placeholder
+          };
+        }
+
+        return placeholder;
+      };
+
+      HidePlaceholder.prototype.removePlaceholder = function (_, data) {
+        var modifiedData = data.slice(0);
+
+        for (var d = data.length - 1; d >= 0; d--) {
+          var item = data[d];
+
+          if (this.placeholder.id === item.id) {
+            modifiedData.splice(d, 1);
+          }
+        }
+
+        return modifiedData;
+      };
+
+      return HidePlaceholder;
+    });
+
+    S2.define('select2/dropdown/infiniteScroll',[
+      'jquery'
+    ], function ($) {
+      function InfiniteScroll (decorated, $element, options, dataAdapter) {
+        this.lastParams = {};
+
+        decorated.call(this, $element, options, dataAdapter);
+
+        this.$loadingMore = this.createLoadingMore();
+        this.loading = false;
+      }
+
+      InfiniteScroll.prototype.append = function (decorated, data) {
+        this.$loadingMore.remove();
+        this.loading = false;
+
+        decorated.call(this, data);
+
+        if (this.showLoadingMore(data)) {
+          this.$results.append(this.$loadingMore);
+          this.loadMoreIfNeeded();
+        }
+      };
+
+      InfiniteScroll.prototype.bind = function (decorated, container, $container) {
+        var self = this;
+
+        decorated.call(this, container, $container);
+
+        container.on('query', function (params) {
+          self.lastParams = params;
+          self.loading = true;
+        });
+
+        container.on('query:append', function (params) {
+          self.lastParams = params;
+          self.loading = true;
+        });
+
+        this.$results.on('scroll', this.loadMoreIfNeeded.bind(this));
+      };
+
+      InfiniteScroll.prototype.loadMoreIfNeeded = function () {
+        var isLoadMoreVisible = $.contains(
+          document.documentElement,
+          this.$loadingMore[0]
+        );
+
+        if (this.loading || !isLoadMoreVisible) {
+          return;
+        }
+
+        var currentOffset = this.$results.offset().top +
+          this.$results.outerHeight(false);
+        var loadingMoreOffset = this.$loadingMore.offset().top +
+          this.$loadingMore.outerHeight(false);
+
+        if (currentOffset + 50 >= loadingMoreOffset) {
+          this.loadMore();
+        }
+      };
+
+      InfiniteScroll.prototype.loadMore = function () {
+        this.loading = true;
+
+        var params = $.extend({}, {page: 1}, this.lastParams);
+
+        params.page++;
+
+        this.trigger('query:append', params);
+      };
+
+      InfiniteScroll.prototype.showLoadingMore = function (_, data) {
+        return data.pagination && data.pagination.more;
+      };
+
+      InfiniteScroll.prototype.createLoadingMore = function () {
+        var $option = $(
+          '<li ' +
+          'class="select2-results__option select2-results__option--load-more"' +
+          'role="option" aria-disabled="true"></li>'
+        );
+
+        var message = this.options.get('translations').get('loadingMore');
+
+        $option.html(message(this.lastParams));
+
+        return $option;
+      };
+
+      return InfiniteScroll;
+    });
+
+    S2.define('select2/dropdown/attachBody',[
+      'jquery',
+      '../utils'
+    ], function ($, Utils) {
+      function AttachBody (decorated, $element, options) {
+        this.$dropdownParent = $(options.get('dropdownParent') || document.body);
+
+        decorated.call(this, $element, options);
+      }
+
+      AttachBody.prototype.bind = function (decorated, container, $container) {
+        var self = this;
+
+        decorated.call(this, container, $container);
+
+        container.on('open', function () {
+          self._showDropdown();
+          self._attachPositioningHandler(container);
+
+          // Must bind after the results handlers to ensure correct sizing
+          self._bindContainerResultHandlers(container);
+        });
+
+        container.on('close', function () {
+          self._hideDropdown();
+          self._detachPositioningHandler(container);
+        });
+
+        this.$dropdownContainer.on('mousedown', function (evt) {
+          evt.stopPropagation();
+        });
+      };
+
+      AttachBody.prototype.destroy = function (decorated) {
+        decorated.call(this);
+
+        this.$dropdownContainer.remove();
+      };
+
+      AttachBody.prototype.position = function (decorated, $dropdown, $container) {
+        // Clone all of the container classes
+        $dropdown.attr('class', $container.attr('class'));
+
+        $dropdown.removeClass('select2');
+        $dropdown.addClass('select2-container--open');
+
+        $dropdown.css({
+          position: 'absolute',
+          top: -999999
+        });
+
+        this.$container = $container;
+      };
+
+      AttachBody.prototype.render = function (decorated) {
+        var $container = $('<span></span>');
+
+        var $dropdown = decorated.call(this);
+        $container.append($dropdown);
+
+        this.$dropdownContainer = $container;
+
+        return $container;
+      };
+
+      AttachBody.prototype._hideDropdown = function (decorated) {
+        this.$dropdownContainer.detach();
+      };
+
+      AttachBody.prototype._bindContainerResultHandlers =
+          function (decorated, container) {
+
+        // These should only be bound once
+        if (this._containerResultsHandlersBound) {
+          return;
+        }
+
+        var self = this;
+
+        container.on('results:all', function () {
+          self._positionDropdown();
+          self._resizeDropdown();
+        });
+
+        container.on('results:append', function () {
+          self._positionDropdown();
+          self._resizeDropdown();
+        });
+
+        container.on('results:message', function () {
+          self._positionDropdown();
+          self._resizeDropdown();
+        });
+
+        container.on('select', function () {
+          self._positionDropdown();
+          self._resizeDropdown();
+        });
+
+        container.on('unselect', function () {
+          self._positionDropdown();
+          self._resizeDropdown();
+        });
+
+        this._containerResultsHandlersBound = true;
+      };
+
+      AttachBody.prototype._attachPositioningHandler =
+          function (decorated, container) {
+        var self = this;
+
+        var scrollEvent = 'scroll.select2.' + container.id;
+        var resizeEvent = 'resize.select2.' + container.id;
+        var orientationEvent = 'orientationchange.select2.' + container.id;
+
+        var $watchers = this.$container.parents().filter(Utils.hasScroll);
+        $watchers.each(function () {
+          Utils.StoreData(this, 'select2-scroll-position', {
+            x: $(this).scrollLeft(),
+            y: $(this).scrollTop()
+          });
+        });
+
+        $watchers.on(scrollEvent, function (ev) {
+          var position = Utils.GetData(this, 'select2-scroll-position');
+          $(this).scrollTop(position.y);
+        });
+
+        $(window).on(scrollEvent + ' ' + resizeEvent + ' ' + orientationEvent,
+          function (e) {
+          self._positionDropdown();
+          self._resizeDropdown();
+        });
+      };
+
+      AttachBody.prototype._detachPositioningHandler =
+          function (decorated, container) {
+        var scrollEvent = 'scroll.select2.' + container.id;
+        var resizeEvent = 'resize.select2.' + container.id;
+        var orientationEvent = 'orientationchange.select2.' + container.id;
+
+        var $watchers = this.$container.parents().filter(Utils.hasScroll);
+        $watchers.off(scrollEvent);
+
+        $(window).off(scrollEvent + ' ' + resizeEvent + ' ' + orientationEvent);
+      };
+
+      AttachBody.prototype._positionDropdown = function () {
+        var $window = $(window);
+
+        var isCurrentlyAbove = this.$dropdown.hasClass('select2-dropdown--above');
+        var isCurrentlyBelow = this.$dropdown.hasClass('select2-dropdown--below');
+
+        var newDirection = null;
+
+        var offset = this.$container.offset();
+
+        offset.bottom = offset.top + this.$container.outerHeight(false);
+
+        var container = {
+          height: this.$container.outerHeight(false)
+        };
+
+        container.top = offset.top;
+        container.bottom = offset.top + container.height;
+
+        var dropdown = {
+          height: this.$dropdown.outerHeight(false)
+        };
+
+        var viewport = {
+          top: $window.scrollTop(),
+          bottom: $window.scrollTop() + $window.height()
+        };
+
+        var enoughRoomAbove = viewport.top < (offset.top - dropdown.height);
+        var enoughRoomBelow = viewport.bottom > (offset.bottom + dropdown.height);
+
+        var css = {
+          left: offset.left,
+          top: container.bottom
+        };
+
+        // Determine what the parent element is to use for calculating the offset
+        var $offsetParent = this.$dropdownParent;
+
+        // For statically positioned elements, we need to get the element
+        // that is determining the offset
+        if ($offsetParent.css('position') === 'static') {
+          $offsetParent = $offsetParent.offsetParent();
+        }
+
+        var parentOffset = {
+          top: 0,
+          left: 0
+        };
+
+        if (
+          $.contains(document.body, $offsetParent[0]) ||
+          $offsetParent[0].isConnected
+          ) {
+          parentOffset = $offsetParent.offset();
+        }
+
+        css.top -= parentOffset.top;
+        css.left -= parentOffset.left;
+
+        if (!isCurrentlyAbove && !isCurrentlyBelow) {
+          newDirection = 'below';
+        }
+
+        if (!enoughRoomBelow && enoughRoomAbove && !isCurrentlyAbove) {
+          newDirection = 'above';
+        } else if (!enoughRoomAbove && enoughRoomBelow && isCurrentlyAbove) {
+          newDirection = 'below';
+        }
+
+        if (newDirection == 'above' ||
+          (isCurrentlyAbove && newDirection !== 'below')) {
+          css.top = container.top - parentOffset.top - dropdown.height;
+        }
+
+        if (newDirection != null) {
+          this.$dropdown
+            .removeClass('select2-dropdown--below select2-dropdown--above')
+            .addClass('select2-dropdown--' + newDirection);
+          this.$container
+            .removeClass('select2-container--below select2-container--above')
+            .addClass('select2-container--' + newDirection);
+        }
+
+        this.$dropdownContainer.css(css);
+      };
+
+      AttachBody.prototype._resizeDropdown = function () {
+        var css = {
+          width: this.$container.outerWidth(false) + 'px'
+        };
+
+        if (this.options.get('dropdownAutoWidth')) {
+          css.minWidth = css.width;
+          css.position = 'relative';
+          css.width = 'auto';
+        }
+
+        this.$dropdown.css(css);
+      };
+
+      AttachBody.prototype._showDropdown = function (decorated) {
+        this.$dropdownContainer.appendTo(this.$dropdownParent);
+
+        this._positionDropdown();
+        this._resizeDropdown();
+      };
+
+      return AttachBody;
+    });
+
+    S2.define('select2/dropdown/minimumResultsForSearch',[
+
+    ], function () {
+      function countResults (data) {
+        var count = 0;
+
+        for (var d = 0; d < data.length; d++) {
+          var item = data[d];
+
+          if (item.children) {
+            count += countResults(item.children);
+          } else {
+            count++;
+          }
+        }
+
+        return count;
+      }
+
+      function MinimumResultsForSearch (decorated, $element, options, dataAdapter) {
+        this.minimumResultsForSearch = options.get('minimumResultsForSearch');
+
+        if (this.minimumResultsForSearch < 0) {
+          this.minimumResultsForSearch = Infinity;
+        }
+
+        decorated.call(this, $element, options, dataAdapter);
+      }
+
+      MinimumResultsForSearch.prototype.showSearch = function (decorated, params) {
+        if (countResults(params.data.results) < this.minimumResultsForSearch) {
+          return false;
+        }
+
+        return decorated.call(this, params);
+      };
+
+      return MinimumResultsForSearch;
+    });
+
+    S2.define('select2/dropdown/selectOnClose',[
+      '../utils'
+    ], function (Utils) {
+      function SelectOnClose () { }
+
+      SelectOnClose.prototype.bind = function (decorated, container, $container) {
+        var self = this;
+
+        decorated.call(this, container, $container);
+
+        container.on('close', function (params) {
+          self._handleSelectOnClose(params);
+        });
+      };
+
+      SelectOnClose.prototype._handleSelectOnClose = function (_, params) {
+        if (params && params.originalSelect2Event != null) {
+          var event = params.originalSelect2Event;
+
+          // Don't select an item if the close event was triggered from a select or
+          // unselect event
+          if (event._type === 'select' || event._type === 'unselect') {
+            return;
+          }
+        }
+
+        var $highlightedResults = this.getHighlightedResults();
+
+        // Only select highlighted results
+        if ($highlightedResults.length < 1) {
+          return;
+        }
+
+        var data = Utils.GetData($highlightedResults[0], 'data');
+
+        // Don't re-select already selected resulte
+        if (
+          (data.element != null && data.element.selected) ||
+          (data.element == null && data.selected)
+        ) {
+          return;
+        }
+
+        this.trigger('select', {
+            data: data
+        });
+      };
+
+      return SelectOnClose;
+    });
+
+    S2.define('select2/dropdown/closeOnSelect',[
+
+    ], function () {
+      function CloseOnSelect () { }
+
+      CloseOnSelect.prototype.bind = function (decorated, container, $container) {
+        var self = this;
+
+        decorated.call(this, container, $container);
+
+        container.on('select', function (evt) {
+          self._selectTriggered(evt);
+        });
+
+        container.on('unselect', function (evt) {
+          self._selectTriggered(evt);
+        });
+      };
+
+      CloseOnSelect.prototype._selectTriggered = function (_, evt) {
+        var originalEvent = evt.originalEvent;
+
+        // Don't close if the control key is being held
+        if (originalEvent && (originalEvent.ctrlKey || originalEvent.metaKey)) {
+          return;
+        }
+
+        this.trigger('close', {
+          originalEvent: originalEvent,
+          originalSelect2Event: evt
+        });
+      };
+
+      return CloseOnSelect;
+    });
+
+    S2.define('select2/i18n/en',[],function () {
+      // English
+      return {
+        errorLoading: function () {
+          return 'The results could not be loaded.';
+        },
+        inputTooLong: function (args) {
+          var overChars = args.input.length - args.maximum;
+
+          var message = 'Please delete ' + overChars + ' character';
+
+          if (overChars != 1) {
+            message += 's';
+          }
+
+          return message;
+        },
+        inputTooShort: function (args) {
+          var remainingChars = args.minimum - args.input.length;
+
+          var message = 'Please enter ' + remainingChars + ' or more characters';
+
+          return message;
+        },
+        loadingMore: function () {
+          return 'Loading more results…';
+        },
+        maximumSelected: function (args) {
+          var message = 'You can only select ' + args.maximum + ' item';
+
+          if (args.maximum != 1) {
+            message += 's';
+          }
+
+          return message;
+        },
+        noResults: function () {
+          return 'No results found';
+        },
+        searching: function () {
+          return 'Searching…';
+        },
+        removeAllItems: function () {
+          return 'Remove all items';
+        }
+      };
+    });
+
+    S2.define('select2/defaults',[
+      'jquery',
+      'require',
+
+      './results',
+
+      './selection/single',
+      './selection/multiple',
+      './selection/placeholder',
+      './selection/allowClear',
+      './selection/search',
+      './selection/eventRelay',
+
+      './utils',
+      './translation',
+      './diacritics',
+
+      './data/select',
+      './data/array',
+      './data/ajax',
+      './data/tags',
+      './data/tokenizer',
+      './data/minimumInputLength',
+      './data/maximumInputLength',
+      './data/maximumSelectionLength',
+
+      './dropdown',
+      './dropdown/search',
+      './dropdown/hidePlaceholder',
+      './dropdown/infiniteScroll',
+      './dropdown/attachBody',
+      './dropdown/minimumResultsForSearch',
+      './dropdown/selectOnClose',
+      './dropdown/closeOnSelect',
+
+      './i18n/en'
+    ], function ($, require,
+
+                 ResultsList,
+
+                 SingleSelection, MultipleSelection, Placeholder, AllowClear,
+                 SelectionSearch, EventRelay,
+
+                 Utils, Translation, DIACRITICS,
+
+                 SelectData, ArrayData, AjaxData, Tags, Tokenizer,
+                 MinimumInputLength, MaximumInputLength, MaximumSelectionLength,
+
+                 Dropdown, DropdownSearch, HidePlaceholder, InfiniteScroll,
+                 AttachBody, MinimumResultsForSearch, SelectOnClose, CloseOnSelect,
+
+                 EnglishTranslation) {
+      function Defaults () {
+        this.reset();
+      }
+
+      Defaults.prototype.apply = function (options) {
+        options = $.extend(true, {}, this.defaults, options);
+
+        if (options.dataAdapter == null) {
+          if (options.ajax != null) {
+            options.dataAdapter = AjaxData;
+          } else if (options.data != null) {
+            options.dataAdapter = ArrayData;
+          } else {
+            options.dataAdapter = SelectData;
+          }
+
+          if (options.minimumInputLength > 0) {
+            options.dataAdapter = Utils.Decorate(
+              options.dataAdapter,
+              MinimumInputLength
+            );
+          }
+
+          if (options.maximumInputLength > 0) {
+            options.dataAdapter = Utils.Decorate(
+              options.dataAdapter,
+              MaximumInputLength
+            );
+          }
+
+          if (options.maximumSelectionLength > 0) {
+            options.dataAdapter = Utils.Decorate(
+              options.dataAdapter,
+              MaximumSelectionLength
+            );
+          }
+
+          if (options.tags) {
+            options.dataAdapter = Utils.Decorate(options.dataAdapter, Tags);
+          }
+
+          if (options.tokenSeparators != null || options.tokenizer != null) {
+            options.dataAdapter = Utils.Decorate(
+              options.dataAdapter,
+              Tokenizer
+            );
+          }
+
+          if (options.query != null) {
+            var Query = require(options.amdBase + 'compat/query');
+
+            options.dataAdapter = Utils.Decorate(
+              options.dataAdapter,
+              Query
+            );
+          }
+
+          if (options.initSelection != null) {
+            var InitSelection = require(options.amdBase + 'compat/initSelection');
+
+            options.dataAdapter = Utils.Decorate(
+              options.dataAdapter,
+              InitSelection
+            );
+          }
+        }
+
+        if (options.resultsAdapter == null) {
+          options.resultsAdapter = ResultsList;
+
+          if (options.ajax != null) {
+            options.resultsAdapter = Utils.Decorate(
+              options.resultsAdapter,
+              InfiniteScroll
+            );
+          }
+
+          if (options.placeholder != null) {
+            options.resultsAdapter = Utils.Decorate(
+              options.resultsAdapter,
+              HidePlaceholder
+            );
+          }
+
+          if (options.selectOnClose) {
+            options.resultsAdapter = Utils.Decorate(
+              options.resultsAdapter,
+              SelectOnClose
+            );
+          }
+        }
+
+        if (options.dropdownAdapter == null) {
+          if (options.multiple) {
+            options.dropdownAdapter = Dropdown;
+          } else {
+            var SearchableDropdown = Utils.Decorate(Dropdown, DropdownSearch);
+
+            options.dropdownAdapter = SearchableDropdown;
+          }
+
+          if (options.minimumResultsForSearch !== 0) {
+            options.dropdownAdapter = Utils.Decorate(
+              options.dropdownAdapter,
+              MinimumResultsForSearch
+            );
+          }
+
+          if (options.closeOnSelect) {
+            options.dropdownAdapter = Utils.Decorate(
+              options.dropdownAdapter,
+              CloseOnSelect
+            );
+          }
+
+          if (
+            options.dropdownCssClass != null ||
+            options.dropdownCss != null ||
+            options.adaptDropdownCssClass != null
+          ) {
+            var DropdownCSS = require(options.amdBase + 'compat/dropdownCss');
+
+            options.dropdownAdapter = Utils.Decorate(
+              options.dropdownAdapter,
+              DropdownCSS
+            );
+          }
+
+          options.dropdownAdapter = Utils.Decorate(
+            options.dropdownAdapter,
+            AttachBody
+          );
+        }
+
+        if (options.selectionAdapter == null) {
+          if (options.multiple) {
+            options.selectionAdapter = MultipleSelection;
+          } else {
+            options.selectionAdapter = SingleSelection;
+          }
+
+          // Add the placeholder mixin if a placeholder was specified
+          if (options.placeholder != null) {
+            options.selectionAdapter = Utils.Decorate(
+              options.selectionAdapter,
+              Placeholder
+            );
+          }
+
+          if (options.allowClear) {
+            options.selectionAdapter = Utils.Decorate(
+              options.selectionAdapter,
+              AllowClear
+            );
+          }
+
+          if (options.multiple) {
+            options.selectionAdapter = Utils.Decorate(
+              options.selectionAdapter,
+              SelectionSearch
+            );
+          }
+
+          if (
+            options.containerCssClass != null ||
+            options.containerCss != null ||
+            options.adaptContainerCssClass != null
+          ) {
+            var ContainerCSS = require(options.amdBase + 'compat/containerCss');
+
+            options.selectionAdapter = Utils.Decorate(
+              options.selectionAdapter,
+              ContainerCSS
+            );
+          }
+
+          options.selectionAdapter = Utils.Decorate(
+            options.selectionAdapter,
+            EventRelay
+          );
+        }
+
+        // If the defaults were not previously applied from an element, it is
+        // possible for the language option to have not been resolved
+        options.language = this._resolveLanguage(options.language);
+
+        // Always fall back to English since it will always be complete
+        options.language.push('en');
+
+        var uniqueLanguages = [];
+
+        for (var l = 0; l < options.language.length; l++) {
+          var language = options.language[l];
+
+          if (uniqueLanguages.indexOf(language) === -1) {
+            uniqueLanguages.push(language);
+          }
+        }
+
+        options.language = uniqueLanguages;
+
+        options.translations = this._processTranslations(
+          options.language,
+          options.debug
+        );
+
+        return options;
+      };
+
+      Defaults.prototype.reset = function () {
+        function stripDiacritics (text) {
+          // Used 'uni range + named function' from http://jsperf.com/diacritics/18
+          function match(a) {
+            return DIACRITICS[a] || a;
+          }
+
+          return text.replace(/[^\u0000-\u007E]/g, match);
+        }
+
+        function matcher (params, data) {
+          // Always return the object if there is nothing to compare
+          if ($.trim(params.term) === '') {
+            return data;
+          }
+
+          // Do a recursive check for options with children
+          if (data.children && data.children.length > 0) {
+            // Clone the data object if there are children
+            // This is required as we modify the object to remove any non-matches
+            var match = $.extend(true, {}, data);
+
+            // Check each child of the option
+            for (var c = data.children.length - 1; c >= 0; c--) {
+              var child = data.children[c];
+
+              var matches = matcher(params, child);
+
+              // If there wasn't a match, remove the object in the array
+              if (matches == null) {
+                match.children.splice(c, 1);
+              }
+            }
+
+            // If any children matched, return the new object
+            if (match.children.length > 0) {
+              return match;
+            }
+
+            // If there were no matching children, check just the plain object
+            return matcher(params, match);
+          }
+
+          var original = stripDiacritics(data.text).toUpperCase();
+          var term = stripDiacritics(params.term).toUpperCase();
+
+          // Check if the text contains the term
+          if (original.indexOf(term) > -1) {
+            return data;
+          }
+
+          // If it doesn't contain the term, don't return anything
+          return null;
+        }
+
+        this.defaults = {
+          amdBase: './',
+          amdLanguageBase: './i18n/',
+          closeOnSelect: true,
+          debug: false,
+          dropdownAutoWidth: false,
+          escapeMarkup: Utils.escapeMarkup,
+          language: {},
+          matcher: matcher,
+          minimumInputLength: 0,
+          maximumInputLength: 0,
+          maximumSelectionLength: 0,
+          minimumResultsForSearch: 0,
+          selectOnClose: false,
+          scrollAfterSelect: false,
+          sorter: function (data) {
+            return data;
+          },
+          templateResult: function (result) {
+            return result.text;
+          },
+          templateSelection: function (selection) {
+            return selection.text;
+          },
+          theme: 'default',
+          width: 'resolve'
+        };
+      };
+
+      Defaults.prototype.applyFromElement = function (options, $element) {
+        var optionLanguage = options.language;
+        var defaultLanguage = this.defaults.language;
+        var elementLanguage = $element.prop('lang');
+        var parentLanguage = $element.closest('[lang]').prop('lang');
+
+        var languages = Array.prototype.concat.call(
+          this._resolveLanguage(elementLanguage),
+          this._resolveLanguage(optionLanguage),
+          this._resolveLanguage(defaultLanguage),
+          this._resolveLanguage(parentLanguage)
+        );
+
+        options.language = languages;
+
+        return options;
+      };
+
+      Defaults.prototype._resolveLanguage = function (language) {
+        if (!language) {
+          return [];
+        }
+
+        if ($.isEmptyObject(language)) {
+          return [];
+        }
+
+        if ($.isPlainObject(language)) {
+          return [language];
+        }
+
+        var languages;
+
+        if (!$.isArray(language)) {
+          languages = [language];
+        } else {
+          languages = language;
+        }
+
+        var resolvedLanguages = [];
+
+        for (var l = 0; l < languages.length; l++) {
+          resolvedLanguages.push(languages[l]);
+
+          if (typeof languages[l] === 'string' && languages[l].indexOf('-') > 0) {
+            // Extract the region information if it is included
+            var languageParts = languages[l].split('-');
+            var baseLanguage = languageParts[0];
+
+            resolvedLanguages.push(baseLanguage);
+          }
+        }
+
+        return resolvedLanguages;
+      };
+
+      Defaults.prototype._processTranslations = function (languages, debug) {
+        var translations = new Translation();
+
+        for (var l = 0; l < languages.length; l++) {
+          var languageData = new Translation();
+
+          var language = languages[l];
+
+          if (typeof language === 'string') {
+            try {
+              // Try to load it with the original name
+              languageData = Translation.loadPath(language);
+            } catch (e) {
+              try {
+                // If we couldn't load it, check if it wasn't the full path
+                language = this.defaults.amdLanguageBase + language;
+                languageData = Translation.loadPath(language);
+              } catch (ex) {
+                // The translation could not be loaded at all. Sometimes this is
+                // because of a configuration problem, other times this can be
+                // because of how Select2 helps load all possible translation files
+                if (debug && window.console && console.warn) {
+                  console.warn(
+                    'Select2: The language file for "' + language + '" could ' +
+                    'not be automatically loaded. A fallback will be used instead.'
+                  );
+                }
+              }
+            }
+          } else if ($.isPlainObject(language)) {
+            languageData = new Translation(language);
+          } else {
+            languageData = language;
+          }
+
+          translations.extend(languageData);
+        }
+
+        return translations;
+      };
+
+      Defaults.prototype.set = function (key, value) {
+        var camelKey = $.camelCase(key);
+
+        var data = {};
+        data[camelKey] = value;
+
+        var convertedData = Utils._convertData(data);
+
+        $.extend(true, this.defaults, convertedData);
+      };
+
+      var defaults = new Defaults();
+
+      return defaults;
+    });
+
+    S2.define('select2/options',[
+      'require',
+      'jquery',
+      './defaults',
+      './utils'
+    ], function (require, $, Defaults, Utils) {
+      function Options (options, $element) {
+        this.options = options;
+
+        if ($element != null) {
+          this.fromElement($element);
+        }
+
+        if ($element != null) {
+          this.options = Defaults.applyFromElement(this.options, $element);
+        }
+
+        this.options = Defaults.apply(this.options);
+
+        if ($element && $element.is('input')) {
+          var InputCompat = require(this.get('amdBase') + 'compat/inputData');
+
+          this.options.dataAdapter = Utils.Decorate(
+            this.options.dataAdapter,
+            InputCompat
+          );
+        }
+      }
+
+      Options.prototype.fromElement = function ($e) {
+        var excludedData = ['select2'];
+
+        if (this.options.multiple == null) {
+          this.options.multiple = $e.prop('multiple');
+        }
+
+        if (this.options.disabled == null) {
+          this.options.disabled = $e.prop('disabled');
+        }
+
+        if (this.options.dir == null) {
+          if ($e.prop('dir')) {
+            this.options.dir = $e.prop('dir');
+          } else if ($e.closest('[dir]').prop('dir')) {
+            this.options.dir = $e.closest('[dir]').prop('dir');
+          } else {
+            this.options.dir = 'ltr';
+          }
+        }
+
+        $e.prop('disabled', this.options.disabled);
+        $e.prop('multiple', this.options.multiple);
+
+        if (Utils.GetData($e[0], 'select2Tags')) {
+          if (this.options.debug && window.console && console.warn) {
+            console.warn(
+              'Select2: The `data-select2-tags` attribute has been changed to ' +
+              'use the `data-data` and `data-tags="true"` attributes and will be ' +
+              'removed in future versions of Select2.'
+            );
+          }
+
+          Utils.StoreData($e[0], 'data', Utils.GetData($e[0], 'select2Tags'));
+          Utils.StoreData($e[0], 'tags', true);
+        }
+
+        if (Utils.GetData($e[0], 'ajaxUrl')) {
+          if (this.options.debug && window.console && console.warn) {
+            console.warn(
+              'Select2: The `data-ajax-url` attribute has been changed to ' +
+              '`data-ajax--url` and support for the old attribute will be removed' +
+              ' in future versions of Select2.'
+            );
+          }
+
+          $e.attr('ajax--url', Utils.GetData($e[0], 'ajaxUrl'));
+          Utils.StoreData($e[0], 'ajax-Url', Utils.GetData($e[0], 'ajaxUrl'));
+        }
+
+        var dataset = {};
+
+        function upperCaseLetter(_, letter) {
+          return letter.toUpperCase();
+        }
+
+        // Pre-load all of the attributes which are prefixed with `data-`
+        for (var attr = 0; attr < $e[0].attributes.length; attr++) {
+          var attributeName = $e[0].attributes[attr].name;
+          var prefix = 'data-';
+
+          if (attributeName.substr(0, prefix.length) == prefix) {
+            // Get the contents of the attribute after `data-`
+            var dataName = attributeName.substring(prefix.length);
+
+            // Get the data contents from the consistent source
+            // This is more than likely the jQuery data helper
+            var dataValue = Utils.GetData($e[0], dataName);
+
+            // camelCase the attribute name to match the spec
+            var camelDataName = dataName.replace(/-([a-z])/g, upperCaseLetter);
+
+            // Store the data attribute contents into the dataset since
+            dataset[camelDataName] = dataValue;
+          }
+        }
+
+        // Prefer the element's `dataset` attribute if it exists
+        // jQuery 1.x does not correctly handle data attributes with multiple dashes
+        if ($.fn.jquery && $.fn.jquery.substr(0, 2) == '1.' && $e[0].dataset) {
+          dataset = $.extend(true, {}, $e[0].dataset, dataset);
+        }
+
+        // Prefer our internal data cache if it exists
+        var data = $.extend(true, {}, Utils.GetData($e[0]), dataset);
+
+        data = Utils._convertData(data);
+
+        for (var key in data) {
+          if ($.inArray(key, excludedData) > -1) {
+            continue;
+          }
+
+          if ($.isPlainObject(this.options[key])) {
+            $.extend(this.options[key], data[key]);
+          } else {
+            this.options[key] = data[key];
+          }
+        }
+
+        return this;
+      };
+
+      Options.prototype.get = function (key) {
+        return this.options[key];
+      };
+
+      Options.prototype.set = function (key, val) {
+        this.options[key] = val;
+      };
+
+      return Options;
+    });
+
+    S2.define('select2/core',[
+      'jquery',
+      './options',
+      './utils',
+      './keys'
+    ], function ($, Options, Utils, KEYS) {
+      var Select2 = function ($element, options) {
+        if (Utils.GetData($element[0], 'select2') != null) {
+          Utils.GetData($element[0], 'select2').destroy();
+        }
+
+        this.$element = $element;
+
+        this.id = this._generateId($element);
+
+        options = options || {};
+
+        this.options = new Options(options, $element);
+
+        Select2.__super__.constructor.call(this);
+
+        // Set up the tabindex
+
+        var tabindex = $element.attr('tabindex') || 0;
+        Utils.StoreData($element[0], 'old-tabindex', tabindex);
+        $element.attr('tabindex', '-1');
+
+        // Set up containers and adapters
+
+        var DataAdapter = this.options.get('dataAdapter');
+        this.dataAdapter = new DataAdapter($element, this.options);
+
+        var $container = this.render();
+
+        this._placeContainer($container);
+
+        var SelectionAdapter = this.options.get('selectionAdapter');
+        this.selection = new SelectionAdapter($element, this.options);
+        this.$selection = this.selection.render();
+
+        this.selection.position(this.$selection, $container);
+
+        var DropdownAdapter = this.options.get('dropdownAdapter');
+        this.dropdown = new DropdownAdapter($element, this.options);
+        this.$dropdown = this.dropdown.render();
+
+        this.dropdown.position(this.$dropdown, $container);
+
+        var ResultsAdapter = this.options.get('resultsAdapter');
+        this.results = new ResultsAdapter($element, this.options, this.dataAdapter);
+        this.$results = this.results.render();
+
+        this.results.position(this.$results, this.$dropdown);
+
+        // Bind events
+
+        var self = this;
+
+        // Bind the container to all of the adapters
+        this._bindAdapters();
+
+        // Register any DOM event handlers
+        this._registerDomEvents();
+
+        // Register any internal event handlers
+        this._registerDataEvents();
+        this._registerSelectionEvents();
+        this._registerDropdownEvents();
+        this._registerResultsEvents();
+        this._registerEvents();
+
+        // Set the initial state
+        this.dataAdapter.current(function (initialData) {
+          self.trigger('selection:update', {
+            data: initialData
+          });
+        });
+
+        // Hide the original select
+        $element.addClass('select2-hidden-accessible');
+        $element.attr('aria-hidden', 'true');
+
+        // Synchronize any monitored attributes
+        this._syncAttributes();
+
+        Utils.StoreData($element[0], 'select2', this);
+
+        // Ensure backwards compatibility with $element.data('select2').
+        $element.data('select2', this);
+      };
+
+      Utils.Extend(Select2, Utils.Observable);
+
+      Select2.prototype._generateId = function ($element) {
+        var id = '';
+
+        if ($element.attr('id') != null) {
+          id = $element.attr('id');
+        } else if ($element.attr('name') != null) {
+          id = $element.attr('name') + '-' + Utils.generateChars(2);
+        } else {
+          id = Utils.generateChars(4);
+        }
+
+        id = id.replace(/(:|\.|\[|\]|,)/g, '');
+        id = 'select2-' + id;
+
+        return id;
+      };
+
+      Select2.prototype._placeContainer = function ($container) {
+        $container.insertAfter(this.$element);
+
+        var width = this._resolveWidth(this.$element, this.options.get('width'));
+
+        if (width != null) {
+          $container.css('width', width);
+        }
+      };
+
+      Select2.prototype._resolveWidth = function ($element, method) {
+        var WIDTH = /^width:(([-+]?([0-9]*\.)?[0-9]+)(px|em|ex|%|in|cm|mm|pt|pc))/i;
+
+        if (method == 'resolve') {
+          var styleWidth = this._resolveWidth($element, 'style');
+
+          if (styleWidth != null) {
+            return styleWidth;
+          }
+
+          return this._resolveWidth($element, 'element');
+        }
+
+        if (method == 'element') {
+          var elementWidth = $element.outerWidth(false);
+
+          if (elementWidth <= 0) {
+            return 'auto';
+          }
+
+          return elementWidth + 'px';
+        }
+
+        if (method == 'style') {
+          var style = $element.attr('style');
+
+          if (typeof(style) !== 'string') {
+            return null;
+          }
+
+          var attrs = style.split(';');
+
+          for (var i = 0, l = attrs.length; i < l; i = i + 1) {
+            var attr = attrs[i].replace(/\s/g, '');
+            var matches = attr.match(WIDTH);
+
+            if (matches !== null && matches.length >= 1) {
+              return matches[1];
+            }
+          }
+
+          return null;
+        }
+
+        if (method == 'computedstyle') {
+          var computedStyle = window.getComputedStyle($element[0]);
+
+          return computedStyle.width;
+        }
+
+        return method;
+      };
+
+      Select2.prototype._bindAdapters = function () {
+        this.dataAdapter.bind(this, this.$container);
+        this.selection.bind(this, this.$container);
+
+        this.dropdown.bind(this, this.$container);
+        this.results.bind(this, this.$container);
+      };
+
+      Select2.prototype._registerDomEvents = function () {
+        var self = this;
+
+        this.$element.on('change.select2', function () {
+          self.dataAdapter.current(function (data) {
+            self.trigger('selection:update', {
+              data: data
+            });
+          });
+        });
+
+        this.$element.on('focus.select2', function (evt) {
+          self.trigger('focus', evt);
+        });
+
+        this._syncA = Utils.bind(this._syncAttributes, this);
+        this._syncS = Utils.bind(this._syncSubtree, this);
+
+        if (this.$element[0].attachEvent) {
+          this.$element[0].attachEvent('onpropertychange', this._syncA);
+        }
+
+        var observer = window.MutationObserver ||
+          window.WebKitMutationObserver ||
+          window.MozMutationObserver
+        ;
+
+        if (observer != null) {
+          this._observer = new observer(function (mutations) {
+            self._syncA();
+            self._syncS(null, mutations);
+          });
+          this._observer.observe(this.$element[0], {
+            attributes: true,
+            childList: true,
+            subtree: false
+          });
+        } else if (this.$element[0].addEventListener) {
+          this.$element[0].addEventListener(
+            'DOMAttrModified',
+            self._syncA,
+            false
+          );
+          this.$element[0].addEventListener(
+            'DOMNodeInserted',
+            self._syncS,
+            false
+          );
+          this.$element[0].addEventListener(
+            'DOMNodeRemoved',
+            self._syncS,
+            false
+          );
+        }
+      };
+
+      Select2.prototype._registerDataEvents = function () {
+        var self = this;
+
+        this.dataAdapter.on('*', function (name, params) {
+          self.trigger(name, params);
+        });
+      };
+
+      Select2.prototype._registerSelectionEvents = function () {
+        var self = this;
+        var nonRelayEvents = ['toggle', 'focus'];
+
+        this.selection.on('toggle', function () {
+          self.toggleDropdown();
+        });
+
+        this.selection.on('focus', function (params) {
+          self.focus(params);
+        });
+
+        this.selection.on('*', function (name, params) {
+          if ($.inArray(name, nonRelayEvents) !== -1) {
+            return;
+          }
+
+          self.trigger(name, params);
+        });
+      };
+
+      Select2.prototype._registerDropdownEvents = function () {
+        var self = this;
+
+        this.dropdown.on('*', function (name, params) {
+          self.trigger(name, params);
+        });
+      };
+
+      Select2.prototype._registerResultsEvents = function () {
+        var self = this;
+
+        this.results.on('*', function (name, params) {
+          self.trigger(name, params);
+        });
+      };
+
+      Select2.prototype._registerEvents = function () {
+        var self = this;
+
+        this.on('open', function () {
+          self.$container.addClass('select2-container--open');
+        });
+
+        this.on('close', function () {
+          self.$container.removeClass('select2-container--open');
+        });
+
+        this.on('enable', function () {
+          self.$container.removeClass('select2-container--disabled');
+        });
+
+        this.on('disable', function () {
+          self.$container.addClass('select2-container--disabled');
+        });
+
+        this.on('blur', function () {
+          self.$container.removeClass('select2-container--focus');
+        });
+
+        this.on('query', function (params) {
+          if (!self.isOpen()) {
+            self.trigger('open', {});
+          }
+
+          this.dataAdapter.query(params, function (data) {
+            self.trigger('results:all', {
+              data: data,
+              query: params
+            });
+          });
+        });
+
+        this.on('query:append', function (params) {
+          this.dataAdapter.query(params, function (data) {
+            self.trigger('results:append', {
+              data: data,
+              query: params
+            });
+          });
+        });
+
+        this.on('keypress', function (evt) {
+          var key = evt.which;
+
+          if (self.isOpen()) {
+            if (key === KEYS.ESC || key === KEYS.TAB ||
+                (key === KEYS.UP && evt.altKey)) {
+              self.close(evt);
+
+              evt.preventDefault();
+            } else if (key === KEYS.ENTER) {
+              self.trigger('results:select', {});
+
+              evt.preventDefault();
+            } else if ((key === KEYS.SPACE && evt.ctrlKey)) {
+              self.trigger('results:toggle', {});
+
+              evt.preventDefault();
+            } else if (key === KEYS.UP) {
+              self.trigger('results:previous', {});
+
+              evt.preventDefault();
+            } else if (key === KEYS.DOWN) {
+              self.trigger('results:next', {});
+
+              evt.preventDefault();
+            }
+          } else {
+            if (key === KEYS.ENTER || key === KEYS.SPACE ||
+                (key === KEYS.DOWN && evt.altKey)) {
+              self.open();
+
+              evt.preventDefault();
+            }
+          }
+        });
+      };
+
+      Select2.prototype._syncAttributes = function () {
+        this.options.set('disabled', this.$element.prop('disabled'));
+
+        if (this.isDisabled()) {
+          if (this.isOpen()) {
+            this.close();
+          }
+
+          this.trigger('disable', {});
+        } else {
+          this.trigger('enable', {});
+        }
+      };
+
+      Select2.prototype._isChangeMutation = function (evt, mutations) {
+        var changed = false;
+        var self = this;
+
+        // Ignore any mutation events raised for elements that aren't options or
+        // optgroups. This handles the case when the select element is destroyed
+        if (
+          evt && evt.target && (
+            evt.target.nodeName !== 'OPTION' && evt.target.nodeName !== 'OPTGROUP'
+          )
+        ) {
+          return;
+        }
+
+        if (!mutations) {
+          // If mutation events aren't supported, then we can only assume that the
+          // change affected the selections
+          changed = true;
+        } else if (mutations.addedNodes && mutations.addedNodes.length > 0) {
+          for (var n = 0; n < mutations.addedNodes.length; n++) {
+            var node = mutations.addedNodes[n];
+
+            if (node.selected) {
+              changed = true;
+            }
+          }
+        } else if (mutations.removedNodes && mutations.removedNodes.length > 0) {
+          changed = true;
+        } else if ($.isArray(mutations)) {
+          $.each(mutations, function(evt, mutation) {
+            if (self._isChangeMutation(evt, mutation)) {
+              // We've found a change mutation.
+              // Let's escape from the loop and continue
+              changed = true;
+              return false;
+            }
+          });
+        }
+        return changed;
+      };
+
+      Select2.prototype._syncSubtree = function (evt, mutations) {
+        var changed = this._isChangeMutation(evt, mutations);
+        var self = this;
+
+        // Only re-pull the data if we think there is a change
+        if (changed) {
+          this.dataAdapter.current(function (currentData) {
+            self.trigger('selection:update', {
+              data: currentData
+            });
+          });
+        }
+      };
+
+      /**
+       * Override the trigger method to automatically trigger pre-events when
+       * there are events that can be prevented.
+       */
+      Select2.prototype.trigger = function (name, args) {
+        var actualTrigger = Select2.__super__.trigger;
+        var preTriggerMap = {
+          'open': 'opening',
+          'close': 'closing',
+          'select': 'selecting',
+          'unselect': 'unselecting',
+          'clear': 'clearing'
+        };
+
+        if (args === undefined) {
+          args = {};
+        }
+
+        if (name in preTriggerMap) {
+          var preTriggerName = preTriggerMap[name];
+          var preTriggerArgs = {
+            prevented: false,
+            name: name,
+            args: args
+          };
+
+          actualTrigger.call(this, preTriggerName, preTriggerArgs);
+
+          if (preTriggerArgs.prevented) {
+            args.prevented = true;
+
+            return;
+          }
+        }
+
+        actualTrigger.call(this, name, args);
+      };
+
+      Select2.prototype.toggleDropdown = function () {
+        if (this.isDisabled()) {
+          return;
+        }
+
+        if (this.isOpen()) {
+          this.close();
+        } else {
+          this.open();
+        }
+      };
+
+      Select2.prototype.open = function () {
+        if (this.isOpen()) {
+          return;
+        }
+
+        if (this.isDisabled()) {
+          return;
+        }
+
+        this.trigger('query', {});
+      };
+
+      Select2.prototype.close = function (evt) {
+        if (!this.isOpen()) {
+          return;
+        }
+
+        this.trigger('close', { originalEvent : evt });
+      };
+
+      /**
+       * Helper method to abstract the "enabled" (not "disabled") state of this
+       * object.
+       *
+       * @return {true} if the instance is not disabled.
+       * @return {false} if the instance is disabled.
+       */
+      Select2.prototype.isEnabled = function () {
+        return !this.isDisabled();
+      };
+
+      /**
+       * Helper method to abstract the "disabled" state of this object.
+       *
+       * @return {true} if the disabled option is true.
+       * @return {false} if the disabled option is false.
+       */
+      Select2.prototype.isDisabled = function () {
+        return this.options.get('disabled');
+      };
+
+      Select2.prototype.isOpen = function () {
+        return this.$container.hasClass('select2-container--open');
+      };
+
+      Select2.prototype.hasFocus = function () {
+        return this.$container.hasClass('select2-container--focus');
+      };
+
+      Select2.prototype.focus = function (data) {
+        // No need to re-trigger focus events if we are already focused
+        if (this.hasFocus()) {
+          return;
+        }
+
+        this.$container.addClass('select2-container--focus');
+        this.trigger('focus', {});
+      };
+
+      Select2.prototype.enable = function (args) {
+        if (this.options.get('debug') && window.console && console.warn) {
+          console.warn(
+            'Select2: The `select2("enable")` method has been deprecated and will' +
+            ' be removed in later Select2 versions. Use $element.prop("disabled")' +
+            ' instead.'
+          );
+        }
+
+        if (args == null || args.length === 0) {
+          args = [true];
+        }
+
+        var disabled = !args[0];
+
+        this.$element.prop('disabled', disabled);
+      };
+
+      Select2.prototype.data = function () {
+        if (this.options.get('debug') &&
+            arguments.length > 0 && window.console && console.warn) {
+          console.warn(
+            'Select2: Data can no longer be set using `select2("data")`. You ' +
+            'should consider setting the value instead using `$element.val()`.'
+          );
+        }
+
+        var data = [];
+
+        this.dataAdapter.current(function (currentData) {
+          data = currentData;
+        });
+
+        return data;
+      };
+
+      Select2.prototype.val = function (args) {
+        if (this.options.get('debug') && window.console && console.warn) {
+          console.warn(
+            'Select2: The `select2("val")` method has been deprecated and will be' +
+            ' removed in later Select2 versions. Use $element.val() instead.'
+          );
+        }
+
+        if (args == null || args.length === 0) {
+          return this.$element.val();
+        }
+
+        var newVal = args[0];
+
+        if ($.isArray(newVal)) {
+          newVal = $.map(newVal, function (obj) {
+            return obj.toString();
+          });
+        }
+
+        this.$element.val(newVal).trigger('input').trigger('change');
+      };
+
+      Select2.prototype.destroy = function () {
+        this.$container.remove();
+
+        if (this.$element[0].detachEvent) {
+          this.$element[0].detachEvent('onpropertychange', this._syncA);
+        }
+
+        if (this._observer != null) {
+          this._observer.disconnect();
+          this._observer = null;
+        } else if (this.$element[0].removeEventListener) {
+          this.$element[0]
+            .removeEventListener('DOMAttrModified', this._syncA, false);
+          this.$element[0]
+            .removeEventListener('DOMNodeInserted', this._syncS, false);
+          this.$element[0]
+            .removeEventListener('DOMNodeRemoved', this._syncS, false);
+        }
+
+        this._syncA = null;
+        this._syncS = null;
+
+        this.$element.off('.select2');
+        this.$element.attr('tabindex',
+        Utils.GetData(this.$element[0], 'old-tabindex'));
+
+        this.$element.removeClass('select2-hidden-accessible');
+        this.$element.attr('aria-hidden', 'false');
+        Utils.RemoveData(this.$element[0]);
+        this.$element.removeData('select2');
+
+        this.dataAdapter.destroy();
+        this.selection.destroy();
+        this.dropdown.destroy();
+        this.results.destroy();
+
+        this.dataAdapter = null;
+        this.selection = null;
+        this.dropdown = null;
+        this.results = null;
+      };
+
+      Select2.prototype.render = function () {
+        var $container = $(
+          '<span class="select2 select2-container">' +
+            '<span class="selection"></span>' +
+            '<span class="dropdown-wrapper" aria-hidden="true"></span>' +
+          '</span>'
+        );
+
+        $container.attr('dir', this.options.get('dir'));
+
+        this.$container = $container;
+
+        this.$container.addClass('select2-container--' + this.options.get('theme'));
+
+        Utils.StoreData($container[0], 'element', this.$element);
+
+        return $container;
+      };
+
+      return Select2;
+    });
+
+    S2.define('jquery-mousewheel',[
+      'jquery'
+    ], function ($) {
+      // Used to shim jQuery.mousewheel for non-full builds.
+      return $;
+    });
+
+    S2.define('jquery.select2',[
+      'jquery',
+      'jquery-mousewheel',
+
+      './select2/core',
+      './select2/defaults',
+      './select2/utils'
+    ], function ($, _, Select2, Defaults, Utils) {
+      if ($.fn.select2 == null) {
+        // All methods that should return the element
+        var thisMethods = ['open', 'close', 'destroy'];
+
+        $.fn.select2 = function (options) {
+          options = options || {};
+
+          if (typeof options === 'object') {
+            this.each(function () {
+              var instanceOptions = $.extend(true, {}, options);
+
+              new Select2($(this), instanceOptions);
+            });
+
+            return this;
+          } else if (typeof options === 'string') {
+            var ret;
+            var args = Array.prototype.slice.call(arguments, 1);
+
+            this.each(function () {
+              var instance = Utils.GetData(this, 'select2');
+
+              if (instance == null && window.console && console.error) {
+                console.error(
+                  'The select2(\'' + options + '\') method was called on an ' +
+                  'element that is not using Select2.'
+                );
+              }
+
+              ret = instance[options].apply(instance, args);
+            });
+
+            // Check if we should be returning `this`
+            if ($.inArray(options, thisMethods) > -1) {
+              return this;
+            }
+
+            return ret;
+          } else {
+            throw new Error('Invalid arguments for Select2: ' + options);
+          }
+        };
+      }
+
+      if ($.fn.select2.defaults == null) {
+        $.fn.select2.defaults = Defaults;
+      }
+
+      return Select2;
+    });
+
+      // Return the AMD loader configuration so it can be used outside of this file
+      return {
+        define: S2.define,
+        require: S2.require
+      };
+    }());
+
+      // Autoload the jQuery bindings
+      // We know that all of the modules exist above this, so we're safe
+      var select2 = S2.require('jquery.select2');
+
+      // Hold the AMD module references on the jQuery function that was just loaded
+      // This allows Select2 to use the internal loader outside of this file, such
+      // as in the language files.
+      jQuery.fn.select2.amd = S2;
+
+      // Return the Select2 instance for anyone who is importing it.
+      return select2;
+    }));
 
     const doc = new SongDocument();
     const editor = new SongEditor(doc);

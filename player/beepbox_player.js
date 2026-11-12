@@ -215,12 +215,12 @@ var beepbox = (function (exports) {
                 sampleLoadingState.statusTable[chipWaveIndex] = 0;
                 sampleLoadingState.urlTable[chipWaveIndex] = "legacySamples";
             }
-            loadScript("samples.js")
-                .then(() => loadScript("samples2.js"))
-                .then(() => loadScript("samples3.js"))
-                .then(() => loadScript("drumsamples.js"))
-                .then(() => loadScript("wario_samples.js"))
-                .then(() => loadScript("kirby_samples.js"))
+            loadScript(`${location.pathname.includes("player") ? "." : ""}./samples/samples.js`)
+                .then(() => loadScript(`${location.pathname.includes("player") ? "." : ""}./samples/samples2.js`))
+                .then(() => loadScript(`${location.pathname.includes("player") ? "." : ""}./samples/samples3.js`))
+                .then(() => loadScript(`${location.pathname.includes("player") ? "." : ""}./samples/drumsamples.js`))
+                .then(() => loadScript(`${location.pathname.includes("player") ? "." : ""}./samples/wario_samples.js`))
+                .then(() => loadScript(`${location.pathname.includes("player") ? "." : ""}./samples/kirby_samples.js`))
                 .then(() => {
                 const chipWaveSamples = [
                     centerWave(kicksample),
@@ -330,7 +330,7 @@ var beepbox = (function (exports) {
                 sampleLoadingState.statusTable[chipWaveIndex] = 0;
                 sampleLoadingState.urlTable[chipWaveIndex] = "nintariboxSamples";
             }
-            loadScript("nintaribox_samples.js")
+            loadScript(`${location.pathname.includes("player") ? "." : ""}./samples/nintaribox_samples.js`)
                 .then(() => {
                 const chipWaveSamples = [
                     centerWave(chronoperc1finalsample),
@@ -381,7 +381,7 @@ var beepbox = (function (exports) {
                 sampleLoadingState.statusTable[chipWaveIndex] = 0;
                 sampleLoadingState.urlTable[chipWaveIndex] = "marioPaintboxSamples";
             }
-            loadScript("mario_paintbox_samples.js")
+            loadScript(`${location.pathname.includes("player") ? "." : ""}./samples/mario_paintbox_samples.js`)
                 .then(() => {
                 const chipWaveSamples = [
                     centerWave(catpaintboxsample),
@@ -422,6 +422,7 @@ var beepbox = (function (exports) {
     Config.releaseVal = 0.25;
     Config.willReloadForCustomSamples = false;
     Config.jsonFormat = "AbyssBox";
+    Config.maxEffectCount = 17;
     Config.scales = toNameMap([
         { name: "Free", realName: "chromatic", flags: [true, true, true, true, true, true, true, true, true, true, true, true] },
         { name: "Major", realName: "ionian", flags: [true, false, true, false, true, true, false, true, false, true, false, true] },
@@ -477,6 +478,8 @@ var beepbox = (function (exports) {
     Config.reverbShelfHz = 8000.0;
     Config.reverbShelfGain = Math.pow(2.0, -1.5);
     Config.reverbRange = 32;
+    Config.reverbWetRange = 32;
+    Config.reverbDryRange = 32;
     Config.reverbDelayBufferSize = 16384;
     Config.reverbDelayBufferMask = Config.reverbDelayBufferSize - 1;
     Config.phaserMixRange = 32;
@@ -727,7 +730,7 @@ var beepbox = (function (exports) {
         { name: "arpeggio", customInterval: false, arpeggiates: true, strumParts: 0, singleTone: true },
         { name: "custom interval", customInterval: true, arpeggiates: false, strumParts: 0, singleTone: true },
     ]);
-    Config.maxChordSize = 9;
+    Config.maxChordSize = 97;
     Config.operatorCount = 4;
     Config.maxPitchOrOperatorCount = Math.max(Config.maxChordSize, Config.operatorCount + 2);
     Config.algorithms = toNameMap([
@@ -1111,8 +1114,10 @@ var beepbox = (function (exports) {
         { name: "chorus", computeIndex: 55, displayName: "chorus", interleave: false, isFilter: false, maxCount: 1, effect: 1, compatibleInstruments: null },
         { name: "echoSustain", computeIndex: 56, displayName: "echo sustain", interleave: false, isFilter: false, maxCount: 1, effect: 6, compatibleInstruments: null },
         { name: "reverb", computeIndex: 57, displayName: "reverb", interleave: false, isFilter: false, maxCount: 1, effect: 0, compatibleInstruments: null },
-        { name: "panning", computeIndex: 58, displayName: "panning", interleave: false, isFilter: false, maxCount: 1, effect: 2, compatibleInstruments: null },
-        { name: "arpeggioSpeed", computeIndex: 59, displayName: "arpeggio speed", interleave: false, isFilter: false, maxCount: 1, effect: 11, compatibleInstruments: null },
+        { name: "reverbWet", computeIndex: 58, displayName: "reverb wet mix", interleave: false, isFilter: false, maxCount: 1, effect: 0, compatibleInstruments: null },
+        { name: "reverbDry", computeIndex: 59, displayName: "reverb dry mix", interleave: false, isFilter: false, maxCount: 1, effect: 0, compatibleInstruments: null },
+        { name: "panning", computeIndex: 60, displayName: "panning", interleave: false, isFilter: false, maxCount: 1, effect: 2, compatibleInstruments: null },
+        { name: "arpeggioSpeed", computeIndex: 61, displayName: "arpeggio speed", interleave: false, isFilter: false, maxCount: 1, effect: 11, compatibleInstruments: null },
         { name: "granular", computeIndex: 48, displayName: "granular", interleave: false, isFilter: false, maxCount: 1, effect: 16, compatibleInstruments: null },
         { name: "grainFreq", computeIndex: 49, displayName: "grain freq", interleave: false, isFilter: false, maxCount: 1, effect: 16, compatibleInstruments: null },
         { name: "grainSize", computeIndex: 50, displayName: "grain size", interleave: false, isFilter: false, maxCount: 1, effect: 16, compatibleInstruments: null },
@@ -1427,7 +1432,7 @@ var beepbox = (function (exports) {
             promptDesc: ["This setting controls the number of phaser stages in your insturment, just like the phaser stages slider.", "At $LO, your instrument will have no phaser stages. At $HI, it will be at maximum.", "[OVERWRITING] [$LO - $HI]"] },
         { name: "song pitch shift",
             pianoName: "Song Pitch Shift",
-            maxRawVol: (Config.pitchShiftRange * 2) - 2, newNoteVol: Config.pitchShiftRange, forSong: true, convertRealFactor: -Config.pitchShiftRange + 1, associatedEffect: 7,
+            maxRawVol: (Config.pitchShiftRange * 2) - 2, newNoteVol: Config.pitchShiftRange - 1, forSong: true, convertRealFactor: -Config.pitchShiftRange + 1, associatedEffect: 7,
             promptName: "Songwide Pitch Shift",
             promptDesc: ["This setting controls the pitch offset of all instruments regardless of whether or not the instrument has the effect itself, just like the pitch shift slider.", "At $MID your instrument will have no pitch shift. This increases as you decrease toward $LO pitches (half-steps) at the low end, or increases towards +$HI pitches at the high end.", "[ADDITIVE] [$LO - $HI] [pitch]"] },
         { name: "individual envelope speed",
@@ -1459,6 +1464,21 @@ var beepbox = (function (exports) {
             maxRawVol: Config.grainRangeMax / Config.grainSizeStep, newNoteVol: 0, forSong: false, convertRealFactor: 0, associatedEffect: 16,
             promptName: "Grain Range",
             promptDesc: ["This setting controls the range of values for your grain size of the granular effect in your instrument, from no variation to a lot", "The number shown in the mod channel is multiplied by " + Config.grainSizeStep + " to get the actual grain size.", "[OVERWRITING] [$LO - $HI]"] },
+        { name: "song eq",
+            pianoName: "Song EQ",
+            maxRawVol: 10, newNoteVol: 0, forSong: true, convertRealFactor: 0, associatedEffect: 17,
+            promptName: "Song EQ Filter",
+            promptDesc: ["This setting overwrites every instrument's eq filter. You can do this in a few separate ways, similar to the per instrument eq filter modulator.", "When the option 'morph' is selected, your modulator values will indicate a sub-filter index of your EQ filter to 'morph' to over time. For example, a change from 0 to 1 means your main filter (default) will morph to sub-filter 1 over the specified duration. You can shape the main filter and sub-filters in the large filter editor ('+' button). If your two filters' number, type, and order of filter dots all match up, the morph will happen smoothly and you'll be able to hear them changing. If they do not match up, the filters will simply jump between each other.", "Note that filters will morph based on endpoints in the pattern editor. So, if you specify a morph from sub-filter 1 to 4 but do not specifically drag in new endpoints for 2 and 3, it will morph directly between 1 and 4 without going through the others.", "If you target Dot X or Dot Y, you can finely tune the coordinates of a single dot for your filter. The number of available dots to choose is dependent on your main filter's dot count.", "[OVERWRITING] [$LO - $HI]"] },
+        { name: "reverb wet",
+            pianoName: "Reverb Wet Volume",
+            maxRawVol: Config.reverbWetRange, newNoteVol: 0, forSong: false, convertRealFactor: 0, associatedEffect: 0,
+            promptName: "Reverb Wet Volume",
+            promptDesc: ["This setting controls the volume of the wet samples in your reverb, just like the reverb (Wet) slider.", "At $LO, your instrument will have no wetness. At $HI, it will be at maximum.", "[OVERWRITING] [$LO - $HI]"] },
+        { name: "reverb dry",
+            pianoName: "Reverb Dry Volume",
+            maxRawVol: Config.reverbDryRange, newNoteVol: 0, forSong: false, convertRealFactor: 0, associatedEffect: 0,
+            promptName: "Reverb Dry Volume",
+            promptDesc: ["This setting controls the volume of the dry samples in your reverb, just like the reverb (Dry) slider.", "At $LO, your instrument will have no wetness. At $HI, it will be at maximum.", "[OVERWRITING] [$LO - $HI]"] },
     ]);
     function centerWave(wave) {
         let sum = 0.0;
@@ -2541,8 +2561,8 @@ var beepbox = (function (exports) {
 		--file-page-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-file.png");
 		--edit-pencil-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-edit.png");
 		--preferences-gear-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-preferences.png");
-		--instrument-copy-symbol: url("./image_assets/icon-copy.png");
-		--instrument-paste-symbol: url("./image_assets/icon-paste.png");
+		--instrument-copy-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-copy.png");
+		--instrument-paste-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-paste.png");
 		--play-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-play.png");
 		--pause-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-pause.png");
 		--record-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-record.png");
@@ -2557,28 +2577,28 @@ var beepbox = (function (exports) {
 		--export-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-export.png");
 		--export-instrument-symbol: var(--export-symbol);
 		--import-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-import.png");
-		--undo-symbol: url("./image_assets/icon-undo.png");
-		--redo-symbol: url("./image_assets/icon-redo.png");
-		--copy-symbol: url("./image_assets/icon-copy.png");
-		--paste-symbol: url("./image_assets/icon-paste.png");
-		--insert-channel-symbol: url("./image_assets/icon-insertChannel.png");
-		--delete-channel-symbol: url("./image_assets/icon-deleteChannel.png");
-		--select-all-symbol: url("./image_assets/icon-SelectAll.png");
-		--duplicate-symbol: url("./image_assets/icon-duplicate.png");
-		--notes-up-symbol: url("./image_assets/moveNotesUp.png");
-		--notes-down-symbol: url("./image_assets/moveNotesDown.png");
-		--loop-bar-symbol: url("./image_assets/icon-singleBarLoop.png");
-		--fullscreen-symbol: url("./image_assets/icon-fullscreen.png");
-	--loop-within-bar-symbol: url("./image_assets/icon-loop-bar.png");
-	--loop-full-song-symbol: url("./image_assets/icon-loop-song.png");
-	--dont-loop-symbol: url("./image_assets/icon-loop-once.png");
+		--undo-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-undo.png");
+		--redo-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-redo.png");
+		--copy-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-copy.png");
+		--paste-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-paste.png");
+		--insert-channel-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-insertChannel.png");
+		--delete-channel-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-deleteChannel.png");
+		--select-all-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-SelectAll.png");
+		--duplicate-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-duplicate.png");
+		--notes-up-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/moveNotesUp.png");
+		--notes-down-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/moveNotesDown.png");
+		--loop-bar-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-singleBarLoop.png");
+		--fullscreen-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-fullscreen.png");
+	--loop-within-bar-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-bar.png");
+	--loop-full-song-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-song.png");
+	--dont-loop-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-once.png");
 		}
 		
 			
 
 			/* sets background image */
 			body {
-			background-image: url("./image_assets/stripesbg.gif") !important;
+			background-image: url("${location.pathname.includes("player") ? "." : ""}./image_assets/stripesbg.gif") !important;
 			background-position: center;
 			background-repeat: repeat;
 
@@ -2594,7 +2614,7 @@ var beepbox = (function (exports) {
 			} */
 
 			#text-content {
-    				border-image-source: url("./image_assets/abyssbox_border.png");
+    				border-image-source: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_border.png");
     				border-image-slice: 4 fill; 
    				border-image-width: 8px; 
 				border-image-repeat: stretch; 
@@ -2607,7 +2627,7 @@ var beepbox = (function (exports) {
     				image-rendering: optimizeSpeed !important;             /* IE */
 				}
 			#beepboxEditorContainer {
-    				border-image-source: url("./image_assets/abyssbox_border.png");
+    				border-image-source: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_border.png");
     				border-image-slice: 4 fill; 
    				border-image-width: 8px; 
 				border-image-repeat: stretch;
@@ -2639,7 +2659,7 @@ var beepbox = (function (exports) {
 			button.importInstrumentButton, 
 			.beepboxEditor select, 
 			.beepboxEditor .select2-selection__rendered {
-    				border-image-source: url("./image_assets/abyssbox_border.png") !important;
+    				border-image-source: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_border.png") !important;
     				border-image-slice: 4 fill !important; 
    				border-image-width: 4px !important; 
 				border-image-repeat: stretch !important;
@@ -2651,7 +2671,7 @@ var beepbox = (function (exports) {
     				image-rendering: pixelated !important;                 /* Future browsers */
     				image-rendering: optimizeSpeed !important;             /* IE */
 
-					cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+					cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 				}
 
 			div.selectRow button:not(.copyButton,.pasteButton,.exportInstrumentButton,.importInstrumentButton) {
@@ -2671,7 +2691,7 @@ var beepbox = (function (exports) {
 			@font-face {
 		   font-family: "AbyssType_small";
 		   src:
- 		   url("./image_assets/abysstype_small.otf") format("opentype") tech(color-COLRv1),
+ 		   url("${location.pathname.includes("player") ? "." : ""}./image_assets/abysstype_small.otf") format("opentype") tech(color-COLRv1),
 			}
 
 			
@@ -2680,72 +2700,72 @@ var beepbox = (function (exports) {
 
 			.beepboxEditor input[type="range"]::-webkit-slider-thumb
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]::-webkit-slider-runnable-track
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]:focus::-webkit-slider-runnable-track
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]::-ms-thumb
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]::-ms-track
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]:focus::-ms-track
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]::-moz-range-thumb
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]::-moz-range-track
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]:focus::-moz-range-track
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="text"],
 			.beepboxEditor input[type="number"]
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="checkbox"]
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="checkbox"]:checked
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="checkbox"]:checked:after
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 
 			div.selectRow span {
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 
 			`,
@@ -2892,8 +2912,8 @@ var beepbox = (function (exports) {
 		--file-page-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-file.png");
 		--edit-pencil-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-edit.png");
 		--preferences-gear-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-preferences.png");
-		--instrument-copy-symbol: url("./image_assets/icon-copy.png");
-		--instrument-paste-symbol: url("./image_assets/icon-paste.png");
+		--instrument-copy-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-copy.png");
+		--instrument-paste-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-paste.png");
 		--play-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-play.png");
 		--pause-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-pause.png");
 		--record-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-record.png");
@@ -2908,21 +2928,21 @@ var beepbox = (function (exports) {
 		--export-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-export.png");
 		--export-instrument-symbol: var(--export-symbol);
 		--import-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-import.png");
-		--undo-symbol: url("./image_assets/icon-undo.png");
-		--redo-symbol: url("./image_assets/icon-redo.png");
-		--copy-symbol: url("./image_assets/icon-copy.png");
-		--paste-symbol: url("./image_assets/icon-paste.png");
-		--insert-channel-symbol: url("./image_assets/icon-insertChannel.png");
-		--delete-channel-symbol: url("./image_assets/icon-deleteChannel.png");
-		--select-all-symbol: url("./image_assets/icon-SelectAll.png");
-		--duplicate-symbol: url("./image_assets/icon-duplicate.png");
-		--notes-up-symbol: url("./image_assets/moveNotesUp.png");
-		--notes-down-symbol: url("./image_assets/moveNotesDown.png");
-		--loop-bar-symbol: url("./image_assets/icon-singleBarLoop.png");
-		--fullscreen-symbol: url("./image_assets/icon-fullscreen.png");
-		--loop-within-bar-symbol: url("./image_assets/icon-loop-bar.png");
-	--loop-full-song-symbol: url("./image_assets/icon-loop-song.png");
-	--dont-loop-symbol: url("./image_assets/icon-loop-once.png");
+		--undo-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-undo.png");
+		--redo-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-redo.png");
+		--copy-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-copy.png");
+		--paste-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-paste.png");
+		--insert-channel-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-insertChannel.png");
+		--delete-channel-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-deleteChannel.png");
+		--select-all-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-SelectAll.png");
+		--duplicate-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-duplicate.png");
+		--notes-up-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/moveNotesUp.png");
+		--notes-down-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/moveNotesDown.png");
+		--loop-bar-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-singleBarLoop.png");
+		--fullscreen-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-fullscreen.png");
+		--loop-within-bar-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-bar.png");
+	--loop-full-song-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-song.png");
+	--dont-loop-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-once.png");
 		}
 		
 			
@@ -2932,7 +2952,7 @@ var beepbox = (function (exports) {
 			@font-face {
 		   font-family: "AbyssType_small";
 		   src:
- 		   url("./image_assets/abysstype_small.otf") format("opentype") tech(color-COLRv1),
+ 		   url("${location.pathname.includes("player") ? "." : ""}./image_assets/abysstype_small.otf") format("opentype") tech(color-COLRv1),
 			}
 
 			.beepboxEditor button,
@@ -3007,72 +3027,72 @@ var beepbox = (function (exports) {
 
 			.beepboxEditor input[type="range"]::-webkit-slider-thumb
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]::-webkit-slider-runnable-track
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]:focus::-webkit-slider-runnable-track
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]::-ms-thumb
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]::-ms-track
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]:focus::-ms-track
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]::-moz-range-thumb
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]::-moz-range-track
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]:focus::-moz-range-track
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="text"],
 			.beepboxEditor input[type="number"]
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="checkbox"]
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="checkbox"]:checked
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="checkbox"]:checked:after
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 
 			div.selectRow span {
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 
 			`,
@@ -3219,7 +3239,7 @@ var beepbox = (function (exports) {
 
 				/* sets background image */
 				body {
-				background-image: url("./image_assets/stripesbg_light.gif") !important;
+				background-image: url("${location.pathname.includes("player") ? "." : ""}./image_assets/stripesbg_light.gif") !important;
 				background-position: center;
 				background-repeat: repeat;
 	
@@ -3230,7 +3250,7 @@ var beepbox = (function (exports) {
 				image-rendering: optimizeSpeed !important;             /* IE */
 					}		
 			#text-content {
-    				border-image-source: url("./image_assets/abyssbox_border_light.png");
+    				border-image-source: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_border_light.png");
     				border-image-slice: 4 fill; 
    				border-image-width: 8px; 
 				border-image-repeat: stretch; 
@@ -3243,7 +3263,7 @@ var beepbox = (function (exports) {
     				image-rendering: optimizeSpeed !important;             /* IE */
 				}
 			#beepboxEditorContainer {
-    				border-image-source: url("./image_assets/abyssbox_border_light.png");
+    				border-image-source: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_border_light.png");
     				border-image-slice: 4 fill; 
    				border-image-width: 8px; 
 				border-image-repeat: stretch;
@@ -3275,7 +3295,7 @@ var beepbox = (function (exports) {
 				button.importInstrumentButton, 
 				.beepboxEditor select, 
 				.beepboxEditor .select2-selection__rendered {
-						border-image-source: url("./image_assets/abyssbox_border_light.png") !important;
+						border-image-source: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_border_light.png") !important;
 						border-image-slice: 4 fill !important; 
 					   border-image-width: 4px !important; 
 					border-image-repeat: stretch !important;
@@ -3287,7 +3307,7 @@ var beepbox = (function (exports) {
 						image-rendering: pixelated !important;                 /* Future browsers */
 						image-rendering: optimizeSpeed !important;             /* IE */
 	
-						cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+						cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 					}
 	
 				div.selectRow button:not(.copyButton,.pasteButton,.exportInstrumentButton,.importInstrumentButton) {
@@ -3305,8 +3325,8 @@ var beepbox = (function (exports) {
 		--file-page-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-file.png");
 		--edit-pencil-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-edit.png");
 		--preferences-gear-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-preferences.png");
-		--instrument-copy-symbol: url("./image_assets/icon-copy.png");
-		--instrument-paste-symbol: url("./image_assets/icon-paste.png");
+		--instrument-copy-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-copy.png");
+		--instrument-paste-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-paste.png");
 		--play-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-play.png");
 		--pause-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-pause.png");
 		--record-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-record.png");
@@ -3321,21 +3341,21 @@ var beepbox = (function (exports) {
 		--export-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-export.png");
 		--export-instrument-symbol: var(--export-symbol);
 		--import-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-import.png");
-		--undo-symbol: url("./image_assets/icon-undo.png");
-		--redo-symbol: url("./image_assets/icon-redo.png");
-		--copy-symbol: url("./image_assets/icon-copy.png");
-		--paste-symbol: url("./image_assets/icon-paste.png");
-		--insert-channel-symbol: url("./image_assets/icon-insertChannel.png");
-		--delete-channel-symbol: url("./image_assets/icon-deleteChannel.png");
-		--select-all-symbol: url("./image_assets/icon-SelectAll.png");
-		--duplicate-symbol: url("./image_assets/icon-duplicate.png");
-		--notes-up-symbol: url("./image_assets/moveNotesUp.png");
-		--notes-down-symbol: url("./image_assets/moveNotesDown.png");
-		--loop-bar-symbol: url("./image_assets/icon-singleBarLoop.png");
-		--fullscreen-symbol: url("./image_assets/icon-fullscreen.png");
-		--loop-within-bar-symbol: url("./image_assets/icon-loop-bar.png");
-	--loop-full-song-symbol: url("./image_assets/icon-loop-song.png");
-	--dont-loop-symbol: url("./image_assets/icon-loop-once.png");
+		--undo-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-undo.png");
+		--redo-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-redo.png");
+		--copy-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-copy.png");
+		--paste-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-paste.png");
+		--insert-channel-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-insertChannel.png");
+		--delete-channel-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-deleteChannel.png");
+		--select-all-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-SelectAll.png");
+		--duplicate-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-duplicate.png");
+		--notes-up-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/moveNotesUp.png");
+		--notes-down-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/moveNotesDown.png");
+		--loop-bar-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-singleBarLoop.png");
+		--fullscreen-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-fullscreen.png");
+		--loop-within-bar-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-bar.png");
+	--loop-full-song-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-song.png");
+	--dont-loop-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-once.png");
 		}
 		
 			
@@ -3345,7 +3365,7 @@ var beepbox = (function (exports) {
 			@font-face {
 		   font-family: "AbyssType_small";
 		   src:
- 		   url("./image_assets/abysstype_small.otf") format("opentype") tech(color-COLRv1),
+ 		   url("${location.pathname.includes("player") ? "." : ""}./image_assets/abysstype_small.otf") format("opentype") tech(color-COLRv1),
 			}
 
 			button.envelopeDropdown, div.selectRow button:not(.copyButton,.pasteButton,.exportInstrumentButton,.importInstrumentButton) {
@@ -3360,72 +3380,72 @@ var beepbox = (function (exports) {
 
 			.beepboxEditor input[type="range"]::-webkit-slider-thumb
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]::-webkit-slider-runnable-track
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]:focus::-webkit-slider-runnable-track
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]::-ms-thumb
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]::-ms-track
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]:focus::-ms-track
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]::-moz-range-thumb
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]::-moz-range-track
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]:focus::-moz-range-track
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="text"],
 			.beepboxEditor input[type="number"]
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="checkbox"]
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="checkbox"]:checked
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="checkbox"]:checked:after
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 
 			div.selectRow span {
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 
 			`,
@@ -3558,6 +3578,428 @@ var beepbox = (function (exports) {
 			--note-flash: #ffffff;
 			--note-flash-secondary: #ffffff77;
 			--empty-sample-bar: #260b1b;
+				}
+			`,
+        "AbyssBox Comp simple": `
+			:root { 		
+			--page-margin: #000000; 		
+			--editor-background: #000000; 		
+			--hover-preview: white; 		
+			--playhead: rgba(255, 255, 255, 0.9); 		
+			--primary-text: white; 		
+			--secondary-text: #ffcedd; 		
+			--inverted-text: black;	 		
+			--text-selection: rgba(119,68,255,0.99); 		
+			--box-selection-fill: #bf2c5d; 		
+			--loop-accent: #873a51; 		
+			--link-accent: #df88ff; 		
+			--ui-widget-background: #581b3e; 		
+			--ui-widget-focus: #000000; 		
+			--pitch-background: #240f15; 		
+			--tonic: #a34b65; 		
+			--fifth-note: #75001e; 	
+			--third-note: #75002c;		
+			--white-piano-key: #cca5c7; 		
+			--black-piano-key: #402f2f;
+			--white-piano-key-text: #131200;		
+			--black-piano-key-text: #fff;		 		
+			--use-color-formula: true; 		
+			--track-editor-bg-pitch: #571c40; 		
+			--track-editor-bg-pitch-dim: #290d0d; 		
+			--track-editor-bg-noise: #571131; 		
+			--track-editor-bg-noise-dim: #330a28; 		
+			--track-editor-bg-mod: #54083c; 		
+			--track-editor-bg-mod-dim: #360426; 		
+			--multiplicative-mod-slider: #9f6082; 		
+			--overwriting-mod-slider: #9e3470; 		
+			--indicator-primary: #b3498f; 		
+			--indicator-secondary: #541d40; 		
+			--select2-opt-group: #4f191e; 		
+			--input-box-outline: #18041a; 		
+			--mute-button-normal: #dd5d94;	 		
+			--mute-button-mod: #ba364c; 		
+			--mod-label-primary: #541625; 		
+			--mod-label-secondary-text: rgb(120, 87, 86); 
+			--mod-label-primary-text: gray; 
+			--mod-title: #bf2c5d;
+			--progress-bar: #bf2c5d;
+			--empty-sample-bar: #0d0d0d;
+
+			--pitch-secondary-channel-hue: -80; 		
+			--pitch-secondary-channel-hue-scale: 0; 		
+			--pitch-secondary-channel-sat: 43; 		
+			--pitch-secondary-channel-sat-scale: 0.1; 		
+			--pitch-secondary-channel-lum: 40; 		
+			--pitch-secondary-channel-lum-scale: 0.05; 
+		
+			--pitch-primary-channel-hue: -53; 		
+			--pitch-primary-channel-hue-scale: 6.1; 		
+			--pitch-primary-channel-sat: 75; 		
+			--pitch-primary-channel-sat-scale: 0.1; 		
+			--pitch-primary-channel-lum: 67.5; 		
+			--pitch-primary-channel-lum-scale: 0.05; 	
+	
+			--pitch-secondary-note-hue: -34; 		
+			--pitch-secondary-note-hue-scale: 6.1; 		
+			--pitch-secondary-note-sat: 93.9; 		
+			--pitch-secondary-note-sat-scale: 0.1; 		
+			--pitch-secondary-note-lum: 25; 		
+			--pitch-secondary-note-lum-scale: 0.05; 
+		
+			--pitch-primary-note-hue: -53; 		
+			--pitch-primary-note-hue-scale: 6.1; 		
+			--pitch-primary-note-sat: 100; 		
+			--pitch-primary-note-sat-scale: 0.05; 		
+			--pitch-primary-note-lum: 85.6; 		
+			--pitch-primary-note-lum-scale: 0.025; 
+		
+			--noise-secondary-channel-hue: 0; 		
+			--noise-secondary-channel-hue-scale: 2; 		
+			--noise-secondary-channel-sat: 65; 		
+			--noise-secondary-channel-sat-scale: 0; 		
+			--noise-secondary-channel-lum: 42; 		
+			--noise-secondary-channel-lum-scale: 0; 
+		
+			--noise-primary-channel-hue: 0; 		
+			--noise-primary-channel-hue-scale: 1; 		
+			--noise-primary-channel-sat: 100; 		
+			--noise-primary-channel-sat-scale: 1; 		
+			--noise-primary-channel-lum: 63.5; 		
+			--noise-primary-channel-lum-scale: 0; 
+		
+			--noise-secondary-note-hue: 24; 		
+			--noise-secondary-note-hue-scale: 2; 		
+			--noise-secondary-note-sat: 100; 		
+			--noise-secondary-note-sat-scale: 0; 		
+			--noise-secondary-note-lum: 35; 		
+			--noise-secondary-note-lum-scale: 0; 	
+	
+			--noise-primary-note-hue: 24; 		
+			--noise-primary-note-hue-scale: 2; 		
+			--noise-primary-note-sat: 100; 		
+			--noise-primary-note-sat-scale: 1; 		
+			--noise-primary-note-lum: 60; 		
+			--noise-primary-note-lum-scale: 1; 	
+	
+			--mod-secondary-channel-hue: 55; 		
+			--mod-secondary-channel-hue-scale: 1.5; 		
+			--mod-secondary-channel-sat: 100; 		
+			--mod-secondary-channel-sat-scale: 0; 		
+			--mod-secondary-channel-lum: 20; 		
+			--mod-secondary-channel-lum-scale: 0; 
+		
+			--mod-primary-channel-hue: 55; 		
+			--mod-primary-channel-hue-scale: 1.5; 		
+			--mod-primary-channel-sat: 96; 		
+			--mod-primary-channel-sat-scale: 0; 		
+			--mod-primary-channel-lum: 50; 		
+			--mod-primary-channel-lum-scale: 0; 
+		
+			--mod-secondary-note-hue: 55; 		
+			--mod-secondary-note-hue-scale: 1.5; 		
+			--mod-secondary-note-sat: 92; 		
+			--mod-secondary-note-sat-scale: 0; 		
+			--mod-secondary-note-lum: 45; 		
+			--mod-secondary-note-lum-scale: 0; 
+		
+			--mod-primary-note-hue: 55; 		
+			--mod-primary-note-hue-scale: 1.5; 		
+			--mod-primary-note-sat: 96; 		
+			--mod-primary-note-sat-scale: 0; 		
+			--mod-primary-note-lum: 85; 		
+			--mod-primary-note-lum-scale: 0; 
+
+			--note-flash: #ffffff;
+			--note-flash-secondary: #ffffff77;
+
+			--oscilloscope-line-R: var(--ui-widget-background);
+			--oscilloscope-line-L: var(--secondary-text);
+
+			--scrollbar-color: #bf2c5d;
+				}		
+			`,
+        "AbyssBox Light simple": `
+			:root { 		
+			--page-margin: #e0adbc; 		
+			--editor-background: #e0adbc; 		
+			--hover-preview: white; 		
+			--playhead: rgba(255, 255, 255, 0.9); 		
+			--primary-text: #6110d9; 		
+			--secondary-text: #cc1338;		
+			--inverted-text:  #e8bcc9;	 		
+			--text-selection: rgba(119,68,255,0.99); 		
+			--box-selection-fill: #bf2c5d; 		
+			--loop-accent: #8c346a; 		
+			--link-accent: #8c346a; 		
+			--ui-widget-background: #eec8de;		
+			--ui-widget-focus: #eec8de; 		
+			--pitch-background: #eddadf; 		
+			--tonic: #f5f0f1; 		
+			--fifth-note: #ffb5c9; 	
+			--third-note: #ffa6f0;		
+			--white-piano-key: #cca5c7; 		
+			--black-piano-key: #402f2f;
+			--white-piano-key-text: #131200;		
+			--black-piano-key-text: #fff;	 		
+			--use-color-formula: true; 		
+			--track-editor-bg-pitch: #edbecc;	
+			--track-editor-bg-pitch-dim: #e0adbc; 		
+			--track-editor-bg-noise: #edbecc;		
+			--track-editor-bg-noise-dim: #e0adbc;		
+			--track-editor-bg-mod: #edbecc; 		
+			--track-editor-bg-mod-dim: #e0adbc;		
+			--multiplicative-mod-slider: #9f6082; 		
+			--overwriting-mod-slider: #9e3470; 		
+			--indicator-primary: #b3498f; 		
+			--indicator-secondary: #541d40; 		
+			--select2-opt-group: #4f191e; 		
+			--input-box-outline: #18041a; 		
+			--mute-button-normal: #dd5d94;	 		
+			--mute-button-mod: #ba364c; 		
+			--mod-label-primary: #541625; 		
+			--mod-label-secondary-text: rgb(120, 87, 86); 
+			--mod-label-primary-text: gray; 
+			--mod-title: #cc1338;
+			--progress-bar: #cc1338;
+			--empty-sample-bar: #d9a0b1;
+
+			--pitch-secondary-channel-hue: -80; 		
+			--pitch-secondary-channel-hue-scale: 0; 		
+			--pitch-secondary-channel-sat: 255; 		
+			--pitch-secondary-channel-sat-scale: 0.1; 		
+			--pitch-secondary-channel-lum: 30; 		
+			--pitch-secondary-channel-lum-scale: 0.05; 
+		
+			--pitch-primary-channel-hue: -53; 		
+			--pitch-primary-channel-hue-scale: 6.1; 		
+			--pitch-primary-channel-sat: 255; 		
+			--pitch-primary-channel-sat-scale: 0.1; 		
+			--pitch-primary-channel-lum: 60; 		
+			--pitch-primary-channel-lum-scale: 0.05; 	
+	
+			--pitch-secondary-note-hue: -34; 		
+			--pitch-secondary-note-hue-scale: 6.1; 		
+			--pitch-secondary-note-sat: 255; 		
+			--pitch-secondary-note-sat-scale: 0.1; 		
+			--pitch-secondary-note-lum: 30; 		
+			--pitch-secondary-note-lum-scale: 0.05; 
+		
+			--pitch-primary-note-hue: -53; 		
+			--pitch-primary-note-hue-scale: 6.1; 		
+			--pitch-primary-note-sat: 255; 		
+			--pitch-primary-note-sat-scale: 0.05; 		
+			--pitch-primary-note-lum: 60; 		
+			--pitch-primary-note-lum-scale: 0.025; 
+		
+			--noise-secondary-channel-hue: 0; 		
+			--noise-secondary-channel-hue-scale: 2; 		
+			--noise-secondary-channel-sat: 255; 		
+			--noise-secondary-channel-sat-scale: 0; 		
+			--noise-secondary-channel-lum: 30; 		
+			--noise-secondary-channel-lum-scale: 0; 
+		
+			--noise-primary-channel-hue: 0; 		
+			--noise-primary-channel-hue-scale: 1; 		
+			--noise-primary-channel-sat: 255; 		
+			--noise-primary-channel-sat-scale: 1; 		
+			--noise-primary-channel-lum: 60; 		
+			--noise-primary-channel-lum-scale: 0; 
+		
+			--noise-secondary-note-hue: 24; 		
+			--noise-secondary-note-hue-scale: 2; 		
+			--noise-secondary-note-sat: 255; 		
+			--noise-secondary-note-sat-scale: 0; 		
+			--noise-secondary-note-lum: 30; 		
+			--noise-secondary-note-lum-scale: 0; 	
+	
+			--noise-primary-note-hue: 24; 		
+			--noise-primary-note-hue-scale: 2; 		
+			--noise-primary-note-sat: 255; 		
+			--noise-primary-note-sat-scale: 1; 		
+			--noise-primary-note-lum: 60; 		
+			--noise-primary-note-lum-scale: 1; 	
+	
+			--mod-secondary-channel-hue: 55; 		
+			--mod-secondary-channel-hue-scale: 1.5; 		
+			--mod-secondary-channel-sat: 255; 		
+			--mod-secondary-channel-sat-scale: 0; 		
+			--mod-secondary-channel-lum: 30; 		
+			--mod-secondary-channel-lum-scale: 0; 
+		
+			--mod-primary-channel-hue: 55; 		
+			--mod-primary-channel-hue-scale: 1.5; 		
+			--mod-primary-channel-sat: 255; 		
+			--mod-primary-channel-sat-scale: 0; 		
+			--mod-primary-channel-lum: 60; 		
+			--mod-primary-channel-lum-scale: 0; 
+		
+			--mod-secondary-note-hue: 55; 		
+			--mod-secondary-note-hue-scale: 1.5; 		
+			--mod-secondary-note-sat: 255; 		
+			--mod-secondary-note-sat-scale: 0; 		
+			--mod-secondary-note-lum: 30; 		
+			--mod-secondary-note-lum-scale: 0; 
+		
+			--mod-primary-note-hue: 55; 		
+			--mod-primary-note-hue-scale: 1.5; 		
+			--mod-primary-note-sat: 255; 		
+			--mod-primary-note-sat-scale: 0; 		
+			--mod-primary-note-lum: 60; 		
+			--mod-primary-note-lum-scale: 0; 	
+			--note-flash: #ffffff;
+			--note-flash-secondary: #ffffff77;
+
+			--oscilloscope-line-R: var(--ui-widget-background);
+			--oscilloscope-line-L: var(--secondary-text);
+
+			--scrollbar-color: #bf2c5d;
+			}
+			`,
+        "AbyssBox Piano simple": ` 
+			:root {		
+			--page-margin: #450320; 		
+			--editor-background: #450320; 		
+			--hover-preview: white; 		
+			--playhead: rgba(255, 255, 255, 0.9); 		
+			--primary-text: white; 		
+			--secondary-text: #ffcedd; 		
+			--inverted-text: #450320;	 		
+			--text-selection: rgba(119,68,255,0.99); 		
+			--box-selection-fill: #1e0915; 		
+			--loop-accent: #873a51; 		
+			--link-accent: #df88ff; 		
+			--ui-widget-background: #800d4f; 		
+			--ui-widget-focus: #a01565;
+            --pitch-background: #5e2233;  	
+            --use-piano-scheme: true;	
+            --pitch-black-key: #4d1a28; 				
+            --pitch-white-key: #5e2233; 
+            --tonic: #873a51; 	
+			--white-tonic: #873a51; 	
+            --black-tonic: #68182f;	
+			--white-fifth-note: #911d3b; 	
+            --fifth-note: #911d3b; 
+            --black-fifth-note: #6e001d; 	
+			--white-third-note: #880d3c;	
+            --third-note: #880d3c;	
+            --black-third-note: #660f30; 	
+			--white-piano-key: #cca5c7; 		
+			--black-piano-key: #402f2f;
+			--white-piano-key-text: #131200;		
+			--black-piano-key-text: #fff;		 		
+			--use-color-formula: true; 		
+			--track-editor-bg-pitch: #7b0f52; 		
+			--track-editor-bg-pitch-dim: #560738; 		
+			--track-editor-bg-noise: #7b0f38; 		
+			--track-editor-bg-noise-dim: #5f0b2b; 		
+			--track-editor-bg-mod: #731116; 		
+			--track-editor-bg-mod-dim: #52060a; 		
+			--multiplicative-mod-slider: #9f6082; 		
+			--overwriting-mod-slider: #9e3470; 		
+			--indicator-primary: #b3498f; 		
+			--indicator-secondary: #541d40; 		
+			--select2-opt-group: #4f191e; 		
+			--input-box-outline: #18041a; 		
+			--mute-button-normal: #dd5d94;	 		
+			--mute-button-mod: #ba364c; 		
+			--mod-label-primary: #541625; 		
+			--mod-label-secondary-text: rgb(120, 87, 86); 
+			--mod-label-primary-text: gray; 
+			--mod-title: #bf2c5d;
+			--progress-bar: #bf2c5d;
+			--empty-sample-bar: #38021a;
+
+			--pitch-secondary-channel-hue: -80; 		
+			--pitch-secondary-channel-hue-scale: 0; 		
+			--pitch-secondary-channel-sat: 43; 		
+			--pitch-secondary-channel-sat-scale: 0.1; 		
+			--pitch-secondary-channel-lum: 40; 		
+			--pitch-secondary-channel-lum-scale: 0.05; 
+		
+			--pitch-primary-channel-hue: -53; 		
+			--pitch-primary-channel-hue-scale: 6.1; 		
+			--pitch-primary-channel-sat: 75; 		
+			--pitch-primary-channel-sat-scale: 0.1; 		
+			--pitch-primary-channel-lum: 67.5; 		
+			--pitch-primary-channel-lum-scale: 0.05; 	
+	
+			--pitch-secondary-note-hue: -34; 		
+			--pitch-secondary-note-hue-scale: 6.1; 		
+			--pitch-secondary-note-sat: 93.9; 		
+			--pitch-secondary-note-sat-scale: 0.1; 		
+			--pitch-secondary-note-lum: 25; 		
+			--pitch-secondary-note-lum-scale: 0.05; 
+		
+			--pitch-primary-note-hue: -53; 		
+			--pitch-primary-note-hue-scale: 6.1; 		
+			--pitch-primary-note-sat: 100; 		
+			--pitch-primary-note-sat-scale: 0.05; 		
+			--pitch-primary-note-lum: 85.6; 		
+			--pitch-primary-note-lum-scale: 0.025; 
+		
+			--noise-secondary-channel-hue: 0; 		
+			--noise-secondary-channel-hue-scale: 2; 		
+			--noise-secondary-channel-sat: 65; 		
+			--noise-secondary-channel-sat-scale: 0; 		
+			--noise-secondary-channel-lum: 42; 		
+			--noise-secondary-channel-lum-scale: 0; 
+		
+			--noise-primary-channel-hue: 0; 		
+			--noise-primary-channel-hue-scale: 1; 		
+			--noise-primary-channel-sat: 100; 		
+			--noise-primary-channel-sat-scale: 1; 		
+			--noise-primary-channel-lum: 63.5; 		
+			--noise-primary-channel-lum-scale: 0; 
+		
+			--noise-secondary-note-hue: 24; 		
+			--noise-secondary-note-hue-scale: 2; 		
+			--noise-secondary-note-sat: 100; 		
+			--noise-secondary-note-sat-scale: 0; 		
+			--noise-secondary-note-lum: 35; 		
+			--noise-secondary-note-lum-scale: 0; 	
+	
+			--noise-primary-note-hue: 24; 		
+			--noise-primary-note-hue-scale: 2; 		
+			--noise-primary-note-sat: 100; 		
+			--noise-primary-note-sat-scale: 1; 		
+			--noise-primary-note-lum: 60; 		
+			--noise-primary-note-lum-scale: 1; 	
+	
+			--mod-secondary-channel-hue: 55; 		
+			--mod-secondary-channel-hue-scale: 1.5; 		
+			--mod-secondary-channel-sat: 100; 		
+			--mod-secondary-channel-sat-scale: 0; 		
+			--mod-secondary-channel-lum: 20; 		
+			--mod-secondary-channel-lum-scale: 0; 
+		
+			--mod-primary-channel-hue: 55; 		
+			--mod-primary-channel-hue-scale: 1.5; 		
+			--mod-primary-channel-sat: 96; 		
+			--mod-primary-channel-sat-scale: 0; 		
+			--mod-primary-channel-lum: 50; 		
+			--mod-primary-channel-lum-scale: 0; 
+		
+			--mod-secondary-note-hue: 55; 		
+			--mod-secondary-note-hue-scale: 1.5; 		
+			--mod-secondary-note-sat: 92; 		
+			--mod-secondary-note-sat-scale: 0; 		
+			--mod-secondary-note-lum: 45; 		
+			--mod-secondary-note-lum-scale: 0; 
+		
+			--mod-primary-note-hue: 55; 		
+			--mod-primary-note-hue-scale: 1.5; 		
+			--mod-primary-note-sat: 96; 		
+			--mod-primary-note-sat-scale: 0; 		
+			--mod-primary-note-lum: 85; 		
+			--mod-primary-note-lum-scale: 0; 	
+
+			--note-flash: #ffffff;
+			--note-flash-secondary: #ffffff77;
+
+			--oscilloscope-line-R: var(--ui-widget-background);
+			--oscilloscope-line-L: var(--secondary-text);
+
+			--scrollbar-color: #bf2c5d;
 				}
 			`,
         "AbyssBox Piano": ` 
@@ -3711,8 +4153,8 @@ var beepbox = (function (exports) {
 		--file-page-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-file.png");
 		--edit-pencil-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-edit.png");
 		--preferences-gear-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-preferences.png");
-		--instrument-copy-symbol: url("./image_assets/icon-copy.png");
-		--instrument-paste-symbol: url("./image_assets/icon-paste.png");
+		--instrument-copy-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-copy.png");
+		--instrument-paste-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-paste.png");
 		--play-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-play.png");
 		--pause-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-pause.png");
 		--record-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-record.png");
@@ -3727,21 +4169,21 @@ var beepbox = (function (exports) {
 		--export-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-export.png");
 		--export-instrument-symbol: var(--export-symbol);
 		--import-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-import.png");
-		--undo-symbol: url("./image_assets/icon-undo.png");
-		--redo-symbol: url("./image_assets/icon-redo.png");
-		--copy-symbol: url("./image_assets/icon-copy.png");
-		--paste-symbol: url("./image_assets/icon-paste.png");
-		--insert-channel-symbol: url("./image_assets/icon-insertChannel.png");
-		--delete-channel-symbol: url("./image_assets/icon-deleteChannel.png");
-		--select-all-symbol: url("./image_assets/icon-SelectAll.png");
-		--duplicate-symbol: url("./image_assets/icon-duplicate.png");
-		--notes-up-symbol: url("./image_assets/moveNotesUp.png");
-		--notes-down-symbol: url("./image_assets/moveNotesDown.png");
-		--loop-bar-symbol: url("./image_assets/icon-singleBarLoop.png");
-		--fullscreen-symbol: url("./image_assets/icon-fullscreen.png");
-		--loop-within-bar-symbol: url("./image_assets/icon-loop-bar.png");
-	--loop-full-song-symbol: url("./image_assets/icon-loop-song.png");
-	--dont-loop-symbol: url("./image_assets/icon-loop-once.png");
+		--undo-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-undo.png");
+		--redo-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-redo.png");
+		--copy-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-copy.png");
+		--paste-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-paste.png");
+		--insert-channel-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-insertChannel.png");
+		--delete-channel-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-deleteChannel.png");
+		--select-all-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-SelectAll.png");
+		--duplicate-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-duplicate.png");
+		--notes-up-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/moveNotesUp.png");
+		--notes-down-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/moveNotesDown.png");
+		--loop-bar-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-singleBarLoop.png");
+		--fullscreen-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-fullscreen.png");
+		--loop-within-bar-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-bar.png");
+	--loop-full-song-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-song.png");
+	--dont-loop-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-once.png");
 		}
 		
 			
@@ -3821,7 +4263,7 @@ var beepbox = (function (exports) {
     				image-rendering: pixelated !important;                 /* Future browsers */
     				image-rendering: optimizeSpeed !important;             /* IE */
 
-					cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+					cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 				}
 
 			div.selectRow button:not(.copyButton,.pasteButton,.exportInstrumentButton,.importInstrumentButton) {
@@ -3841,7 +4283,7 @@ var beepbox = (function (exports) {
 			@font-face {
 		   font-family: "AbyssType_small";
 		   src:
- 		   url("./image_assets/abysstype_small.otf") format("opentype") tech(color-COLRv1),
+ 		   url("${location.pathname.includes("player") ? "." : ""}./image_assets/abysstype_small.otf") format("opentype") tech(color-COLRv1),
 			}
 
 			
@@ -3850,72 +4292,72 @@ var beepbox = (function (exports) {
 
 			.beepboxEditor input[type="range"]::-webkit-slider-thumb
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]::-webkit-slider-runnable-track
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]:focus::-webkit-slider-runnable-track
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]::-ms-thumb
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]::-ms-track
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]:focus::-ms-track
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]::-moz-range-thumb
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]::-moz-range-track
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="range"]:focus::-moz-range-track
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="text"],
 			.beepboxEditor input[type="number"]
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="checkbox"]
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="checkbox"]:checked
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			 
 			.beepboxEditor input[type="checkbox"]:checked:after
 			{
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 
 			div.selectRow span {
-				cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 			}
 			`,
         "Frutiger Aero": `
@@ -4083,6 +4525,16 @@ var beepbox = (function (exports) {
 			image-rendering: optimizeSpeed !important;             /* IE */
 		}
 
+		.beepboxEditor .effectExt {
+			margin-top: 8px;
+			margin-bottom: 8px;
+			background: linear-gradient(#596c8a54, #273449a6);
+			padding: 4px;
+			border-radius: 7px;
+			box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.2), 0px 1px 4px 1px rgba(0, 0, 0, 0.3), inset 0px 1px 0px 0px rgba(255, 255, 255, 0.3);
+			border-top: none !important;
+		}
+		
 		div.mute-button.muted::before {
 			background: #fff0 !important;
 			background-image: url("https://choptop84.github.io/choptop84s-image-repository/vistaSpeakerIconMuted.png") !important;
@@ -4597,6 +5049,16 @@ var beepbox = (function (exports) {
 			opacity: 0 !important;
 		}
 
+		.beepboxEditor .effectExt {
+			margin-top: 8px;
+			margin-bottom: 8px;
+			background: linear-gradient(#8a598054, #332749a6);
+			padding: 4px;
+			border-radius: 7px;
+			box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.2), 0px 1px 4px 1px rgba(0, 0, 0, 0.3), inset 0px 1px 0px 0px rgba(255, 255, 255, 0.3);
+			border-top: none !important;
+		}
+
 		div.mute-button::before {
 			background: #fff0 !important;
 			background-image: url("https://choptop84.github.io/choptop84s-image-repository/vistaSpeakerIcon.png") !important;
@@ -4680,7 +5142,7 @@ var beepbox = (function (exports) {
 			  }
 
 			div.prompt.noSelection{
-				background: linear-gradient(#84aef080, #2a3d6a80) !important; 
+				background: linear-gradient(#e384f080, #682a6a80) !important; 
 				opacity: 77;
 				backdrop-filter: blur(14px);
 			}  
@@ -5700,7 +6162,7 @@ var beepbox = (function (exports) {
 		 
 		.beepboxEditor .prompt
 		{
-			background: radial-gradient(farthest-corner at 50% 0px, #1d0700, #110400) !important;
+			background: radial-gradient(farthest-corner at 50% 0px, #27241e, #13120f) !important
 		}
 		 
 		#beepboxEditorContainer {
@@ -6089,7 +6551,7 @@ var beepbox = (function (exports) {
 			@font-face {
 		   font-family: "Varela";
 		   src:
- 		   url("./image_assets/Varela.ttf") format("truetype") tech(color-COLRv1),
+ 		   url("${location.pathname.includes("player") ? "." : ""}./image_assets/Varela.ttf") format("truetype") tech(color-COLRv1),
 			}
 
 			/* sets background image */
@@ -6434,7 +6896,7 @@ var beepbox = (function (exports) {
 			}
 
 			#text-content {
-    				border-image-source: url("./image_assets/abyssbox_border.png");
+    				border-image-source: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_border.png");
     				border-image-slice: 4 fill; 
    				border-image-width: 8px; 
 				border-image-repeat: stretch; 
@@ -6447,7 +6909,7 @@ var beepbox = (function (exports) {
     				image-rendering: optimizeSpeed !important;             /* IE */
 				}
 			#beepboxEditorContainer {
-    				border-image-source: url("./image_assets/abyssbox_border.png");
+    				border-image-source: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_border.png");
     				border-image-slice: 4 fill; 
    				border-image-width: 8px; 
 				border-image-repeat: stretch;
@@ -6461,7 +6923,7 @@ var beepbox = (function (exports) {
 
 				}
 			 .beepboxEditor button, .beepboxEditor select, .beepboxEditor .select2-selection__rendered {
-    				border-image-source: url("./image_assets/abyssbox_border.png") !important;
+    				border-image-source: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_border.png") !important;
     				border-image-slice: 4 fill !important; 
    				border-image-width: 4px !important; 
 				border-image-repeat: stretch !important;
@@ -6479,7 +6941,7 @@ var beepbox = (function (exports) {
 				}
 
 				#firstImage {
-					background-image: url("./image_assets/viviandbelle.png") !important;
+					background-image: url("${location.pathname.includes("player") ? "." : ""}./image_assets/viviandbelle.png") !important;
 					background-repeat: no-repeat !important;
 					background-size: 100% 100% !important;
 				}
@@ -6488,7 +6950,7 @@ var beepbox = (function (exports) {
 			@font-face {
 		   font-family: "AbyssType_small";
 		   src:
- 		   url("./image_assets/abysstype_small.otf") format("opentype") tech(color-COLRv1),
+ 		   url("${location.pathname.includes("player") ? "." : ""}./image_assets/abysstype_small.otf") format("opentype") tech(color-COLRv1),
 			}
 
 			
@@ -6631,7 +7093,7 @@ var beepbox = (function (exports) {
 		}
 		.instructions-column > section:first-of-type > p:first-of-type:after {
 		display: block;
-		content: url("./image_assets/wide-gordon.png");
+		content: url("${location.pathname.includes("player") ? "." : ""}./image_assets/wide-gordon.png");
 		width: inherit;
 		height: contain;
 		text-align: center;
@@ -6639,7 +7101,7 @@ var beepbox = (function (exports) {
 		}
 		/* sets background image */
 		body {
-		background-image: url("./image_assets/lambda.png") !important;
+		background-image: url("${location.pathname.includes("player") ? "." : ""}./image_assets/lambda.png") !important;
 		background-size: cover !important;
 		background-position: center !important;
 		background-repeat: no-repeat !important;
@@ -6651,7 +7113,7 @@ var beepbox = (function (exports) {
 			@font-face {
 		   font-family: "trebuc";
 		   src:
- 		   url("./image_assets/trebuc.otf") format("opentype") tech(color-COLRv1),
+ 		   url("${location.pathname.includes("player") ? "." : ""}./image_assets/trebuc.otf") format("opentype") tech(color-COLRv1),
 			}
 
 			html {
@@ -6799,7 +7261,7 @@ var beepbox = (function (exports) {
 		}
 		.instructions-column > section:first-of-type > p:first-of-type:after {
 		display: block;
-		content: url("./image_assets/wide-gordon.png");
+		content: url("${location.pathname.includes("player") ? "." : ""}./image_assets/wide-gordon.png");
 		width: inherit;
 		height: contain;
 		text-align: center;
@@ -6807,7 +7269,7 @@ var beepbox = (function (exports) {
 		}
 		/* sets background image */
 		body {
-		background-image: url("./image_assets/lambda.png") !important;
+		background-image: url("${location.pathname.includes("player") ? "." : ""}./image_assets/lambda.png") !important;
 		background-position: center;
 		background-repeat: repeat;
 			}
@@ -7612,12 +8074,12 @@ var beepbox = (function (exports) {
 		}
 		#text-content > section > h1 {
 		margin: auto;
-		content: url("./image_assets/AbyssBox_DOOM.png");
+		content: url("${location.pathname.includes("player") ? "." : ""}./image_assets/AbyssBox_DOOM.png");
 		}
 				
 				/* sets background image */
 		body {
-		background-image: url("./image_assets/doomsky.png") !important;
+		background-image: url("${location.pathname.includes("player") ? "." : ""}./image_assets/doomsky.png") !important;
 		background-size: cover;
 		background-position: center;
 		background-repeat: no-repeat;
@@ -7630,7 +8092,7 @@ var beepbox = (function (exports) {
 			@font-face {
 		   font-family: "doomfont";
 		   src:
- 		   url("./image_assets/doomfont.otf") format("opentype") tech(color-COLRv1),
+ 		   url("${location.pathname.includes("player") ? "." : ""}./image_assets/doomfont.otf") format("opentype") tech(color-COLRv1),
 			}
 
 			html {
@@ -8020,8 +8482,8 @@ var beepbox = (function (exports) {
 		--file-page-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-file.png");
 		--edit-pencil-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-edit.png");
 		--preferences-gear-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-preferences.png");
-		--instrument-copy-symbol: url("./image_assets/icon-copy.png");
-		--instrument-paste-symbol: url("./image_assets/icon-paste.png");
+		--instrument-copy-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-copy.png");
+		--instrument-paste-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-paste.png");
 		--play-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-play.png");
 		--pause-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-pause.png");
 		--record-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-record.png");
@@ -8036,21 +8498,21 @@ var beepbox = (function (exports) {
 		--export-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-export.png");
 		--export-instrument-symbol: var(--export-symbol);
 		--import-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-import.png");
-		--undo-symbol: url("./image_assets/icon-undo.png");
-		--redo-symbol: url("./image_assets/icon-redo.png");
-		--copy-symbol: url("./image_assets/icon-copy.png");
-		--paste-symbol: url("./image_assets/icon-paste.png");
-		--insert-channel-symbol: url("./image_assets/icon-insertChannel.png");
-		--delete-channel-symbol: url("./image_assets/icon-deleteChannel.png");
-		--select-all-symbol: url("./image_assets/icon-SelectAll.png");
-		--duplicate-symbol: url("./image_assets/icon-duplicate.png");
-		--notes-up-symbol: url("./image_assets/moveNotesUp.png");
-		--notes-down-symbol: url("./image_assets/moveNotesDown.png");
-		--loop-bar-symbol: url("./image_assets/icon-singleBarLoop.png");
-		--fullscreen-symbol: url("./image_assets/icon-fullscreen.png");
-		--loop-within-bar-symbol: url("./image_assets/icon-loop-bar.png");
-		--loop-full-song-symbol: url("./image_assets/icon-loop-song.png");
-		--dont-loop-symbol: url("./image_assets/icon-loop-once.png");
+		--undo-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-undo.png");
+		--redo-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-redo.png");
+		--copy-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-copy.png");
+		--paste-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-paste.png");
+		--insert-channel-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-insertChannel.png");
+		--delete-channel-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-deleteChannel.png");
+		--select-all-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-SelectAll.png");
+		--duplicate-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-duplicate.png");
+		--notes-up-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/moveNotesUp.png");
+		--notes-down-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/moveNotesDown.png");
+		--loop-bar-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-singleBarLoop.png");
+		--fullscreen-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-fullscreen.png");
+		--loop-within-bar-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-bar.png");
+		--loop-full-song-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-song.png");
+		--dont-loop-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-once.png");
 		}
 		
 		.spIcon {
@@ -8316,7 +8778,7 @@ var beepbox = (function (exports) {
 				@font-face {
 					font-family: "tahoma";
 					src:
-					 url("./image_assets/tahoma.otf") format("opentype") tech(color-COLRv1),
+					 url("${location.pathname.includes("player") ? "." : ""}./image_assets/tahoma.otf") format("opentype") tech(color-COLRv1),
 					 image-rendering: -moz-crisp-edges !important;         /* Firefox */
 					 image-rendering: -webkit-optimize-contrast !important; /* Webkit (Chrome/Safari) */
 					 image-rendering: -o-crisp-edges !important;            /* Opera */
@@ -8484,21 +8946,21 @@ var beepbox = (function (exports) {
 				}
 
 		* {
-		cursor: url("./image_assets/xpcursor.png"), auto !important;
-		--play-symbol:url("./image_assets/xpPlay.png");
-		--pause-symbol:url("./image_assets/xpPause.png");
-		--record-symbol:url("./image_assets/xpRecord.png");
-		--stop-symbol:url("./image_assets/xpStop.png");
-		--prev-bar-symbol:url("./image_assets/xpBackward.png");
-		--next-bar-symbol:url("./image_assets/xpForward.png");
-		--file-page-symbol: url("./image_assets/xpFile.png");
-		--edit-pencil-symbol: url("./image_assets/xpEdit.png");
-		--preferences-gear-symbol: url("./image_assets/xpPreferences.png");
-		--muted-symbol: url("./image_assets/xpSpeakerMute.png");
-		--unmuted-symbol: url("./image_assets/xpSpeaker.png");
-		--volume-symbol: url("./image_assets/xpSpeaker.png");
-		--zoom-in-symbol: url("./image_assets/xpZoomIn.png");
-		--zoom-out-symbol: url("./image_assets/xpZoomOut.png");
+		cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpcursor.png"), auto !important;
+		--play-symbol:url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpPlay.png");
+		--pause-symbol:url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpPause.png");
+		--record-symbol:url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpRecord.png");
+		--stop-symbol:url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpStop.png");
+		--prev-bar-symbol:url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpBackward.png");
+		--next-bar-symbol:url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpForward.png");
+		--file-page-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpFile.png");
+		--edit-pencil-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpEdit.png");
+		--preferences-gear-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpPreferences.png");
+		--muted-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpSpeakerMute.png");
+		--unmuted-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpSpeaker.png");
+		--volume-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpSpeaker.png");
+		--zoom-in-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpZoomIn.png");
+		--zoom-out-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpZoomOut.png");
 		}
 
 		.beepboxEditor button,
@@ -8525,7 +8987,7 @@ var beepbox = (function (exports) {
 			}
 
 		div.mute-button::before {
-			background-image: url("./image_assets/xpSpeaker.png") !important;
+			background-image: url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpSpeaker.png") !important;
 			background-size: 120% !important;
 			background-position-x: center !important;
 			background-position-y: center !important;
@@ -8539,7 +9001,7 @@ var beepbox = (function (exports) {
 		}
 
 		div.mute-button.muted::before {
-			background-image: url("./image_assets/xpSpeakerMute.png") !important;
+			background-image: url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpSpeakerMute.png") !important;
 			background-size: 120% !important;
 			background-position-x: center !important;
 			background-position-y: center !important;
@@ -8553,7 +9015,7 @@ var beepbox = (function (exports) {
 		}
 
 		button.recordButton::Before {
-			background-image: url("./image_assets/xpRecord.png") !important;
+			background-image: url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpRecord.png") !important;
 			background-size: 64% !important;
 			background-position: center !important;
 			background-repeat: no-repeat !important;
@@ -8567,7 +9029,7 @@ var beepbox = (function (exports) {
 		}
 
 		button.stopButton::Before {
-			background-image: url("./image_assets/xpStop.png") !important;
+			background-image: url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpStop.png") !important;
 			background-size: 64% !important;
 			background-position: center !important;
 			background-repeat: no-repeat !important;
@@ -8581,7 +9043,7 @@ var beepbox = (function (exports) {
 		}
 
 		button.pauseButton::Before {
-			background-image: url("./image_assets/xpPause.png") !important;
+			background-image: url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpPause.png") !important;
 			background-size: 64% !important;
 			background-position: center !important;
 			background-repeat: no-repeat !important;
@@ -8595,7 +9057,7 @@ var beepbox = (function (exports) {
 		}
 
 		.beepboxEditor span.volume-speaker {
-			background-image: url("./image_assets/xpSpeaker.png");
+			background-image: url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpSpeaker.png");
 			background-position: center !important;
 			background-repeat: no-repeat !important;
 
@@ -8608,7 +9070,7 @@ var beepbox = (function (exports) {
 
 		div.selectContainer.menu.file::before {
 
-			background-image: url("./image_assets/xpFile.png");
+			background-image: url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpFile.png");
 			background-size: 64%;
 			background-position-x: center;
 			background-position-y: center;
@@ -8622,7 +9084,7 @@ var beepbox = (function (exports) {
 
 		div.selectContainer.menu.edit::before {
 
-			background-image: url("./image_assets/xpEdit.png");
+			background-image: url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpEdit.png");
 			background-size: 64%;
 			background-position-x: center;
 			background-position-y: center;
@@ -8635,7 +9097,7 @@ var beepbox = (function (exports) {
 		}
 		div.selectContainer.menu.preferences::before {
 
-			background-image: url("./image_assets/xpPreferences.png");
+			background-image: url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpPreferences.png");
 			background-size: 64%;
 			background-position-x: center;
 			background-position-y: center;
@@ -8648,7 +9110,7 @@ var beepbox = (function (exports) {
 		}
 		button.playButton::before {
 
-			background-image: url("./image_assets/xpPlay.png") !important;
+			background-image: url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpPlay.png") !important;
 			background-size: 64% !important;
 			background-position: center !important;
 
@@ -8661,7 +9123,7 @@ var beepbox = (function (exports) {
 		}
 
 		.beepboxEditor button.prevBarButton::before {
-			background-image: url("./image_assets/xpBackward.png") !important;
+			background-image: url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpBackward.png") !important;
 			background-size: 64% !important;
 			background-position: center !important;
 
@@ -8675,7 +9137,7 @@ var beepbox = (function (exports) {
 		}
 
 		.beepboxEditor button.nextBarButton::before {
-			background-image: url("./image_assets/xpForward.png") !important;
+			background-image: url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpForward.png") !important;
 			background-size: 64% !important;
 			background-position: center !important;
 
@@ -8689,7 +9151,7 @@ var beepbox = (function (exports) {
 		}
 
 		.beepboxEditor .zoomInButton::before {
-			background-image: url("./image_assets/xpZoomIn.png") !important;
+			background-image: url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpZoomIn.png") !important;
 			background-position: center !important;
 
 
@@ -8702,7 +9164,7 @@ var beepbox = (function (exports) {
 		}
 
 		.beepboxEditor .zoomOutButton::before {
-			background-image: url("./image_assets/xpZoomOut.png") !important;
+			background-image: url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpZoomOut.png") !important;
 			background-position: center !important;
 
 
@@ -8715,7 +9177,7 @@ var beepbox = (function (exports) {
 		}
 
 		.beepboxEditor input[type="range"]::-moz-range-thumb {
-			background-image: url("./image_assets/scrollbar.png") !important;
+			background-image: url("${location.pathname.includes("player") ? "." : ""}./image_assets/scrollbar.png") !important;
 			background-position: center !important;
 			background-size: inherit !important;
 
@@ -8737,12 +9199,12 @@ var beepbox = (function (exports) {
 		}
 		#text-content > section > h1 {
 		margin: auto;
-		content: url("./image_assets/AbyssBox_XP.png");
+		content: url("${location.pathname.includes("player") ? "." : ""}./image_assets/AbyssBox_XP.png");
 		}
 
 				/* sets background image */
 		body {
-		background-image: url("./image_assets/xphills.png") !important;
+		background-image: url("${location.pathname.includes("player") ? "." : ""}./image_assets/xphills.png") !important;
 		background-size: cover;
 		background-position: center;
 		background-repeat: no-repeat;
@@ -8772,7 +9234,7 @@ var beepbox = (function (exports) {
 				margin-top: 15px;
 				}
 			#beepboxEditorContainer {
-    				border-image-source: url("./image_assets/xptextbg.png");
+    				border-image-source: url("${location.pathname.includes("player") ? "." : ""}./image_assets/xptextbg.png");
     				border-image-slice: 11 fill; 
    				border-image-width: 11px; 
 				border-image-repeat: stretch;
@@ -8827,7 +9289,7 @@ var beepbox = (function (exports) {
 			}
 
 			#firstImage {
-				background-image: url("./image_assets/xpsongeditorbg.png") !important;
+				background-image: url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpsongeditorbg.png") !important;
 				background-repeat: no-repeat !important;
 				background-size: 100% 100% !important;
 			}
@@ -8852,7 +9314,7 @@ var beepbox = (function (exports) {
 			}
 			
 			.beepboxEditor select:focus {
-					border-image-source: url("./image_assets/xpbuttonpressedbg.png");
+					border-image-source: url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpbuttonpressedbg.png");
 					border-image-slice: 4 fill; 
 					border-image-width: 4px; 
 					border-image-repeat: repeat;
@@ -8869,7 +9331,7 @@ var beepbox = (function (exports) {
 					border-radius: 0px;
 					width: 13px !important;
 					height: 13px !important;
-					background-image:url("./image_assets/xpCheckmarkBlank.png");
+					background-image:url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpCheckmarkBlank.png");
 					background-repeat:no-repeat;
 
 					image-rendering: -moz-crisp-edges !important;         /* Firefox */
@@ -8894,7 +9356,7 @@ var beepbox = (function (exports) {
 					text-align: center;
 					content: "";
 					background-repeat:no-repeat;
-					background-image:url("./image_assets/xpCheckmark.png");
+					background-image:url("${location.pathname.includes("player") ? "." : ""}./image_assets/xpCheckmark.png");
 					image-rendering: -moz-crisp-edges !important;         /* Firefox */
 					image-rendering: -webkit-optimize-contrast !important; /* Webkit (Chrome/Safari) */
 					image-rendering: -o-crisp-edges !important;            /* Opera */
@@ -9105,6 +9567,15 @@ var beepbox = (function (exports) {
 			--mod-title: #1D1C1D;
 			}
 
+			.beepboxEditor .effectExt {
+				margin-top: 8px;
+				margin-bottom: 8px;
+				background: #151516;
+				padding: 4px;
+				border-radius: 7px;
+				border-top: none !important;
+			}
+
 			.channelBox {
 			border-radius: 25px;
 			}
@@ -9245,6 +9716,15 @@ var beepbox = (function (exports) {
 			--disabled-note-primary:    #999;
 			--disabled-note-secondary:  #666;
 			--mod-title: #1D1C1D;
+			}
+
+			.beepboxEditor .effectExt {
+				margin-top: 8px;
+				margin-bottom: 8px;
+				background: #E3E1DE;
+				padding: 4px;
+				border-radius: 7px;
+				border-top: none !important;
 			}
 
 			.channelBox {
@@ -9397,7 +9877,7 @@ var beepbox = (function (exports) {
 						@font-face {
 					   font-family: "Workbench";
 					   src:
-						url("./image_assets/Workbench.ttf") format("truetype") tech(color-COLRv1),
+						url("${location.pathname.includes("player") ? "." : ""}./image_assets/Workbench.ttf") format("truetype") tech(color-COLRv1),
 						}
 			
 						html {
@@ -9667,8 +10147,8 @@ var beepbox = (function (exports) {
 				--file-page-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-file.png");
 				--edit-pencil-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-edit.png");
 				--preferences-gear-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-preferences.png");
-				--instrument-copy-symbol: url("./image_assets/icon-copy.png");
-				--instrument-paste-symbol: url("./image_assets/icon-paste.png");
+				--instrument-copy-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-copy.png");
+				--instrument-paste-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-paste.png");
 				--play-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-play.png");
 				--pause-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-pause.png");
 				--record-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-record.png");
@@ -9683,32 +10163,32 @@ var beepbox = (function (exports) {
 				--export-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-export.png");
 				--export-instrument-symbol: var(--export-symbol);
 				--import-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-import.png");
-				--undo-symbol: url("./image_assets/icon-undo.png");
-				--redo-symbol: url("./image_assets/icon-redo.png");
-				--copy-symbol: url("./image_assets/icon-copy.png");
-				--paste-symbol: url("./image_assets/icon-paste.png");
-				--insert-channel-symbol: url("./image_assets/icon-insertChannel.png");
-				--delete-channel-symbol: url("./image_assets/icon-deleteChannel.png");
-				--select-all-symbol: url("./image_assets/icon-SelectAll.png");
-				--duplicate-symbol: url("./image_assets/icon-duplicate.png");
-				--notes-up-symbol: url("./image_assets/moveNotesUp.png");
-				--notes-down-symbol: url("./image_assets/moveNotesDown.png");
-				--loop-bar-symbol: url("./image_assets/icon-singleBarLoop.png");
-				--fullscreen-symbol: url("./image_assets/icon-fullscreen.png");
-				--loop-within-bar-symbol: url("./image_assets/icon-loop-bar.png");
-	--loop-full-song-symbol: url("./image_assets/icon-loop-song.png");
-	--dont-loop-symbol: url("./image_assets/icon-loop-once.png");
+				--undo-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-undo.png");
+				--redo-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-redo.png");
+				--copy-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-copy.png");
+				--paste-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-paste.png");
+				--insert-channel-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-insertChannel.png");
+				--delete-channel-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-deleteChannel.png");
+				--select-all-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-SelectAll.png");
+				--duplicate-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-duplicate.png");
+				--notes-up-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/moveNotesUp.png");
+				--notes-down-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/moveNotesDown.png");
+				--loop-bar-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-singleBarLoop.png");
+				--fullscreen-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-fullscreen.png");
+				--loop-within-bar-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-bar.png");
+	--loop-full-song-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-song.png");
+	--dont-loop-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-once.png");
 				} 
 					@font-face {
 				   font-family: "AbyssType";
 				   src:
-					url("./image_assets/abysstype.otf") format("opentype") tech(color-COLRv1),
+					url("${location.pathname.includes("player") ? "." : ""}./image_assets/abysstype.otf") format("opentype") tech(color-COLRv1),
 					}
 			
 					@font-face {
 				   font-family: "AbyssType_small";
 				   src:
-					url("./image_assets/abysstype_small.otf") format("opentype") tech(color-COLRv1),
+					url("${location.pathname.includes("player") ? "." : ""}./image_assets/abysstype_small.otf") format("opentype") tech(color-COLRv1),
 					}
 			
 					body {
@@ -10272,8 +10752,8 @@ var beepbox = (function (exports) {
 					--file-page-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-file.png");
 					--edit-pencil-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-edit.png");
 					--preferences-gear-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-preferences.png");
-					--instrument-copy-symbol: url("./image_assets/icon-copy.png");
-					--instrument-paste-symbol: url("./image_assets/icon-paste.png");
+					--instrument-copy-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-copy.png");
+					--instrument-paste-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-paste.png");
 					--play-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-play.png");
 					--pause-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-pause.png");
 					--record-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-record.png");
@@ -10288,32 +10768,32 @@ var beepbox = (function (exports) {
 					--export-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-export.png");
 					--export-instrument-symbol: var(--export-symbol);
 					--import-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-import.png");
-					--undo-symbol: url("./image_assets/icon-undo.png");
-					--redo-symbol: url("./image_assets/icon-redo.png");
-					--copy-symbol: url("./image_assets/icon-copy.png");
-					--paste-symbol: url("./image_assets/icon-paste.png");
-					--insert-channel-symbol: url("./image_assets/icon-insertChannel.png");
-					--delete-channel-symbol: url("./image_assets/icon-deleteChannel.png");
-					--select-all-symbol: url("./image_assets/icon-SelectAll.png");
-					--duplicate-symbol: url("./image_assets/icon-duplicate.png");
-					--notes-up-symbol: url("./image_assets/moveNotesUp.png");
-					--notes-down-symbol: url("./image_assets/moveNotesDown.png");
-					--loop-bar-symbol: url("./image_assets/icon-singleBarLoop.png");
-					--fullscreen-symbol: url("./image_assets/icon-fullscreen.png");
-					--loop-within-bar-symbol: url("./image_assets/icon-loop-bar.png");
-	--loop-full-song-symbol: url("./image_assets/icon-loop-song.png");
-	--dont-loop-symbol: url("./image_assets/icon-loop-once.png");
+					--undo-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-undo.png");
+					--redo-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-redo.png");
+					--copy-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-copy.png");
+					--paste-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-paste.png");
+					--insert-channel-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-insertChannel.png");
+					--delete-channel-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-deleteChannel.png");
+					--select-all-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-SelectAll.png");
+					--duplicate-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-duplicate.png");
+					--notes-up-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/moveNotesUp.png");
+					--notes-down-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/moveNotesDown.png");
+					--loop-bar-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-singleBarLoop.png");
+					--fullscreen-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-fullscreen.png");
+					--loop-within-bar-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-bar.png");
+	--loop-full-song-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-song.png");
+	--dont-loop-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-once.png");
 					}
 					
 						@font-face {
 					   font-family: "AbyssType";
 					   src:
-						url("./image_assets/abysstype.otf") format("opentype") tech(color-COLRv1),
+						url("${location.pathname.includes("player") ? "." : ""}./image_assets/abysstype.otf") format("opentype") tech(color-COLRv1),
 						}
 
 						/* sets background image */
 						body {
-						background-image: url("./image_assets/diamondsbg.gif") !important;
+						background-image: url("${location.pathname.includes("player") ? "." : ""}./image_assets/diamondsbg.gif") !important;
 						background-position: center;
 						background-repeat: repeat;
 			
@@ -10325,7 +10805,7 @@ var beepbox = (function (exports) {
 							}
 			
 						#text-content {
-								border-image-source: url("./image_assets/beepbox_pixel_border.png");
+								border-image-source: url("${location.pathname.includes("player") ? "." : ""}./image_assets/beepbox_pixel_border.png");
 								border-image-slice: 4 fill; 
 							   border-image-width: 8px; 
 							border-image-repeat: stretch; 
@@ -10338,7 +10818,7 @@ var beepbox = (function (exports) {
 								image-rendering: optimizeSpeed !important;             /* IE */
 							}
 						#beepboxEditorContainer {
-								border-image-source: url("./image_assets/beepbox_pixel_border.png");
+								border-image-source: url("${location.pathname.includes("player") ? "." : ""}./image_assets/beepbox_pixel_border.png");
 								border-image-slice: 4 fill; 
 							   border-image-width: 8px; 
 							border-image-repeat: stretch;
@@ -10370,7 +10850,7 @@ var beepbox = (function (exports) {
 						button.importInstrumentButton, 
 						.beepboxEditor select, 
 						.beepboxEditor .select2-selection__rendered {
-								border-image-source: url("./image_assets/beepbox_pixel_border.png") !important;
+								border-image-source: url("${location.pathname.includes("player") ? "." : ""}./image_assets/beepbox_pixel_border.png") !important;
 								border-image-slice: 4 fill !important; 
 							   border-image-width: 4px !important; 
 							border-image-repeat: stretch !important;
@@ -10382,7 +10862,7 @@ var beepbox = (function (exports) {
 								image-rendering: pixelated !important;                 /* Future browsers */
 								image-rendering: optimizeSpeed !important;             /* IE */
 			
-								cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+								cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 							}
 			
 						.beepboxEditor .channelBox {
@@ -10431,7 +10911,7 @@ var beepbox = (function (exports) {
 						@font-face {
 					   font-family: "AbyssType_small";
 					   src:
-						url("./image_assets/abysstype_small.otf") format("opentype") tech(color-COLRv1),
+						url("${location.pathname.includes("player") ? "." : ""}./image_assets/abysstype_small.otf") format("opentype") tech(color-COLRv1),
 						}
 			
 						html {
@@ -10444,72 +10924,72 @@ var beepbox = (function (exports) {
 			
 						.beepboxEditor input[type="range"]::-webkit-slider-thumb
 						{
-							cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+							cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 						}
 						 
 						.beepboxEditor input[type="range"]::-webkit-slider-runnable-track
 						{
-							cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+							cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 						}
 						 
 						.beepboxEditor input[type="range"]:focus::-webkit-slider-runnable-track
 						{
-							cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+							cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 						}
 						 
 						.beepboxEditor input[type="range"]::-ms-thumb
 						{
-							cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+							cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 						}
 						 
 						.beepboxEditor input[type="range"]::-ms-track
 						{
-							cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+							cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 						}
 						 
 						.beepboxEditor input[type="range"]:focus::-ms-track
 						{
-							cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+							cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 						}
 						 
 						.beepboxEditor input[type="range"]::-moz-range-thumb
 						{
-							cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+							cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 						}
 						 
 						.beepboxEditor input[type="range"]::-moz-range-track
 						{
-							cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+							cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 						}
 						 
 						.beepboxEditor input[type="range"]:focus::-moz-range-track
 						{
-							cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+							cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 						}
 						 
 						.beepboxEditor input[type="text"],
 						.beepboxEditor input[type="number"]
 						{
-							cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+							cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 						}
 						 
 						.beepboxEditor input[type="checkbox"]
 						{
-							cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+							cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 						}
 						 
 						.beepboxEditor input[type="checkbox"]:checked
 						{
-							cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+							cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 						}
 						 
 						.beepboxEditor input[type="checkbox"]:checked:after
 						{
-							cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+							cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 						}
 			
 						div.selectRow span {
-							cursor: url("./image_assets/abyssbox_cursor_hand.png"), pointer !important;
+							cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/abyssbox_cursor_hand.png"), pointer !important;
 						}
 			
 			`,
@@ -11308,7 +11788,7 @@ var beepbox = (function (exports) {
 
 					/* sets background image */
 					body {
-						background-image: url("./image_assets/Forest2Trees.png") !important;
+						background-image: url("${location.pathname.includes("player") ? "." : ""}./image_assets/Forest2Trees.png") !important;
 						background-size: cover;
 						background-position: center top; /* Adjusted to align with the top */
   						background-repeat: no-repeat;
@@ -11321,7 +11801,7 @@ var beepbox = (function (exports) {
 						}
 						#text-content {
 						--editor-background: (255, 255, 255, 0);
-							border-image-source: url("./image_assets/forest2_border.png");
+							border-image-source: url("${location.pathname.includes("player") ? "." : ""}./image_assets/forest2_border.png");
 							border-image-slice: 16 fill; 
 						   	border-image-width: 32px; 
 							border-image-repeat: repeat; 
@@ -11335,7 +11815,7 @@ var beepbox = (function (exports) {
 						}
 					#beepboxEditorContainer {
 						--editor-background: (255, 255, 255, 0);
-							border-image-source: url("./image_assets/forest2_border.png");
+							border-image-source: url("${location.pathname.includes("player") ? "." : ""}./image_assets/forest2_border.png");
 							border-image-slice: 16 fill; 
 						   	border-image-width: 32px; 
 							border-image-repeat: repeat; 
@@ -11351,7 +11831,7 @@ var beepbox = (function (exports) {
 							image-rendering: optimizeSpeed !important;             /* IE */ 
 						}
 					.beepboxEditor button, .beepboxEditor select, .beepboxEditor .select2-selection__rendered, button {
-							border-image-source: url("./image_assets/forest2_border2.png") !important;
+							border-image-source: url("${location.pathname.includes("player") ? "." : ""}./image_assets/forest2_border2.png") !important;
 							border-image-slice: 4 fill !important; 
 						   border-image-width: 4px !important; 
 						border-image-repeat: stretch !important;
@@ -11373,12 +11853,12 @@ var beepbox = (function (exports) {
 					border-radius: 5px;
 					} */
 					* {
-						cursor: url("./image_assets/pixel_cursor.png"), auto !important;
+						cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/pixel_cursor.png"), auto !important;
 						--file-page-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-file.png");
 						--edit-pencil-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-edit.png");
 						--preferences-gear-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-preferences.png");
-						--instrument-copy-symbol: url("./image_assets/icon-copy.png");
-						--instrument-paste-symbol: url("./image_assets/icon-paste.png");
+						--instrument-copy-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-copy.png");
+						--instrument-paste-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-paste.png");
 						--play-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-play.png");
 						--pause-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-pause.png");
 						--record-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-record.png");
@@ -11393,26 +11873,26 @@ var beepbox = (function (exports) {
 						--export-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-export.png");
 						--export-instrument-symbol: var(--export-symbol);
 						--import-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-import.png");
-						--undo-symbol: url("./image_assets/icon-undo.png");
-						--redo-symbol: url("./image_assets/icon-redo.png");
-						--copy-symbol: url("./image_assets/icon-copy.png");
-						--paste-symbol: url("./image_assets/icon-paste.png");
-						--insert-channel-symbol: url("./image_assets/icon-insertChannel.png");
-						--delete-channel-symbol: url("./image_assets/icon-deleteChannel.png");
-						--select-all-symbol: url("./image_assets/icon-SelectAll.png");
-						--duplicate-symbol: url("./image_assets/icon-duplicate.png");
-						--notes-up-symbol: url("./image_assets/moveNotesUp.png");
-						--notes-down-symbol: url("./image_assets/moveNotesDown.png");
-						--loop-bar-symbol: url("./image_assets/icon-singleBarLoop.png");
-						--fullscreen-symbol: url("./image_assets/icon-fullscreen.png");
-						--loop-within-bar-symbol: url("./image_assets/icon-loop-bar.png");
-	--loop-full-song-symbol: url("./image_assets/icon-loop-song.png");
-	--dont-loop-symbol: url("./image_assets/icon-loop-once.png");
+						--undo-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-undo.png");
+						--redo-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-redo.png");
+						--copy-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-copy.png");
+						--paste-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-paste.png");
+						--insert-channel-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-insertChannel.png");
+						--delete-channel-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-deleteChannel.png");
+						--select-all-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-SelectAll.png");
+						--duplicate-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-duplicate.png");
+						--notes-up-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/moveNotesUp.png");
+						--notes-down-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/moveNotesDown.png");
+						--loop-bar-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-singleBarLoop.png");
+						--fullscreen-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-fullscreen.png");
+						--loop-within-bar-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-bar.png");
+	--loop-full-song-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-song.png");
+	--dont-loop-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-once.png");
 						} 
 							@font-face {
 						   font-family: "AbyssType";
 						   src:
-							url("./image_assets/abysstype.otf") format("opentype") tech(color-COLRv1),
+							url("${location.pathname.includes("player") ? "." : ""}./image_assets/abysstype.otf") format("opentype") tech(color-COLRv1),
 							}
 				
 							button.envelopeDropdown, div.selectRow button:not(.copyButton,.pasteButton,.exportInstrumentButton,.importInstrumentButton) {
@@ -11423,7 +11903,7 @@ var beepbox = (function (exports) {
 							@font-face {
 						   font-family: "AbyssType_small";
 						   src:
-							url("./image_assets/abysstype_small.otf") format("opentype") tech(color-COLRv1),
+							url("${location.pathname.includes("player") ? "." : ""}./image_assets/abysstype_small.otf") format("opentype") tech(color-COLRv1),
 							}
 				
 							html {
@@ -11672,12 +12152,12 @@ var beepbox = (function (exports) {
 			}
 			
 			* {
-				cursor: url("./image_assets/pixel_cursor.png"), auto !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/pixel_cursor.png"), auto !important;
 				--file-page-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-file.png");
 				--edit-pencil-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-edit.png");
 				--preferences-gear-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-preferences.png");
-				--instrument-copy-symbol: url("./image_assets/icon-copy.png");
-				--instrument-paste-symbol: url("./image_assets/icon-paste.png");
+				--instrument-copy-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-copy.png");
+				--instrument-paste-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-paste.png");
 				--play-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-play.png");
 				--pause-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-pause.png");
 				--record-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-record.png");
@@ -11692,33 +12172,33 @@ var beepbox = (function (exports) {
 				--export-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-export.png");
 				--export-instrument-symbol: var(--export-symbol);
 				--import-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-import.png");
-				--undo-symbol: url("./image_assets/icon-undo.png");
-				--redo-symbol: url("./image_assets/icon-redo.png");
-				--copy-symbol: url("./image_assets/icon-copy.png");
-				--paste-symbol: url("./image_assets/icon-paste.png");
-				--insert-channel-symbol: url("./image_assets/icon-insertChannel.png");
-				--delete-channel-symbol: url("./image_assets/icon-deleteChannel.png");
-				--select-all-symbol: url("./image_assets/icon-SelectAll.png");
-				--duplicate-symbol: url("./image_assets/icon-duplicate.png");
-				--notes-up-symbol: url("./image_assets/moveNotesUp.png");
-				--notes-down-symbol: url("./image_assets/moveNotesDown.png");
-				--loop-bar-symbol: url("./image_assets/icon-singleBarLoop.png");
-				--fullscreen-symbol: url("./image_assets/icon-fullscreen.png");
-				--loop-within-bar-symbol: url("./image_assets/icon-loop-bar.png");
-	--loop-full-song-symbol: url("./image_assets/icon-loop-song.png");
-	--dont-loop-symbol: url("./image_assets/icon-loop-once.png");
+				--undo-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-undo.png");
+				--redo-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-redo.png");
+				--copy-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-copy.png");
+				--paste-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-paste.png");
+				--insert-channel-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-insertChannel.png");
+				--delete-channel-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-deleteChannel.png");
+				--select-all-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-SelectAll.png");
+				--duplicate-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-duplicate.png");
+				--notes-up-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/moveNotesUp.png");
+				--notes-down-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/moveNotesDown.png");
+				--loop-bar-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-singleBarLoop.png");
+				--fullscreen-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-fullscreen.png");
+				--loop-within-bar-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-bar.png");
+	--loop-full-song-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-song.png");
+	--dont-loop-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-once.png");
 				} 
 			
 			@font-face {
 				font-family: "AbyssType";
 				src:
-				 url("./image_assets/abysstype.otf") format("opentype") tech(color-COLRv1),
+				 url("${location.pathname.includes("player") ? "." : ""}./image_assets/abysstype.otf") format("opentype") tech(color-COLRv1),
 				 }
 			
 				 @font-face {
 				font-family: "AbyssType_small";
 				src:
-				 url("./image_assets/abysstype_small.otf") format("opentype") tech(color-COLRv1),
+				 url("${location.pathname.includes("player") ? "." : ""}./image_assets/abysstype_small.otf") format("opentype") tech(color-COLRv1),
 				 }
 			
 				 #pattern-area {
@@ -13850,7 +14330,7 @@ var beepbox = (function (exports) {
 			}
 
 			body {
-				background-image: url("./image_assets/stars.gif") !important;
+				background-image: url("${location.pathname.includes("player") ? "." : ""}./image_assets/stars.gif") !important;
 				background-size: contain !important;
 				background-position: center top !important;
 				  background-repeat: repeat !important;
@@ -13863,7 +14343,7 @@ var beepbox = (function (exports) {
 				}
 			#text-content {
 				--editor-background: rgba(255, 255, 255, 0);
-					border-image-source: url("./image_assets/nebula2_border.png");
+					border-image-source: url("${location.pathname.includes("player") ? "." : ""}./image_assets/nebula2_border.png");
 					border-image-slice: 16 fill; 
 					   border-image-width: 32px; 
 					border-image-repeat: repeat; 
@@ -13877,7 +14357,7 @@ var beepbox = (function (exports) {
 				}
 			#beepboxEditorContainer {
 				--editor-background: rgba(255, 255, 255, 0);
-					border-image-source: url("./image_assets/nebula2_border.png");
+					border-image-source: url("${location.pathname.includes("player") ? "." : ""}./image_assets/nebula2_border.png");
 					border-image-slice: 16 fill; 
 					   border-image-width: 32px; 
 					border-image-repeat: repeat; 
@@ -13893,7 +14373,7 @@ var beepbox = (function (exports) {
 					image-rendering: optimizeSpeed !important;             /* IE */ 
 				}
 			.beepboxEditor button, .beepboxEditor select, .beepboxEditor .select2-selection__rendered, button {
-					border-image-source: url("./image_assets/nebula2_border2.png") !important;
+					border-image-source: url("${location.pathname.includes("player") ? "." : ""}./image_assets/nebula2_border2.png") !important;
 					border-image-slice: 4 fill !important; 
 				   border-image-width: 4px !important; 
 				border-image-repeat: stretch !important;
@@ -13912,12 +14392,12 @@ var beepbox = (function (exports) {
 			border-radius: 5px;
 			} */
 			* {
-				cursor: url("./image_assets/pixel_cursor.png"), auto !important;
+				cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/pixel_cursor.png"), auto !important;
 				--file-page-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-file.png");
 				--edit-pencil-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-edit.png");
 				--preferences-gear-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-preferences.png");
-				--instrument-copy-symbol: url("./image_assets/icon-copy.png");
-				--instrument-paste-symbol: url("./image_assets/icon-paste.png");
+				--instrument-copy-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-copy.png");
+				--instrument-paste-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-paste.png");
 				--play-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-play.png");
 				--pause-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-pause.png");
 				--record-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-record.png");
@@ -13932,32 +14412,32 @@ var beepbox = (function (exports) {
 				--export-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-export.png");
 				--export-instrument-symbol: var(--export-symbol);
 				--import-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-import.png");
-				--undo-symbol: url("./image_assets/icon-undo.png");
-				--redo-symbol: url("./image_assets/icon-redo.png");
-				--copy-symbol: url("./image_assets/icon-copy.png");
-				--paste-symbol: url("./image_assets/icon-paste.png");
-				--insert-channel-symbol: url("./image_assets/icon-insertChannel.png");
-				--delete-channel-symbol: url("./image_assets/icon-deleteChannel.png");
-				--select-all-symbol: url("./image_assets/icon-SelectAll.png");
-				--duplicate-symbol: url("./image_assets/icon-duplicate.png");
-				--notes-up-symbol: url("./image_assets/moveNotesUp.png");
-				--notes-down-symbol: url("./image_assets/moveNotesDown.png");
-				--loop-bar-symbol: url("./image_assets/icon-singleBarLoop.png");
-				--fullscreen-symbol: url("./image_assets/icon-fullscreen.png");
-				--loop-within-bar-symbol: url("./image_assets/icon-loop-bar.png");
-	--loop-full-song-symbol: url("./image_assets/icon-loop-song.png");
-	--dont-loop-symbol: url("./image_assets/icon-loop-once.png");
+				--undo-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-undo.png");
+				--redo-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-redo.png");
+				--copy-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-copy.png");
+				--paste-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-paste.png");
+				--insert-channel-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-insertChannel.png");
+				--delete-channel-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-deleteChannel.png");
+				--select-all-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-SelectAll.png");
+				--duplicate-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-duplicate.png");
+				--notes-up-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/moveNotesUp.png");
+				--notes-down-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/moveNotesDown.png");
+				--loop-bar-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-singleBarLoop.png");
+				--fullscreen-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-fullscreen.png");
+				--loop-within-bar-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-bar.png");
+	--loop-full-song-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-song.png");
+	--dont-loop-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-once.png");
 				} 
 					@font-face {
 				   font-family: "AbyssType";
 				   src:
-					url("./image_assets/abysstype.otf") format("opentype") tech(color-COLRv1),
+					url("${location.pathname.includes("player") ? "." : ""}./image_assets/abysstype.otf") format("opentype") tech(color-COLRv1),
 					}
 		
 					@font-face {
 				   font-family: "AbyssType_small";
 				   src:
-					url("./image_assets/abysstype_small.otf") format("opentype") tech(color-COLRv1),
+					url("${location.pathname.includes("player") ? "." : ""}./image_assets/abysstype_small.otf") format("opentype") tech(color-COLRv1),
 					}
 		
 					html {
@@ -14944,12 +15424,12 @@ var beepbox = (function (exports) {
 		--note-flash-secondary: #ffffff77; }
 	
 		* {
-		cursor: url("./image_assets/pixel_cursor.png"), auto !important;
+		cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/pixel_cursor.png"), auto !important;
 		--file-page-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-file.png");
 		--edit-pencil-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-edit.png");
 		--preferences-gear-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-preferences.png");
-		--instrument-copy-symbol: url("./image_assets/icon-copy.png");
-		--instrument-paste-symbol: url("./image_assets/icon-paste.png");
+		--instrument-copy-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-copy.png");
+		--instrument-paste-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-paste.png");
 		--play-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-play.png");
 		--pause-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-pause.png");
 		--record-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-record.png");
@@ -14964,26 +15444,26 @@ var beepbox = (function (exports) {
 		--export-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-export.png");
 		--export-instrument-symbol: var(--export-symbol);
 		--import-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-import.png");
-		--undo-symbol: url("./image_assets/icon-undo.png");
-		--redo-symbol: url("./image_assets/icon-redo.png");
-		--copy-symbol: url("./image_assets/icon-copy.png");
-		--paste-symbol: url("./image_assets/icon-paste.png");
-		--insert-channel-symbol: url("./image_assets/icon-insertChannel.png");
-		--delete-channel-symbol: url("./image_assets/icon-deleteChannel.png");
-		--select-all-symbol: url("./image_assets/icon-SelectAll.png");
-		--duplicate-symbol: url("./image_assets/icon-duplicate.png");
-		--notes-up-symbol: url("./image_assets/moveNotesUp.png");
-		--notes-down-symbol: url("./image_assets/moveNotesDown.png");
-		--loop-bar-symbol: url("./image_assets/icon-singleBarLoop.png");
-		--fullscreen-symbol: url("./image_assets/icon-fullscreen.png");
-		--loop-within-bar-symbol: url("./image_assets/icon-loop-bar.png");
-	--loop-full-song-symbol: url("./image_assets/icon-loop-song.png");
-	--dont-loop-symbol: url("./image_assets/icon-loop-once.png");
+		--undo-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-undo.png");
+		--redo-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-redo.png");
+		--copy-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-copy.png");
+		--paste-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-paste.png");
+		--insert-channel-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-insertChannel.png");
+		--delete-channel-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-deleteChannel.png");
+		--select-all-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-SelectAll.png");
+		--duplicate-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-duplicate.png");
+		--notes-up-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/moveNotesUp.png");
+		--notes-down-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/moveNotesDown.png");
+		--loop-bar-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-singleBarLoop.png");
+		--fullscreen-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-fullscreen.png");
+		--loop-within-bar-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-bar.png");
+	--loop-full-song-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-song.png");
+	--dont-loop-symbol: url("${location.pathname.includes("player") ? "." : ""}./image_assets/icon-loop-once.png");
 		} 
 			@font-face {
 		   font-family: "AbyssType";
 		   src:
-			url("./image_assets/abysstype.otf") format("opentype") tech(color-COLRv1),
+			url("${location.pathname.includes("player") ? "." : ""}./image_assets/abysstype.otf") format("opentype") tech(color-COLRv1),
 			}
 	
 			#beepboxEditorContainer, .track-area, .beepboxEditor, #text-content, div.noSelection, .beepboxEditor .loopEditor {
@@ -14993,7 +15473,7 @@ var beepbox = (function (exports) {
 			@font-face {
 		   font-family: "AbyssType_small";
 		   src:
-			url("./image_assets/abysstype_small.otf") format("opentype") tech(color-COLRv1),
+			url("${location.pathname.includes("player") ? "." : ""}./image_assets/abysstype_small.otf") format("opentype") tech(color-COLRv1),
 			}
 	
 			body {
@@ -22782,18 +23262,18 @@ var beepbox = (function (exports) {
 		}
 		.instructions-column > section:first-of-type > p:first-of-type:after {
 		display: block;
-		content: url("./image_assets/UltraboxAzurLaneThemeStarterSquad.png");
+		content: url("${location.pathname.includes("player") ? "." : ""}./image_assets/UltraboxAzurLaneThemeStarterSquad.png");
 		width: 100%;
 		text-align: center;
 		margin-top: 25px;
 		}
 		/* sets cursor */
 		* {
-		cursor: url("./image_assets/UltraBoxAzurLaneThemeMouse.png"), auto !important;
+		cursor: url("${location.pathname.includes("player") ? "." : ""}./image_assets/UltraBoxAzurLaneThemeMouse.png"), auto !important;
 		}
 		/* sets background image */
 		body {
-		background-image: url("./image_assets/UltraBoxAzurLaneThemeMemoryTaskBackground.png") !important;
+		background-image: url("${location.pathname.includes("player") ? "." : ""}./image_assets/UltraBoxAzurLaneThemeMemoryTaskBackground.png") !important;
 		background-size: cover;
 		background-position: center;
 		background-repeat: no-repeat;
@@ -22807,7 +23287,7 @@ var beepbox = (function (exports) {
 		}
 		#text-content > section > h1 {
 		margin: auto;
-		content: url("./image_assets/UltraBoxALThemeLogo.png");
+		content: url("${location.pathname.includes("player") ? "." : ""}./image_assets/UltraBoxALThemeLogo.png");
 		}
 	}`,
         "WeebBox": `
@@ -24074,8 +24554,9 @@ var beepbox = (function (exports) {
             return (_a = EditorConfig.presetCategories[0].presets.dictionary) === null || _a === void 0 ? void 0 : _a[TypePresets === null || TypePresets === void 0 ? void 0 : TypePresets[instrument]];
         }
     }
-    EditorConfig.version = "1.7";
-    EditorConfig.versionDisplayName = "AbyssBox " + EditorConfig.version;
+    EditorConfig.version = "1.8";
+    EditorConfig.isExperimental = location.pathname.includes("/abyssbox-experimental/") ? "Experimental " : "";
+    EditorConfig.versionDisplayName = "AbyssBox " + EditorConfig.isExperimental + EditorConfig.version;
     EditorConfig.releaseNotesURL = "./patch_notes.html";
     EditorConfig.isOnMac = /^Mac/i.test(navigator.platform) || /Mac OS X/i.test(navigator.userAgent) || /^(iPhone|iPad|iPod)/i.test(navigator.platform) || /(iPhone|iPad|iPod)/i.test(navigator.userAgent);
     EditorConfig.ctrlSymbol = EditorConfig.isOnMac ? "⌘" : "Ctrl+";
@@ -24457,6 +24938,12 @@ var beepbox = (function (exports) {
                 { name: "Distortion Bass", generalMidi: false, settings: { "type": "Picked String", "eqFilter": [{ "type": "low-pass", "cutoffHz": 4756.83, "linearGain": 0.25 }, { "type": "high-pass", "cutoffHz": 88.39, "linearGain": 1.4142 }, { "type": "low-pass", "cutoffHz": 8000, "linearGain": 0.5 }, { "type": "peak", "cutoffHz": 1000, "linearGain": 0.5 }], "eqFilterType": false, "eqSimpleCut": 10, "eqSimplePeak": 0, "envelopeSpeed": 12, "discreteEnvelope": false, "eqSubFilters0": [{ "type": "low-pass", "cutoffHz": 4756.83, "linearGain": 0.25 }, { "type": "high-pass", "cutoffHz": 88.39, "linearGain": 1.4142 }, { "type": "low-pass", "cutoffHz": 8000, "linearGain": 0.5 }, { "type": "peak", "cutoffHz": 1000, "linearGain": 0.5 }], "effects": ["note filter", "distortion", "bitcrusher", "phaser"], "noteFilterType": false, "noteSimpleCut": 10, "noteSimplePeak": 0, "noteFilter": [{ "type": "high-pass", "cutoffHz": 88.39, "linearGain": 1.4142 }, { "type": "low-pass", "cutoffHz": 4000, "linearGain": 0.5 }], "noteSubFilters0": [{ "type": "high-pass", "cutoffHz": 88.39, "linearGain": 1.4142 }, { "type": "low-pass", "cutoffHz": 4000, "linearGain": 0.5 }], "distortion": 43, "aliases": false, "bitcrusherOctave": 6, "bitcrusherQuantization": 0, "phaserMix": 65, "phaserFreq": 19, "phaserFeedback": 61, "phaserStages": 52, "panDelay": 10, "fadeInSeconds": 0, "fadeOutTicks": 6, "harmonics": [86, 100, 100, 86, 86, 86, 86, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 71], "unison": "none", "stringSustain": 64, "envelopes": [{ "target": "noteFilterFreq", "envelope": "note size", "index": 1 }, { "target": "phaserFeedback", "envelope": "twang 3" }] } },
                 { name: "Phased Overdrive Guitar", generalMidi: false, settings: { "type": "Picked String", "eqFilter": [{ "type": "low-pass", "cutoffHz": 4756.83, "linearGain": 0.7071 }, { "type": "high-pass", "cutoffHz": 250, "linearGain": 1 }, { "type": "low-pass", "cutoffHz": 6727.17, "linearGain": 1.4142 }, { "type": "peak", "cutoffHz": 840.9, "linearGain": 0.3536 }], "eqFilterType": false, "eqSimpleCut": 10, "eqSimplePeak": 0, "envelopeSpeed": 12, "discreteEnvelope": false, "eqSubFilters0": [{ "type": "low-pass", "cutoffHz": 4756.83, "linearGain": 0.7071 }, { "type": "high-pass", "cutoffHz": 250, "linearGain": 1 }, { "type": "low-pass", "cutoffHz": 6727.17, "linearGain": 1.4142 }, { "type": "peak", "cutoffHz": 840.9, "linearGain": 0.3536 }], "effects": ["note filter", "distortion", "bitcrusher", "phaser"], "noteFilterType": false, "noteSimpleCut": 10, "noteSimplePeak": 0, "noteFilter": [{ "type": "high-pass", "cutoffHz": 297.3, "linearGain": 2 }, { "type": "low-pass", "cutoffHz": 2378.41, "linearGain": 0.7071 }], "noteSubFilters0": [{ "type": "high-pass", "cutoffHz": 297.3, "linearGain": 2 }, { "type": "low-pass", "cutoffHz": 2378.41, "linearGain": 0.7071 }], "distortion": 71, "aliases": false, "bitcrusherOctave": 6, "bitcrusherQuantization": 0, "phaserMix": 100, "phaserFreq": 19, "phaserFeedback": 61, "phaserStages": 52, "panDelay": 10, "fadeInSeconds": 0, "fadeOutTicks": 12, "harmonics": [86, 100, 100, 86, 86, 86, 86, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 71], "unison": "none", "stringSustain": 64, "envelopes": [{ "target": "noteFilterFreq", "envelope": "note size", "index": 1 }, { "target": "phaserFeedback", "envelope": "twang 2" }] } },
                 { name: "Phased Picked Guitar", generalMidi: false, settings: { "type": "Picked String", "eqFilter": [{ "type": "low-pass", "cutoffHz": 4756.83, "linearGain": 0.7071 }, { "type": "high-pass", "cutoffHz": 250, "linearGain": 1 }, { "type": "low-pass", "cutoffHz": 6727.17, "linearGain": 1.4142 }, { "type": "peak", "cutoffHz": 840.9, "linearGain": 0.3536 }], "eqFilterType": false, "eqSimpleCut": 10, "eqSimplePeak": 0, "envelopeSpeed": 12, "discreteEnvelope": false, "eqSubFilters0": [{ "type": "low-pass", "cutoffHz": 4756.83, "linearGain": 0.7071 }, { "type": "high-pass", "cutoffHz": 250, "linearGain": 1 }, { "type": "low-pass", "cutoffHz": 6727.17, "linearGain": 1.4142 }, { "type": "peak", "cutoffHz": 840.9, "linearGain": 0.3536 }], "effects": ["note filter", "distortion", "bitcrusher", "chorus", "echo", "phaser"], "noteFilterType": false, "noteSimpleCut": 10, "noteSimplePeak": 0, "noteFilter": [{ "type": "high-pass", "cutoffHz": 297.3, "linearGain": 2 }, { "type": "low-pass", "cutoffHz": 2378.41, "linearGain": 0.7071 }], "noteSubFilters0": [{ "type": "high-pass", "cutoffHz": 297.3, "linearGain": 2 }, { "type": "low-pass", "cutoffHz": 2378.41, "linearGain": 0.7071 }], "distortion": 29, "aliases": false, "bitcrusherOctave": 6, "bitcrusherQuantization": 0, "phaserMix": 77, "phaserFreq": 19, "phaserFeedback": 61, "phaserStages": 52, "panDelay": 10, "chorus": 43, "echoSustain": 43, "echoDelayBeats": 1, "fadeInSeconds": 0, "fadeOutTicks": 12, "harmonics": [86, 100, 100, 86, 86, 86, 86, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 71], "unison": "none", "stringSustain": 64, "envelopes": [{ "target": "noteFilterFreq", "envelope": "note size", "index": 1 }, { "target": "phaserMix", "envelope": "twang -1" }] } },
+            ]) },
+        { name: "AbyssBox Templates", presets: toNameMap([
+                { name: "Template Bass", generalMidi: false, settings: { "type": "FM", "eqFilter": [{ "type": "low-pass", "cutoffHz": 11313.71, "linearGain": 0.1768 }], "eqFilterType": true, "eqSimpleCut": 6, "eqSimplePeak": 0, "envelopeSpeed": 12, "eqSubFilters1": [], "effects": ["bitcrusher"], "bitcrusherOctave": 4.5, "bitcrusherQuantization": 0, "panDelay": 10, "fadeInSeconds": 0, "fadeOutTicks": -1, "algorithm": "1←2←3←4", "feedbackType": "2→3", "feedbackAmplitude": 2, "operators": [{ "frequency": "1×", "amplitude": 15, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "0.5×", "amplitude": 10, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "7×", "amplitude": 4, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "10×", "amplitude": 8, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }], "envelopes": [{ "target": "operatorAmplitude", "envelope": "twang 1", "index": 2 }, { "target": "operatorAmplitude", "envelope": "twang 1", "index": 3 }] } },
+                { name: "Template Organ", generalMidi: false, settings: { "type": "FM", "eqFilter": [{ "type": "low-pass", "cutoffHz": 16000, "linearGain": 0.3536 }], "eqFilterType": true, "eqSimpleCut": 8, "eqSimplePeak": 0, "envelopeSpeed": 12, "eqSubFilters1": [], "effects": ["note filter"], "noteFilterType": true, "noteSimpleCut": 8, "noteSimplePeak": 0, "noteFilter": [{ "type": "low-pass", "cutoffHz": 16000, "linearGain": 0.3536 }], "noteSubFilters1": [{ "type": "low-pass", "cutoffHz": 16000, "linearGain": 0.3536 }], "panDelay": 10, "fadeInSeconds": 0.0125, "fadeOutTicks": 6, "algorithm": "1 2 3 4", "feedbackType": "1→2", "feedbackAmplitude": 0, "operators": [{ "frequency": "1×", "amplitude": 15, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "2×", "amplitude": 15, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "3×", "amplitude": 15, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "4×", "amplitude": 15, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }], "envelopes": [] } },
+                { name: "Template Soft Lead", generalMidi: false, settings: { "type": "FM", "eqFilter": [{ "type": "low-pass", "cutoffHz": 19027.31, "linearGain": 0.7071 }], "eqFilterType": true, "eqSimpleCut": 10, "eqSimplePeak": 0, "envelopeSpeed": 12, "eqSubFilters1": [], "effects": [], "panDelay": 10, "fadeInSeconds": 0.0263, "fadeOutTicks": 12, "algorithm": "1←(2 3 4)", "feedbackType": "1⟲", "feedbackAmplitude": 0, "operators": [{ "frequency": "1×", "amplitude": 15, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "8×", "amplitude": 5, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }], "envelopes": [{ "target": "operatorAmplitude", "envelope": "twang 1", "index": 1 }] } },
+                { name: "Template Noise", generalMidi: false, settings: { "type": "FM", "eqFilter": [{ "type": "low-pass", "cutoffHz": 19027.31, "linearGain": 0.7071 }], "eqFilterType": true, "eqSimpleCut": 10, "eqSimplePeak": 0, "envelopeSpeed": 12, "eqSubFilters1": [], "effects": [], "panDelay": 10, "fadeInSeconds": 0, "fadeOutTicks": -1, "algorithm": "1←(2 3 4)", "feedbackType": "1→2", "feedbackAmplitude": 15, "operators": [{ "frequency": "1×", "amplitude": 15, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 15, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }], "envelopes": [] } },
             ]) },
         { name: "AbyssBox's Spooky Presets", presets: toNameMap([
                 { name: "Ghost House", generalMidi: false, settings: { "type": "FM", "eqFilter": [], "eqFilterType": false, "eqSimpleCut": 10, "eqSimplePeak": 0, "envelopeSpeed": 12, "discreteEnvelope": false, "eqSubFilters0": [], "effects": ["transition type", "vibrato", "bitcrusher"], "transition": "normal", "clicklessTransition": false, "vibrato": "heavy", "vibratoDepth": 0.45, "vibratoDelay": 0, "vibratoSpeed": 10, "vibratoType": 0, "bitcrusherOctave": 3.5, "bitcrusherQuantization": 43, "panDelay": 10, "fadeInSeconds": 0, "fadeOutTicks": -3, "algorithm": "1←(2 3←4)", "feedbackType": "1⟲", "feedbackAmplitude": 0, "operators": [{ "frequency": "1×", "amplitude": 15, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 4, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 6, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 7, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }], "envelopes": [{ "target": "noteVolume", "envelope": "punch" }] } },
@@ -25020,6 +25507,17 @@ var beepbox = (function (exports) {
                 result += this._bits[this._readIndex++];
                 bitCount--;
             }
+            return result;
+        }
+        readSilent(bitCount) {
+            let result = 0;
+            let startingBitCount = bitCount;
+            while (bitCount > 0) {
+                result = result << 1;
+                result += this._bits[this._readIndex++];
+                bitCount--;
+            }
+            this._readIndex -= startingBitCount;
             return result;
         }
         readLongTail(minValue, minBits) {
@@ -26038,6 +26536,8 @@ var beepbox = (function (exports) {
             this.grainRange = 40;
             this.chorus = 0;
             this.reverb = 0;
+            this.reverbWet = Config.reverbWetRange - 1;
+            this.reverbDry = Config.reverbDryRange - 1;
             this.echoSustain = 0;
             this.echoDelay = 0;
             this.phaserFreq = 0;
@@ -26106,6 +26606,8 @@ var beepbox = (function (exports) {
             this.effects = (1 << 2);
             this.chorus = Config.chorusRange - 1;
             this.reverb = 0;
+            this.reverbWet = Config.reverbWetRange - 1;
+            this.reverbDry = Config.reverbDryRange - 1;
             this.echoSustain = Math.floor((Config.echoSustainRange - 1) * 0.5);
             this.echoDelay = Math.floor((Config.echoDelayRange - 1) * 0.5);
             this.eqFilter.reset();
@@ -26476,6 +26978,8 @@ var beepbox = (function (exports) {
             }
             if (effectsIncludeReverb(this.effects)) {
                 instrumentObject["reverb"] = Math.round(100 * this.reverb / (Config.reverbRange - 1));
+                instrumentObject["reverbDry"] = Math.round(100 * this.reverbDry / (Config.reverbRange - 1));
+                instrumentObject["reverbWet"] = Math.round(100 * this.reverbWet / (Config.reverbRange - 1));
             }
             if (effectsIncludeNoteRange(this.effects)) {
                 instrumentObject["upperNoteLimit"] = this.upperNoteLimit;
@@ -26491,7 +26995,7 @@ var beepbox = (function (exports) {
                     instrumentObject["harmonics"][i] = Math.round(100 * this.harmonicsWave.harmonics[i] / Config.harmonicsMax);
                 }
             }
-            if (this.type == 0 || this.type == 6 || this.type == 9 || this.type == 2 || this.type == 5 || this.type == 7 || this.type == 3) {
+            if (this.type != 1 && this.type != 11 && this.type != 8) {
                 instrumentObject["unison"] = this.unison == Config.unisons.length ? "custom" : Config.unisons[this.unison].name;
                 if (this.unison == Config.unisons.length) {
                     instrumentObject["unisonVoices"] = this.unisonVoices;
@@ -26903,6 +27407,12 @@ var beepbox = (function (exports) {
             }
             else {
                 this.reverb = legacyGlobalReverb;
+            }
+            if (instrumentObject["reverbDry"] != undefined) {
+                this.reverbDry = clamp(0, Config.reverbRange, Math.round((Config.reverbRange - 1) * (instrumentObject["reverbDry"] | 0) / 100));
+            }
+            if (instrumentObject["reverbWet"] != undefined) {
+                this.reverbWet = clamp(0, Config.reverbRange, Math.round((Config.reverbRange - 1) * (instrumentObject["reverbWet"] | 0) / 100));
             }
             if (instrumentObject["upperNoteLimit"] != undefined) {
                 this.upperNoteLimit = instrumentObject["upperNoteLimit"];
@@ -27468,7 +27978,7 @@ var beepbox = (function (exports) {
                     let modulator = Config.modulators[instrument.modulators[modCount]];
                     let cap = modulator.maxRawVol;
                     if (cap != undefined) {
-                        if (modulator.name == "eq filter" || modulator.name == "note filter") {
+                        if (modulator.name == "eq filter" || modulator.name == "note filter" || modulator.name == "song eq") {
                             cap = Config.filterMorphCount - 1;
                             if (instrument.modFilterTypes[modCount] > 0 && instrument.modFilterTypes[modCount] % 2) {
                                 cap = Config.filterFreqRange;
@@ -27489,7 +27999,7 @@ var beepbox = (function (exports) {
                 else {
                     let cap = Config.modulators[modSetting].maxRawVol;
                     if (cap != undefined) {
-                        if (filterType != undefined && (Config.modulators[modSetting].name == "eq filter" || Config.modulators[modSetting].name == "note filter")) {
+                        if (filterType != undefined && (Config.modulators[modSetting].name == "eq filter" || Config.modulators[modSetting].name == "note filter" || Config.modulators[modSetting].name == "song eq")) {
                             cap = Config.filterMorphCount - 1;
                             if (filterType > 0 && filterType % 2) {
                                 cap = Config.filterFreqRange;
@@ -27645,6 +28155,32 @@ var beepbox = (function (exports) {
             }
             else {
                 buffer.push(base64IntToCharCode[0x3f]);
+            }
+            buffer.push(99);
+            if (this.eqFilter == null) {
+                buffer.push(base64IntToCharCode[0]);
+                console.log("Null EQ filter settings detected in toBase64String for song");
+            }
+            else {
+                buffer.push(base64IntToCharCode[this.eqFilter.controlPointCount]);
+                for (let j = 0; j < this.eqFilter.controlPointCount; j++) {
+                    const point = this.eqFilter.controlPoints[j];
+                    buffer.push(base64IntToCharCode[point.type], base64IntToCharCode[Math.round(point.freq)], base64IntToCharCode[Math.round(point.gain)]);
+                }
+            }
+            let usingSubFilterBitfield = 0;
+            for (let j = 0; j < Config.filterMorphCount - 1; j++) {
+                usingSubFilterBitfield |= (+(this.eqSubFilters[j + 1] != null) << j);
+            }
+            buffer.push(base64IntToCharCode[usingSubFilterBitfield >> 6], base64IntToCharCode[usingSubFilterBitfield & 63]);
+            for (let j = 0; j < Config.filterMorphCount - 1; j++) {
+                if (usingSubFilterBitfield & (1 << j)) {
+                    buffer.push(base64IntToCharCode[this.eqSubFilters[j + 1].controlPointCount]);
+                    for (let k = 0; k < this.eqSubFilters[j + 1].controlPointCount; k++) {
+                        const point = this.eqSubFilters[j + 1].controlPoints[k];
+                        buffer.push(base64IntToCharCode[point.type], base64IntToCharCode[Math.round(point.freq)], base64IntToCharCode[Math.round(point.gain)]);
+                    }
+                }
             }
             buffer.push(85);
             for (let channel = 0; channel < this.getChannelCount(); channel++) {
@@ -27803,6 +28339,8 @@ var beepbox = (function (exports) {
                     }
                     if (effectsIncludeReverb(instrument.effects)) {
                         buffer.push(base64IntToCharCode[instrument.reverb]);
+                        buffer.push(base64IntToCharCode[instrument.reverbWet]);
+                        buffer.push(base64IntToCharCode[instrument.reverbDry]);
                     }
                     if (effectsIncludeGranular(instrument.effects)) {
                         buffer.push(base64IntToCharCode[instrument.granular]);
@@ -28013,7 +28551,7 @@ var beepbox = (function (exports) {
                             if (status != 3) {
                                 bits.write(6, modSetting);
                             }
-                            if (Config.modulators[instrument.modulators[mod]].name == "eq filter" || Config.modulators[instrument.modulators[mod]].name == "note filter") {
+                            if (Config.modulators[instrument.modulators[mod]].name == "eq filter" || Config.modulators[instrument.modulators[mod]].name == "note filter" || Config.modulators[instrument.modulators[mod]].name == "song eq") {
                                 bits.write(6, modFilter);
                             }
                         }
@@ -28055,7 +28593,7 @@ var beepbox = (function (exports) {
                             }
                             else {
                                 shapeBits.write(1, 1);
-                                shapeBits.write(3, note.pitches.length - 2);
+                                shapeBits.write(7, note.pitches.length - 2);
                             }
                             shapeBits.writePinCount(note.pins.length - 1);
                             if (!isModChannel) {
@@ -28128,11 +28666,11 @@ var beepbox = (function (exports) {
                                 }
                                 else {
                                     bits.write(1, 1);
-                                    bits.write(4, pitchIndex);
+                                    bits.write(7, pitchIndex);
                                     recentPitches.splice(pitchIndex, 1);
                                 }
                                 recentPitches.unshift(pitch);
-                                if (recentPitches.length > 16)
+                                if (recentPitches.length > 97)
                                     recentPitches.pop();
                                 if (i == note.pitches.length - 1) {
                                     lastPitch = note.pitches[0];
@@ -29135,6 +29673,46 @@ var beepbox = (function (exports) {
                                     }
                                 }
                             }
+                            else {
+                                if (fromAbyssBox && !beforeFour) {
+                                    const originalControlPointCount = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                                    this.eqFilter.controlPointCount = clamp(0, Config.filterMaxPoints + 1, originalControlPointCount);
+                                    for (let i = this.eqFilter.controlPoints.length; i < this.eqFilter.controlPointCount; i++) {
+                                        this.eqFilter.controlPoints[i] = new FilterControlPoint();
+                                    }
+                                    for (let i = 0; i < this.eqFilter.controlPointCount; i++) {
+                                        const point = this.eqFilter.controlPoints[i];
+                                        point.type = clamp(0, 3, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                                        point.freq = clamp(0, Config.filterFreqRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                                        point.gain = clamp(0, Config.filterGainRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                                    }
+                                    for (let i = this.eqFilter.controlPointCount; i < originalControlPointCount; i++) {
+                                        charIndex += 3;
+                                    }
+                                    this.eqSubFilters[0] = this.eqFilter;
+                                    let usingSubFilterBitfield = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                                    for (let j = 0; j < Config.filterMorphCount - 1; j++) {
+                                        if (usingSubFilterBitfield & (1 << j)) {
+                                            const originalSubfilterControlPointCount = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                                            if (this.eqSubFilters[j + 1] == null)
+                                                this.eqSubFilters[j + 1] = new FilterSettings();
+                                            this.eqSubFilters[j + 1].controlPointCount = clamp(0, Config.filterMaxPoints + 1, originalSubfilterControlPointCount);
+                                            for (let i = this.eqSubFilters[j + 1].controlPoints.length; i < this.eqSubFilters[j + 1].controlPointCount; i++) {
+                                                this.eqSubFilters[j + 1].controlPoints[i] = new FilterControlPoint();
+                                            }
+                                            for (let i = 0; i < this.eqSubFilters[j + 1].controlPointCount; i++) {
+                                                const point = this.eqSubFilters[j + 1].controlPoints[i];
+                                                point.type = clamp(0, 3, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                                                point.freq = clamp(0, Config.filterFreqRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                                                point.gain = clamp(0, Config.filterGainRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                                            }
+                                            for (let i = this.eqSubFilters[j + 1].controlPointCount; i < originalSubfilterControlPointCount; i++) {
+                                                charIndex += 3;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
                         break;
                     case 71:
@@ -29268,6 +29846,8 @@ var beepbox = (function (exports) {
                                 instrument.convertLegacySettings(legacySettings, forceSimpleFilter);
                             }
                             else {
+                                if (17 > Config.maxEffectCount)
+                                    throw new Error();
                                 if ((fromAbyssBox && !beforeTwo || fromAbyssBox && !beforeThree) || (fromUltraBox && !beforeSix)) {
                                     instrument.effects = ((base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << (6 * 5))
                                         | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << (6 * 4))
@@ -29432,6 +30012,10 @@ var beepbox = (function (exports) {
                                     }
                                     else {
                                         instrument.reverb = clamp(0, Config.reverbRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                                        if (fromAbyssBox && !beforeFour) {
+                                            instrument.reverbWet = clamp(0, Config.reverbRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                                            instrument.reverbDry = clamp(0, Config.reverbRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                                        }
                                     }
                                 }
                                 if (effectsIncludeGranular(instrument.effects)) {
@@ -29885,9 +30469,10 @@ var beepbox = (function (exports) {
                         {
                             let bitStringLength = 0;
                             let channelIndex;
-                            let largerChords = !((beforeFour && fromJummBox) || fromBeepBox);
-                            let recentPitchBitLength = (largerChords ? 4 : 3);
-                            let recentPitchLength = (largerChords ? 16 : 8);
+                            let postJB4Chords = !((beforeFour && fromJummBox) || fromBeepBox);
+                            let postAB4Chords = !beforeFour && fromAbyssBox;
+                            let recentPitchBitLength = postAB4Chords ? 7 : (postJB4Chords ? 4 : 3);
+                            let recentPitchLength = postAB4Chords ? 97 : (postJB4Chords ? 16 : 8);
                             if (beforeThree && fromBeepBox) {
                                 channelIndex = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                                 charIndex++;
@@ -29912,6 +30497,7 @@ var beepbox = (function (exports) {
                             let songReverbIndex = -1;
                             const shouldCorrectTempoMods = fromJummBox;
                             const jummboxTempoMin = 30;
+                            const shouldCorrectPulseWidth = (fromAbyssBox && beforeFour && !beforeThree);
                             while (true) {
                                 const channel = this.channels[channelIndex];
                                 const isNoiseChannel = this.getChannelIsNoise(channelIndex);
@@ -29945,7 +30531,7 @@ var beepbox = (function (exports) {
                                             if (status != 3) {
                                                 instrument.modulators[mod] = bits.read(6);
                                             }
-                                            if (!jumfive && (Config.modulators[instrument.modulators[mod]].name == "eq filter" || Config.modulators[instrument.modulators[mod]].name == "note filter")) {
+                                            if (!jumfive && (Config.modulators[instrument.modulators[mod]].name == "eq filter" || Config.modulators[instrument.modulators[mod]].name == "note filter" || Config.modulators[instrument.modulators[mod]].name == "song eq")) {
                                                 instrument.modFilterTypes[mod] = bits.read(6);
                                             }
                                             if (jumfive && instrument.modChannels[mod] >= 0) {
@@ -30058,14 +30644,19 @@ var beepbox = (function (exports) {
                                             }
                                             else {
                                                 shape = {};
-                                                if (!largerChords) {
+                                                if (!postJB4Chords) {
                                                     shape.pitchCount = 1;
                                                     while (shape.pitchCount < 4 && bits.read(1) == 1)
                                                         shape.pitchCount++;
                                                 }
                                                 else {
                                                     if (bits.read(1) == 1) {
-                                                        shape.pitchCount = bits.read(3) + 2;
+                                                        if (!fromAbyssBox || (fromAbyssBox && beforeFour)) {
+                                                            shape.pitchCount = bits.read(3) + 2;
+                                                        }
+                                                        else {
+                                                            shape.pitchCount = bits.read(7) + 2;
+                                                        }
                                                     }
                                                     else {
                                                         shape.pitchCount = 1;
@@ -30167,8 +30758,8 @@ var beepbox = (function (exports) {
                                             const noteIsForTempoMod = isModChannel && channel.instruments[newPattern.instruments[0]].modulators[Config.modCount - 1 - note.pitches[0]] === Config.modulators.dictionary["tempo"].index;
                                             let tempoOffset = 0;
                                             if (shouldCorrectTempoMods && noteIsForTempoMod) {
-                                                note.pins[0].size += tempoOffset;
                                                 tempoOffset = jummboxTempoMin - Config.tempoMin;
+                                                note.pins[0].size += tempoOffset;
                                             }
                                             if (isModChannel) {
                                                 note.pins[0].size *= detuneScaleNotes[newPattern.instruments[0]][note.pitches[0]];
@@ -30211,6 +30802,11 @@ var beepbox = (function (exports) {
                                                         note.continuesLastPattern = channel.instruments[newPattern.instruments[0]].legacyTieOver;
                                                     }
                                                 }
+                                            }
+                                            const noteIsForPWMod = isModChannel && channel.instruments[newPattern.instruments[0]].modulators[Config.modCount - 1 - note.pitches[0]] === Config.modulators.dictionary["pulse width"].index;
+                                            if (shouldCorrectPulseWidth && noteIsForPWMod) {
+                                                for (const pin of note.pins)
+                                                    pin.size = pin.size >> 1;
                                             }
                                             curPart = validateRange(0, this.beatsPerBar * Config.partsPerBeat, note.end);
                                         }
@@ -30617,10 +31213,14 @@ var beepbox = (function (exports) {
                 "limitRise": this.limitRise,
                 "limitRatio": this.limitRatio,
                 "compressionRatio": this.compressionRatio,
+                "songEq": this.eqFilter.toJsonObject(),
                 "layeredInstruments": this.layeredInstruments,
                 "patternInstruments": this.patternInstruments,
                 "channels": channelArray,
             };
+            for (let i = 0; i < Config.filterMorphCount - 1; i++) {
+                result["songEq" + i] = this.eqSubFilters[i];
+            }
             if (EditorConfig.customSamples != null && EditorConfig.customSamples.length > 0) {
                 result["customSamples"] = EditorConfig.customSamples;
             }
@@ -31062,6 +31662,20 @@ var beepbox = (function (exports) {
             else {
                 this.compressionRatio = 1.0;
             }
+            if (jsonObject["songEq"] != undefined) {
+                this.eqFilter.fromJsonObject(jsonObject["songEq"]);
+            }
+            else {
+                this.eqFilter.reset();
+            }
+            for (let i = 0; i < Config.filterMorphCount - 1; i++) {
+                if (jsonObject["songEq" + i]) {
+                    this.eqSubFilters[i] = jsonObject["songEq" + i];
+                }
+                else {
+                    this.eqSubFilters[i] = null;
+                }
+            }
             let maxInstruments = 1;
             let maxPatterns = 1;
             let maxBars = 1;
@@ -31210,7 +31824,7 @@ var beepbox = (function (exports) {
     Song._oldestUltraBoxVersion = 1;
     Song._latestUltraBoxVersion = 6;
     Song._oldestAbyssBoxVersion = 1;
-    Song._latestAbyssBoxVersion = 3;
+    Song._latestAbyssBoxVersion = 4;
     Song._variant = 0x61;
     class PickedString {
         constructor() {
@@ -31415,7 +32029,7 @@ var beepbox = (function (exports) {
             this._modifiedEnvelopeIndices = [];
             this._modifiedEnvelopeCount = 0;
             this.lowpassCutoffDecayVolumeCompensation = 1.0;
-            const length = 60;
+            const length = 62;
             for (let i = 0; i < length; i++) {
                 this.envelopeStarts[i] = 1.0;
                 this.envelopeEnds[i] = 1.0;
@@ -31886,6 +32500,10 @@ var beepbox = (function (exports) {
             this.reverbDelayPos = 0;
             this.reverbMult = 0.0;
             this.reverbMultDelta = 0.0;
+            this.reverbWetMult = 0.0;
+            this.reverbWetMultDelta = 0.0;
+            this.reverbDryMult = 0.0;
+            this.reverbDryMultDelta = 0.0;
             this.reverbShelfA1 = 0.0;
             this.reverbShelfB0 = 0.0;
             this.reverbShelfB1 = 0.0;
@@ -32316,8 +32934,8 @@ var beepbox = (function (exports) {
             let delayInputMultStart = 1.0;
             let delayInputMultEnd = 1.0;
             if (usesPanning) {
-                const panEnvelopeStart = envelopeStarts[58] * 2.0 - 1.0;
-                const panEnvelopeEnd = envelopeEnds[58] * 2.0 - 1.0;
+                const panEnvelopeStart = envelopeStarts[60] * 2.0 - 1.0;
+                const panEnvelopeEnd = envelopeEnds[60] * 2.0 - 1.0;
                 let usePanStart = instrument.pan;
                 let usePanEnd = instrument.pan;
                 if (synth.isModActive(Config.modulators.dictionary["pan"].index, channelIndex, instrumentIndex)) {
@@ -32533,6 +33151,30 @@ var beepbox = (function (exports) {
                 const reverbEnd = Math.min(1.0, Math.pow(reverbEnvelopeEnd * useReverbEnd / Config.reverbRange, 0.667)) * 0.425;
                 this.reverbMult = reverbStart;
                 this.reverbMultDelta = (reverbEnd - reverbStart) / roundedSamplesPerTick;
+                let reverbDrySettingStart = instrument.reverbDry;
+                let reverbDrySettingEnd = instrument.reverbDry;
+                let reverbWetSettingStart = instrument.reverbWet;
+                let reverbWetSettingEnd = instrument.reverbWet;
+                if (synth.isModActive(Config.modulators.dictionary["reverb wet"].index, channelIndex, instrumentIndex)) {
+                    reverbWetSettingStart = synth.getModValue(Config.modulators.dictionary["reverb wet"].index, channelIndex, instrumentIndex, false);
+                    reverbWetSettingEnd = synth.getModValue(Config.modulators.dictionary["reverb wet"].index, channelIndex, instrumentIndex, true);
+                }
+                if (synth.isModActive(Config.modulators.dictionary["reverb dry"].index, channelIndex, instrumentIndex)) {
+                    reverbDrySettingStart = synth.getModValue(Config.modulators.dictionary["reverb dry"].index, channelIndex, instrumentIndex, false);
+                    reverbDrySettingEnd = synth.getModValue(Config.modulators.dictionary["reverb dry"].index, channelIndex, instrumentIndex, true);
+                }
+                const reverbDryEnvelopeStart = envelopeStarts[59];
+                const reverbDryEnvelopeEnd = envelopeEnds[59];
+                const reverbDryStart = ((reverbDrySettingStart * reverbDryEnvelopeStart)) / Config.reverbDryRange;
+                const reverbDryEnd = ((reverbDrySettingEnd * reverbDryEnvelopeEnd)) / Config.reverbDryRange;
+                const reverbWetEnvelopeStart = envelopeStarts[58];
+                const reverbWetEnvelopeEnd = envelopeEnds[58];
+                const reverbWetStart = ((reverbWetSettingStart * reverbWetEnvelopeStart)) / Config.reverbWetRange;
+                const reverbWetEnd = ((reverbWetSettingEnd * reverbWetEnvelopeEnd)) / Config.reverbWetRange;
+                this.reverbWetMult = reverbWetStart;
+                this.reverbWetMultDelta = (reverbWetEnd - reverbWetStart) / roundedSamplesPerTick;
+                this.reverbDryMult = reverbDryStart;
+                this.reverbDryMultDelta = (reverbDryEnd - reverbDryStart) / roundedSamplesPerTick;
                 maxReverbMult = Math.max(reverbStart, reverbEnd);
                 const shelfRadians = 2.0 * Math.PI * Config.reverbShelfHz / synth.samplesPerSecond;
                 Synth.tempFilterStartCoefficients.highShelf1stOrder(shelfRadians, Config.reverbShelfGain);
@@ -32704,6 +33346,8 @@ var beepbox = (function (exports) {
         }
         initModFilters(song) {
             if (song != null) {
+                song.tmpEqFilterStart = song.eqFilter;
+                song.tmpEqFilterEnd = null;
                 for (let channelIndex = 0; channelIndex < song.getChannelCount(); channelIndex++) {
                     for (let instrumentIndex = 0; instrumentIndex < song.channels[channelIndex].instruments.length; instrumentIndex++) {
                         const instrument = song.channels[channelIndex].instruments[instrumentIndex];
@@ -32798,7 +33442,30 @@ var beepbox = (function (exports) {
                                 for (let mod = 0; mod < Config.modCount; mod++) {
                                     if (latestPinParts[mod] != null) {
                                         if (Config.modulators[instrument.modulators[mod]].forSong) {
+                                            const songFilterParam = instrument.modulators[mod] == Config.modulators.dictionary["song eq"].index;
                                             if (latestModTimes[instrument.modulators[mod]] == null || currentBar * Config.partsPerBeat * this.song.beatsPerBar + latestPinParts[mod] > latestModTimes[instrument.modulators[mod]]) {
+                                                if (songFilterParam) {
+                                                    let tgtSong = this.song;
+                                                    if (instrument.modFilterTypes[mod] == 0) {
+                                                        tgtSong.tmpEqFilterStart = tgtSong.eqSubFilters[latestPinValues[mod]];
+                                                    }
+                                                    else {
+                                                        for (let i = 0; i < Config.filterMorphCount; i++) {
+                                                            if (tgtSong.tmpEqFilterStart != null && tgtSong.tmpEqFilterStart == tgtSong.eqSubFilters[i]) {
+                                                                tgtSong.tmpEqFilterStart = new FilterSettings();
+                                                                tgtSong.tmpEqFilterStart.fromJsonObject(tgtSong.eqSubFilters[i].toJsonObject());
+                                                                i = Config.filterMorphCount;
+                                                            }
+                                                        }
+                                                        if (tgtSong.tmpEqFilterStart != null && Math.floor((instrument.modFilterTypes[mod] - 1) / 2) < tgtSong.tmpEqFilterStart.controlPointCount) {
+                                                            if (instrument.modFilterTypes[mod] % 2)
+                                                                tgtSong.tmpEqFilterStart.controlPoints[Math.floor((instrument.modFilterTypes[mod] - 1) / 2)].freq = latestPinValues[mod];
+                                                            else
+                                                                tgtSong.tmpEqFilterStart.controlPoints[Math.floor((instrument.modFilterTypes[mod] - 1) / 2)].gain = latestPinValues[mod];
+                                                        }
+                                                    }
+                                                    tgtSong.tmpEqFilterEnd = tgtSong.tmpEqFilterStart;
+                                                }
                                                 this.setModValue(latestPinValues[mod], latestPinValues[mod], instrument.modChannels[mod], instrument.modInstruments[mod], instrument.modulators[mod]);
                                                 latestModTimes[instrument.modulators[mod]] = currentBar * Config.partsPerBeat * this.song.beatsPerBar + latestPinParts[mod];
                                             }
@@ -33192,6 +33859,15 @@ var beepbox = (function (exports) {
             this.metronomePrevAmplitude = 0.0;
             this.metronomeFilter = 0.0;
             this.limit = 0.0;
+            this.songEqFilterVolume = 1.0;
+            this.songEqFilterVolumeDelta = 0.0;
+            this.songEqFiltersL = [];
+            this.songEqFiltersR = [];
+            this.songEqFilterCount = 0;
+            this.initialSongEqFilterInput1L = 0.0;
+            this.initialSongEqFilterInput2L = 0.0;
+            this.initialSongEqFilterInput1R = 0.0;
+            this.initialSongEqFilterInput2R = 0.0;
             this.tempMonoInstrumentSampleBuffer = null;
             this.audioCtx = null;
             this.scriptNode = null;
@@ -33294,6 +33970,8 @@ var beepbox = (function (exports) {
             if (this.song != null) {
                 this.song.inVolumeCap = 0.0;
                 this.song.outVolumeCap = 0.0;
+                this.song.tmpEqFilterStart = null;
+                this.song.tmpEqFilterEnd = null;
                 for (let channelIndex = 0; channelIndex < this.song.pitchChannelCount + this.song.noiseChannelCount; channelIndex++) {
                     this.modInsValues[channelIndex] = [];
                     this.nextModInsValues[channelIndex] = [];
@@ -33379,7 +34057,8 @@ var beepbox = (function (exports) {
                 }
             }
         }
-        isFilterModActive(forNoteFilter, channelIdx, instrumentIdx) {
+        isFilterModActive(forNoteFilter, channelIdx, instrumentIdx, forSong) {
+            var _a;
             const instrument = this.song.channels[channelIdx].instruments[instrumentIdx];
             if (forNoteFilter) {
                 if (instrument.noteFilterType)
@@ -33388,10 +34067,16 @@ var beepbox = (function (exports) {
                     return true;
             }
             else {
-                if (instrument.eqFilterType)
-                    return false;
-                if (instrument.tmpEqFilterEnd != null)
-                    return true;
+                if (forSong) {
+                    if (((_a = this === null || this === void 0 ? void 0 : this.song) === null || _a === void 0 ? void 0 : _a.tmpEqFilterEnd) != null)
+                        return true;
+                }
+                else {
+                    if (instrument.eqFilterType)
+                        return false;
+                    if (instrument.tmpEqFilterEnd != null)
+                        return true;
+                }
             }
             return false;
         }
@@ -33530,6 +34215,63 @@ var beepbox = (function (exports) {
                     this.loopRepeatCount--;
             }
         }
+        computeSongState(samplesPerTick) {
+            if (this.song == null)
+                return;
+            const roundedSamplesPerTick = Math.ceil(samplesPerTick);
+            const samplesPerSecond = this.samplesPerSecond;
+            let eqFilterVolume = 1.0;
+            if (this.song.eqFilterType) {
+                const eqFilterSettingsStart = this.song.eqFilter;
+                if (this.song.eqSubFilters[1] == null)
+                    this.song.eqSubFilters[1] = new FilterSettings();
+                this.song.eqSubFilters[1];
+                let startSimpleFreq = this.song.eqFilterSimpleCut;
+                let startSimpleGain = this.song.eqFilterSimplePeak;
+                this.song.eqFilterSimpleCut;
+                this.song.eqFilterSimplePeak;
+                let startPoint;
+                {
+                    eqFilterSettingsStart.convertLegacySettingsForSynth(startSimpleFreq, startSimpleGain, true);
+                    startPoint = eqFilterSettingsStart.controlPoints[0];
+                    startPoint.toCoefficients(Synth.tempFilterStartCoefficients, samplesPerSecond, 1.0, 1.0);
+                    if (this.songEqFiltersL.length < 1)
+                        this.songEqFiltersL[0] = new DynamicBiquadFilter();
+                    this.songEqFiltersL[0].loadCoefficientsWithGradient(Synth.tempFilterStartCoefficients, Synth.tempFilterStartCoefficients, 1.0 / roundedSamplesPerTick, startPoint.type == 0);
+                    if (this.songEqFiltersR.length < 1)
+                        this.songEqFiltersR[0] = new DynamicBiquadFilter();
+                    this.songEqFiltersR[0].loadCoefficientsWithGradient(Synth.tempFilterStartCoefficients, Synth.tempFilterStartCoefficients, 1.0 / roundedSamplesPerTick, startPoint.type == 0);
+                }
+                eqFilterVolume *= startPoint.getVolumeCompensationMult();
+                this.songEqFilterCount = 1;
+                eqFilterVolume = Math.min(3.0, eqFilterVolume);
+            }
+            else {
+                const eqFilterSettings = (this.song.tmpEqFilterStart != null) ? this.song.tmpEqFilterStart : this.song.eqFilter;
+                for (let i = 0; i < eqFilterSettings.controlPointCount; i++) {
+                    let startPoint = eqFilterSettings.controlPoints[i];
+                    let endPoint = (this.song.tmpEqFilterEnd != null && this.song.tmpEqFilterEnd.controlPoints[i] != null) ? this.song.tmpEqFilterEnd.controlPoints[i] : eqFilterSettings.controlPoints[i];
+                    if (startPoint.type != endPoint.type) {
+                        startPoint = endPoint;
+                    }
+                    startPoint.toCoefficients(Synth.tempFilterStartCoefficients, samplesPerSecond, 1.0, 1.0);
+                    endPoint.toCoefficients(Synth.tempFilterEndCoefficients, samplesPerSecond, 1.0, 1.0);
+                    if (this.songEqFiltersL.length <= i)
+                        this.songEqFiltersL[i] = new DynamicBiquadFilter();
+                    this.songEqFiltersL[i].loadCoefficientsWithGradient(Synth.tempFilterStartCoefficients, Synth.tempFilterEndCoefficients, 1.0 / roundedSamplesPerTick, startPoint.type == 0);
+                    if (this.songEqFiltersR.length <= i)
+                        this.songEqFiltersR[i] = new DynamicBiquadFilter();
+                    this.songEqFiltersR[i].loadCoefficientsWithGradient(Synth.tempFilterStartCoefficients, Synth.tempFilterEndCoefficients, 1.0 / roundedSamplesPerTick, startPoint.type == 0);
+                    eqFilterVolume *= startPoint.getVolumeCompensationMult();
+                }
+                this.songEqFilterCount = eqFilterSettings.controlPointCount;
+                eqFilterVolume = Math.min(3.0, eqFilterVolume);
+            }
+            let eqFilterVolumeStart = eqFilterVolume;
+            let eqFilterVolumeEnd = eqFilterVolume;
+            this.songEqFilterVolume = eqFilterVolumeStart;
+            this.songEqFilterVolumeDelta = (eqFilterVolumeEnd - eqFilterVolumeStart) / roundedSamplesPerTick;
+        }
         synthesize(outputDataL, outputDataR, outputBufferLength, playSong = true) {
             if (this.song == null) {
                 for (let i = 0; i < outputBufferLength; i++) {
@@ -33600,7 +34342,8 @@ var beepbox = (function (exports) {
                                 const instrument = channel.instruments[tone.instrumentIndex];
                                 let mod = Config.modCount - 1 - tone.pitches[0];
                                 if ((instrument.modulators[mod] == Config.modulators.dictionary["note filter"].index
-                                    || instrument.modulators[mod] == Config.modulators.dictionary["eq filter"].index)
+                                    || instrument.modulators[mod] == Config.modulators.dictionary["eq filter"].index
+                                    || instrument.modulators[mod] == Config.modulators.dictionary["song eq"].index)
                                     && instrument.modFilterTypes[mod] != null && instrument.modFilterTypes[mod] > 0) {
                                     continue;
                                 }
@@ -33619,7 +34362,8 @@ var beepbox = (function (exports) {
                                 const instrument = channel.instruments[tone.instrumentIndex];
                                 let mod = Config.modCount - 1 - tone.pitches[0];
                                 if ((instrument.modulators[mod] == Config.modulators.dictionary["note filter"].index
-                                    || instrument.modulators[mod] == Config.modulators.dictionary["eq filter"].index)
+                                    || instrument.modulators[mod] == Config.modulators.dictionary["eq filter"].index
+                                    || instrument.modulators[mod] == Config.modulators.dictionary["song eq"].index)
                                     && instrument.modFilterTypes[mod] != null && instrument.modFilterTypes[mod] > 0) {
                                     this.playModTone(song, channelIndex, samplesPerTick, bufferIndex, runLength, tone, false, false);
                                 }
@@ -33642,6 +34386,7 @@ var beepbox = (function (exports) {
                     this.skipBar();
                     continue;
                 }
+                this.computeSongState(samplesPerTick);
                 for (let channelIndex = 0; channelIndex < song.pitchChannelCount + song.noiseChannelCount; channelIndex++) {
                     const channel = song.channels[channelIndex];
                     const channelState = this.channels[channelIndex];
@@ -33742,6 +34487,55 @@ var beepbox = (function (exports) {
                     }
                 }
                 for (let i = bufferIndex; i < runEnd; i++) {
+                    {
+                        let filtersL = this.songEqFiltersL;
+                        let filtersR = this.songEqFiltersR;
+                        const filterCount = this.songEqFilterCount | 0;
+                        let initialFilterInput1L = +this.initialSongEqFilterInput1L;
+                        let initialFilterInput2L = +this.initialSongEqFilterInput2L;
+                        let initialFilterInput1R = +this.initialSongEqFilterInput1R;
+                        let initialFilterInput2R = +this.initialSongEqFilterInput2R;
+                        const applyFilters = Synth.applyFilters;
+                        let eqFilterVolume = +this.songEqFilterVolume;
+                        const eqFilterVolumeDelta = +this.songEqFilterVolumeDelta;
+                        const inputSampleL = outputDataL[i];
+                        let sampleL = inputSampleL;
+                        sampleL = applyFilters(sampleL, initialFilterInput1L, initialFilterInput2L, filterCount, filtersL);
+                        initialFilterInput2L = initialFilterInput1L;
+                        initialFilterInput1L = inputSampleL;
+                        sampleL *= eqFilterVolume;
+                        outputDataL[i] = sampleL;
+                        const inputSampleR = outputDataR[i];
+                        let sampleR = inputSampleR;
+                        sampleR = applyFilters(sampleR, initialFilterInput1R, initialFilterInput2R, filterCount, filtersR);
+                        initialFilterInput2R = initialFilterInput1R;
+                        initialFilterInput1R = inputSampleR;
+                        sampleR *= eqFilterVolume;
+                        outputDataR[i] = sampleR;
+                        eqFilterVolume += eqFilterVolumeDelta;
+                        this.sanitizeFilters(filtersL);
+                        if (!(initialFilterInput1L < 100) || !(initialFilterInput2L < 100)) {
+                            initialFilterInput1L = 0.0;
+                            initialFilterInput2L = 0.0;
+                        }
+                        if (Math.abs(initialFilterInput1L) < epsilon)
+                            initialFilterInput1L = 0.0;
+                        if (Math.abs(initialFilterInput2L) < epsilon)
+                            initialFilterInput2L = 0.0;
+                        this.initialSongEqFilterInput1L = initialFilterInput1L;
+                        this.initialSongEqFilterInput2L = initialFilterInput2L;
+                        this.sanitizeFilters(filtersR);
+                        if (!(initialFilterInput1R < 100) || !(initialFilterInput2R < 100)) {
+                            initialFilterInput1R = 0.0;
+                            initialFilterInput2R = 0.0;
+                        }
+                        if (Math.abs(initialFilterInput1R) < epsilon)
+                            initialFilterInput1R = 0.0;
+                        if (Math.abs(initialFilterInput2R) < epsilon)
+                            initialFilterInput2R = 0.0;
+                        this.initialSongEqFilterInput1R = initialFilterInput1R;
+                        this.initialSongEqFilterInput2R = initialFilterInput2R;
+                    }
                     const sampleL = outputDataL[i] * song.masterGain * song.masterGain;
                     const sampleR = outputDataR[i] * song.masterGain * song.masterGain;
                     const absL = sampleL < 0.0 ? -sampleL : sampleL;
@@ -33829,6 +34623,12 @@ var beepbox = (function (exports) {
                                 instrument.tmpNoteFilterStart = instrument.noteFilter;
                             }
                         }
+                    }
+                    if (song.tmpEqFilterEnd != null) {
+                        song.tmpEqFilterStart = song.tmpEqFilterEnd;
+                    }
+                    else {
+                        song.tmpEqFilterStart = song.eqFilter;
                     }
                     this.tick++;
                     this.tickSampleCountdown += samplesPerTick;
@@ -35121,8 +35921,8 @@ var beepbox = (function (exports) {
                     let pulseWidthModStart = basePulseWidth;
                     let pulseWidthModEnd = basePulseWidth;
                     if (this.isModActive(Config.modulators.dictionary["pulse width"].index, channelIndex, tone.instrumentIndex)) {
-                        pulseWidthModStart = (this.getModValue(Config.modulators.dictionary["pulse width"].index, channelIndex, tone.instrumentIndex, false)) / (Config.pulseWidthRange * 2);
-                        pulseWidthModEnd = (this.getModValue(Config.modulators.dictionary["pulse width"].index, channelIndex, tone.instrumentIndex, true)) / (Config.pulseWidthRange * 2);
+                        pulseWidthModStart = (this.getModValue(Config.modulators.dictionary["pulse width"].index, channelIndex, tone.instrumentIndex, false)) / (Config.pulseWidthRange);
+                        pulseWidthModEnd = (this.getModValue(Config.modulators.dictionary["pulse width"].index, channelIndex, tone.instrumentIndex, true)) / (Config.pulseWidthRange);
                     }
                     const pulseWidthStart = pulseWidthModStart * envelopeStarts[2];
                     const pulseWidthEnd = pulseWidthModEnd * envelopeEnds[2];
@@ -35266,8 +36066,8 @@ var beepbox = (function (exports) {
                     let pulseWidthModStart = basePulseWidth;
                     let pulseWidthModEnd = basePulseWidth;
                     if (this.isModActive(Config.modulators.dictionary["pulse width"].index, channelIndex, tone.instrumentIndex)) {
-                        pulseWidthModStart = (this.getModValue(Config.modulators.dictionary["pulse width"].index, channelIndex, tone.instrumentIndex, false)) / (Config.pulseWidthRange * 2);
-                        pulseWidthModEnd = (this.getModValue(Config.modulators.dictionary["pulse width"].index, channelIndex, tone.instrumentIndex, true)) / (Config.pulseWidthRange * 2);
+                        pulseWidthModStart = (this.getModValue(Config.modulators.dictionary["pulse width"].index, channelIndex, tone.instrumentIndex, false)) / (Config.pulseWidthRange);
+                        pulseWidthModEnd = (this.getModValue(Config.modulators.dictionary["pulse width"].index, channelIndex, tone.instrumentIndex, true)) / (Config.pulseWidthRange);
                     }
                     let pulseWidthStart = pulseWidthModStart * envelopeStarts[2];
                     let pulseWidthEnd = pulseWidthModEnd * envelopeEnds[2];
@@ -36356,6 +37156,10 @@ var beepbox = (function (exports) {
 				
 				let reverb = +instrumentState.reverbMult;
 				const reverbDelta = +instrumentState.reverbMultDelta;
+                let reverbWet = +instrumentState.reverbWetMult;
+                const reverbWetDelta = +instrumentState.reverbWetMultDelta;
+                let reverbDry = +instrumentState.reverbDryMult;
+                const reverbDryDelta = +instrumentState.reverbDryMultDelta;
 				
 				const reverbShelfA1 = +instrumentState.reverbShelfA1;
 				const reverbShelfB0 = +instrumentState.reverbShelfB0;
@@ -36651,34 +37455,59 @@ var beepbox = (function (exports) {
 					const reverbDelayPos1 = (reverbDelayPos +  3041) & reverbMask;
 					const reverbDelayPos2 = (reverbDelayPos +  6426) & reverbMask;
 					const reverbDelayPos3 = (reverbDelayPos + 10907) & reverbMask;
+
+                    let drySampleL = sampleL;
+                    let drySampleR = sampleR;
+
+                    let originalSampleL = sampleL;
+                    let originalSampleR = sampleR;
+
 					const reverbSample0 = (reverbDelayLine[reverbDelayPos]);
 					const reverbSample1 = reverbDelayLine[reverbDelayPos1];
 					const reverbSample2 = reverbDelayLine[reverbDelayPos2];
 					const reverbSample3 = reverbDelayLine[reverbDelayPos3];
+
 					const reverbTemp0 = -(reverbSample0 + sampleL) + reverbSample1;
 					const reverbTemp1 = -(reverbSample0 + sampleR) - reverbSample1;
+
 					const reverbTemp2 = -reverbSample2 + reverbSample3;
 					const reverbTemp3 = -reverbSample2 - reverbSample3;
+
 					const reverbShelfInput0 = (reverbTemp0 + reverbTemp2) * reverb;
 					const reverbShelfInput1 = (reverbTemp1 + reverbTemp3) * reverb;
 					const reverbShelfInput2 = (reverbTemp0 - reverbTemp2) * reverb;
 					const reverbShelfInput3 = (reverbTemp1 - reverbTemp3) * reverb;
+
 					reverbShelfSample0 = reverbShelfB0 * reverbShelfInput0 + reverbShelfB1 * reverbShelfPrevInput0 - reverbShelfA1 * reverbShelfSample0;
 					reverbShelfSample1 = reverbShelfB0 * reverbShelfInput1 + reverbShelfB1 * reverbShelfPrevInput1 - reverbShelfA1 * reverbShelfSample1;
 					reverbShelfSample2 = reverbShelfB0 * reverbShelfInput2 + reverbShelfB1 * reverbShelfPrevInput2 - reverbShelfA1 * reverbShelfSample2;
 					reverbShelfSample3 = reverbShelfB0 * reverbShelfInput3 + reverbShelfB1 * reverbShelfPrevInput3 - reverbShelfA1 * reverbShelfSample3;
+
 					reverbShelfPrevInput0 = reverbShelfInput0;
 					reverbShelfPrevInput1 = reverbShelfInput1;
 					reverbShelfPrevInput2 = reverbShelfInput2;
 					reverbShelfPrevInput3 = reverbShelfInput3;
+
 					reverbDelayLine[reverbDelayPos1] = reverbShelfSample0 * delayInputMult;
 					reverbDelayLine[reverbDelayPos2] = reverbShelfSample1 * delayInputMult;
 					reverbDelayLine[reverbDelayPos3] = reverbShelfSample2 * delayInputMult;
 					reverbDelayLine[reverbDelayPos ] = reverbShelfSample3 * delayInputMult;
+
+                    let wetSampleL = (sampleL + (reverbSample1 + reverbSample2 + reverbSample3)) - drySampleL;
+                    let wetSampleR = (sampleR + (reverbSample0 + reverbSample2 - reverbSample3)) - drySampleR;
+
+                    wetSampleL *= reverbWet;
+                    wetSampleR *= reverbWet;
+                    drySampleL *= reverbDry;
+                    drySampleR *= reverbDry;
+
 					reverbDelayPos = (reverbDelayPos + 1) & reverbMask;
-					sampleL += reverbSample1 + reverbSample2 + reverbSample3;
-					sampleR += reverbSample0 + reverbSample2 - reverbSample3;
-					reverb += reverbDelta;`;
+					sampleL = (drySampleL + wetSampleL);
+					sampleR = (drySampleR + wetSampleR);
+					reverb += reverbDelta;
+                    reverbWet += reverbWetDelta;
+                    reverbDry += reverbDryDelta;
+                    `;
                 }
                 effectsSource += `
 					
@@ -36827,6 +37656,8 @@ var beepbox = (function (exports) {
 				Synth.sanitizeDelayLine(reverbDelayLine, reverbDelayPos + 10907, reverbMask);
 				instrumentState.reverbDelayPos = reverbDelayPos;
 				instrumentState.reverbMult = reverb;
+                instrumentState.reverbWetMult = reverbWet;
+                instrumentState.reverbDryMult = reverbDry;
 				
 				if (!Number.isFinite(reverbShelfSample0) || Math.abs(reverbShelfSample0) < epsilon) reverbShelfSample0 = 0.0;
 				if (!Number.isFinite(reverbShelfSample1) || Math.abs(reverbShelfSample1) < epsilon) reverbShelfSample1 = 0.0;
@@ -37235,6 +38066,43 @@ var beepbox = (function (exports) {
                 }
                 else if (setting == Config.modulators.dictionary["next bar"].index) {
                     synth.wantToSkip = true;
+                }
+                else if (setting == Config.modulators.dictionary["song eq"].index) {
+                    const tgtSong = synth.song;
+                    let dotTarget = instrument.modFilterTypes[mod] | 0;
+                    if (dotTarget == 0) {
+                        let pinIdx = 0;
+                        const currentPart = synth.getTicksIntoBar() / Config.ticksPerPart;
+                        while (tone.note.start + tone.note.pins[pinIdx].time <= currentPart)
+                            pinIdx++;
+                        let lerpEndRatio = ((currentPart - tone.note.start + (roundedSamplesPerTick / (synth.getSamplesPerTick() * Config.ticksPerPart)) * Config.ticksPerPart) - tone.note.pins[pinIdx - 1].time) / (tone.note.pins[pinIdx].time - tone.note.pins[pinIdx - 1].time);
+                        if (tgtSong.eqSubFilters[tone.note.pins[pinIdx - 1].size] != null || tgtSong.eqSubFilters[tone.note.pins[pinIdx].size] != null) {
+                            tgtSong.tmpEqFilterEnd = FilterSettings.lerpFilters(tgtSong.eqSubFilters[tone.note.pins[pinIdx - 1].size], tgtSong.eqSubFilters[tone.note.pins[pinIdx].size], lerpEndRatio);
+                        }
+                        else {
+                            tgtSong.tmpEqFilterEnd = tgtSong.eqFilter;
+                        }
+                    }
+                    else {
+                        for (let i = 0; i < Config.filterMorphCount; i++) {
+                            if (tgtSong.tmpEqFilterEnd == tgtSong.eqSubFilters[i] && tgtSong.tmpEqFilterEnd != null) {
+                                tgtSong.tmpEqFilterEnd = new FilterSettings();
+                                tgtSong.tmpEqFilterEnd.fromJsonObject(tgtSong.eqSubFilters[i].toJsonObject());
+                            }
+                        }
+                        if (tgtSong.tmpEqFilterEnd == null) {
+                            tgtSong.tmpEqFilterEnd = new FilterSettings();
+                            tgtSong.tmpEqFilterEnd.fromJsonObject(tgtSong.eqFilter.toJsonObject());
+                        }
+                        if (tgtSong.tmpEqFilterEnd.controlPointCount > Math.floor((dotTarget - 1) / 2)) {
+                            if (dotTarget % 2) {
+                                tgtSong.tmpEqFilterEnd.controlPoints[Math.floor((dotTarget - 1) / 2)].freq = tone.expression + tone.expressionDelta;
+                            }
+                            else {
+                                tgtSong.tmpEqFilterEnd.controlPoints[Math.floor((dotTarget - 1) / 2)].gain = tone.expression + tone.expressionDelta;
+                            }
+                        }
+                    }
                 }
                 else if (setting == Config.modulators.dictionary["eq filter"].index) {
                     const tgtInstrument = synth.song.channels[instrument.modChannels[mod]].instruments[usedInstruments[instrumentIndex]];
@@ -38004,10 +38872,12 @@ var beepbox = (function (exports) {
 
     const { a, button, div, h1, input, canvas, form, label, h2 } = HTML;
     const { svg, circle, rect, path } = SVG;
+    const isInRecovery = window.self != window.top;
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|android|ipad|playbook|silk/i.test(navigator.userAgent);
     const colorTheme = getLocalStorage("colorTheme");
     const setSpLayout = getLocalStorage("spLayout");
-    SongPlayerLayout.setLayout(setSpLayout === null ? "classic" : setSpLayout);
+    if (!isInRecovery)
+        SongPlayerLayout.setLayout(setSpLayout === null ? "classic" : setSpLayout);
     let prevHash = null;
     let id = ((Math.random() * 0xffffffff) >>> 0).toString(16);
     let pauseButtonDisplayed = false;
@@ -38149,8 +39019,10 @@ var beepbox = (function (exports) {
     let draggingTimelineBar = false;
     const playButton = button({ style: "width: 100%; height: 100%; max-height: 50px;" });
     const playButtonContainer = div({ class: "playButtonContainer", style: "flex-shrink: 0; display: flex; padding: 2px; width: 80px; height: 100%; box-sizing: border-box; align-items: center;" }, playButton);
-    const loopIcon = path({ d: "M 4 2 L 4 0 L 7 3 L 4 6 L 4 4 Q 2 4 2 6 Q 2 8 4 8 L 4 10 Q 0 10 0 6 Q 0 2 4 2 M 8 10 L 8 12 L 5 9 L 8 6 L 8 8 Q 10 8 10 6 Q 10 4 8 4 L 8 2 Q 12 2 12 6 Q 12 10 8 10 z" });
-    const loopButton = button({ title: "loop", class: "spIcon loopIcon", style: "background: none; flex: 0 0 12px; margin: 0 3px; width: 12px; height: 12px; display: flex;" }, svg({ width: 12, height: 12, viewBox: "0 0 12 12" }, loopIcon));
+    const loopIcon = path({ d: "M4 2V4Q2 4 2 6T4 8v2Q0 10 0 6T4 2V4H8q2 0 2 2T8 8H4v2H8q4 0 4-4T8 2z", fill: ColorConfig.linkAccent });
+    const loopWholeSongIcon = path({ d: "M 4 2 L 4 0 L 7 3 L 4 6 L 4 4 Q 2 4 2 6 Q 2 8 4 8 L 4 10 Q 0 10 0 6 Q 0 2 4 2 M 8 10 L 8 12 L 5 9 L 8 6 L 8 8 Q 10 8 10 6 Q 10 4 8 4 L 8 2 Q 12 2 12 6 Q 12 10 8 10 z", fill: ColorConfig.linkAccent });
+    const noLoopIcon = path({ d: "M0 9v2H9v2l3-3L9 7V9ZM0 2V4H9V6l3-3L9 0V2", fill: ColorConfig.uiWidgetBackground });
+    const loopButton = button({ title: "loop", class: "spIcon loopIcon", style: "background: none; flex: 0 0 12px; margin: 0 3px; width: 12px; height: 12px; display: flex;" }, svg({ width: 12, height: 12, viewBox: "0 0 12 12" }, loopIcon, loopWholeSongIcon, noLoopIcon));
     const volumeIcon = svg({ class: "spIcon volumeIcon", style: "flex: 0 0 12px; margin: 0 1px; width: 12px; height: 12px;", viewBox: "0 0 12 12" }, path({ fill: ColorConfig.uiWidgetBackground, d: "M 1 9 L 1 3 L 4 3 L 7 0 L 7 12 L 4 9 L 1 9 M 9 3 Q 12 6 9 9 L 8 8 Q 10.5 6 8 4 L 9 3 z" }));
     const volumeSlider = input({ title: "volume", type: "range", value: 75, min: 0, max: 75, step: 1, style: "width: 12vw; max-width: 100px; margin: 0 1px;" });
     const zoomIcon = svg({ class: "spIcon zoomIcon", width: 12, height: 12, viewBox: "0 0 12 12" }, circle({ cx: "5", cy: "5", r: "4.5", "stroke-width": "1", stroke: "currentColor", fill: "none" }), path({ stroke: "currentColor", "stroke-width": "2", d: "M 8 8 L 11 11 M 5 2 L 5 8 M 2 5 L 8 5", fill: "none" }));
@@ -38190,6 +39062,14 @@ var beepbox = (function (exports) {
     songPlayerContainer.appendChild(pianoContainer);
     songPlayerContainer.appendChild(timelineBarContainer);
     songPlayerContainer.appendChild(div({ class: "control-center", id: "control-center", style: `flex-shrink: 0; height: 20vh; min-height: 22px; max-height: 70px; display: flex; align-items: center; grid-area: control-center;` }, div({ class: "control-center row", id: "row1", style: `display: flex; align-items: center;` }, playButtonContainer, loopButton, volumeIcon, volumeSlider, zoomButton, volumeBarContainerDiv, oscilascope.canvas), div({ class: "control-center row", id: "row2", style: `display: flex; align-items: center;` }, titleText, layoutStuffs, editLink, copyLink, shareLink, shortenSongLink), div({ class: "control-center row", id: "row3", style: `display: flex; align-items: center;` })));
+    const elementsToHide = [loopButton, volumeIcon, volumeSlider, zoomButton, volumeBarContainerDiv, oscilascope.canvas, titleText, layoutStuffs, copyLink];
+    let hasHidden = false;
+    if (isInRecovery && !hasHidden) {
+        for (let i = 0; i < elementsToHide.length; i++) {
+            elementsToHide[i].style.display = "none";
+        }
+        hasHidden = true;
+    }
     document.body.appendChild(songPlayerContainer);
     songPlayerContainer.appendChild(promptContainer);
     promptContainer.appendChild(layoutContainer);
@@ -38250,7 +39130,7 @@ var beepbox = (function (exports) {
         editLink.href = "../#" + updatedSongString;
     }
     function hashUpdatedExternally() {
-        var _a;
+        var _a, _b;
         let myHash = location.hash;
         if (prevHash == myHash || myHash == "")
             return;
@@ -38272,21 +39152,23 @@ var beepbox = (function (exports) {
                             if (synth.song != null) {
                                 if (synth.song.setSongTheme != null) {
                                     if (((_a = synth.song) === null || _a === void 0 ? void 0 : _a.setSongTheme) == "none") {
-                                        ColorConfig.setTheme(colorTheme === null ? "AbyssBox Classic" : colorTheme);
+                                        ColorConfig.setTheme(colorTheme === null ? "AbyssBox 0.8" : colorTheme);
                                     }
                                     else {
                                         ColorConfig.setTheme(synth.song.setSongTheme);
                                     }
                                 }
                                 else {
-                                    ColorConfig.setTheme(colorTheme === null ? "AbyssBox Classic" : colorTheme);
+                                    ColorConfig.setTheme(colorTheme === null ? "AbyssBox 0.8" : colorTheme);
                                 }
                             }
                         }
                         break;
                     case "loop":
-                        synth.loopRepeatCount = (value != "1") ? 0 : -1;
-                        renderLoopIcon();
+                        if (((_b = synth.song) === null || _b === void 0 ? void 0 : _b.loopType) != undefined) {
+                            synth.loopRepeatCount = (synth.song.loopType == 3) ? 0 : -1;
+                            renderLoopIcon();
+                        }
                         break;
                 }
             }
@@ -38301,8 +39183,33 @@ var beepbox = (function (exports) {
         renderTimeline();
     }
     function shortenSongPlayerUrl() {
-        let shortenerStrategy = "https://tinyurl.com/api-create.php?url=";
-        window.open(shortenerStrategy + encodeURIComponent(new URL("#song=" + synth.song.toBase64String(), location.href).href));
+        let localShortenerStrategy = window.localStorage.getItem("shortenerStrategySelect");
+        if (localShortenerStrategy == "tinyurl") {
+            window.localStorage.setItem("shortenerStrategySelect", "wackybox");
+            localShortenerStrategy = "wackybox";
+        }
+        const shorteners = {
+            "wackybox": {
+                maxLength: 128000,
+                altName: "wackybox.org",
+                encode: encodeURIComponent,
+                shortenerStrategy: "https://wackybox.org/api-create.php?url="
+            },
+            "isgd": {
+                maxLength: 5000,
+                altName: "is.gd",
+                encode: encodeURIComponent,
+                shortenerStrategy: "https://is.gd/create.php?format=simple&url="
+            }
+        };
+        const shortener = shorteners[localShortenerStrategy || "wackybox"];
+        if (synth.song == null)
+            return;
+        const uri = shortener.encode(new URL("#" + synth.song.toBase64String(), location.href).href);
+        const uriLength = uri.length;
+        if (uriLength > shortener.maxLength)
+            return;
+        window.open(shortener.shortenerStrategy + uri);
     }
     let pauseIfAnotherPlayerStartsHandle = null;
     function pauseIfAnotherPlayerStarts() {
@@ -38403,11 +39310,15 @@ var beepbox = (function (exports) {
         renderTimeline();
     }
     function onToggleLoop() {
-        if (synth.loopRepeatCount == -1) {
-            synth.loopRepeatCount = 0;
-        }
-        else {
-            synth.loopRepeatCount = -1;
+        var _a;
+        if (((_a = synth.song) === null || _a === void 0 ? void 0 : _a.loopType) != undefined) {
+            if (synth.song.loopType < 3) {
+                synth.song.loopType++;
+            }
+            else {
+                synth.song.loopType = 1;
+                synth.loopRepeatCount = -1;
+            }
         }
         renderLoopIcon();
     }
@@ -38756,7 +39667,14 @@ var beepbox = (function (exports) {
         pauseButtonDisplayed = synth.playing;
     }
     function renderLoopIcon() {
-        loopIcon.setAttribute("fill", (synth.loopRepeatCount == -1) ? ColorConfig.linkAccent : ColorConfig.uiWidgetBackground);
+        var _a;
+        if (((_a = synth.song) === null || _a === void 0 ? void 0 : _a.loopType) != undefined) {
+            loopIcon.setAttribute("display", (synth.song.loopType == 1) ? "" : "none");
+            loopWholeSongIcon.setAttribute("display", (synth.song.loopType == 2) ? "" : "none");
+            noLoopIcon.setAttribute("display", (synth.song.loopType == 3) ? "" : "none");
+            if (synth.song.loopType == 3)
+                synth.loopRepeatCount = 0;
+        }
     }
     function renderZoomIcon() {
         zoomIcon.style.color = zoomEnabled ? ColorConfig.linkAccent : ColorConfig.uiWidgetBackground;
