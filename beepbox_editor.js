@@ -64978,7 +64978,7 @@ You should be redirected to the song at:<br /><br />
                     const getInstType = instrument.type;
                     const advLoopingEnabled = instrument.isUsingAdvancedLoopControls && getInstType == 0;
                     this._chipWaveSelectRow.style.display = getInstType == 0 ? "" : "none";
-                    this._useChipWaveAdvancedLoopControlsRow.style.display = advLoopingEnabled ? "" : "none";
+                    this._useChipWaveAdvancedLoopControlsRow.style.display = getInstType == 0 ? "" : "none";
                     this._chipWaveLoopModeSelectRow.style.display = advLoopingEnabled ? "" : "none";
                     this._chipWaveLoopStartRow.style.display = advLoopingEnabled ? "" : "none";
                     this._chipWaveLoopEndRow.style.display = advLoopingEnabled ? "" : "none";
